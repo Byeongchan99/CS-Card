@@ -1,7 +1,7 @@
 ---
 title: 캐파시티 지정이 GC 부담을 줄이는 이유
 tags: [자료구조, 유니티, GC, CSharp]
-related: [[List 리사이즈가 힙에 남기는 쓰레기]], [[GC 스파이크와 프레임 예산]]
+related: ["List 리사이즈가 힙에 남기는 쓰레기", "GC 스파이크와 프레임 예산", "List Clear의 내부 동작", "유니티 GC의 내부 동작", "List의 Add가 상환 O(1)인 이유"]
 parent:
 date: 2026-07-18
 result: 부분

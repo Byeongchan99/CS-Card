@@ -1,7 +1,7 @@
 ---
 title: GC 스파이크와 프레임 예산
 tags: [자료구조, 유니티, GC, 성능]
-related: [[List 리사이즈가 힙에 남기는 쓰레기]], [[유니티 GC의 내부 동작]]
+related: ["List 리사이즈가 힙에 남기는 쓰레기", "유니티 GC의 내부 동작", "캐파시티 지정이 GC 부담을 줄이는 이유", "Boehm GC가 객체를 이동시키지 못하는 이유", "List Clear의 내부 동작"]
 parent:
 date: 2026-07-18
 result: 부분

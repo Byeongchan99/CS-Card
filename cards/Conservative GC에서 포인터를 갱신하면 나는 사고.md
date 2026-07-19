@@ -1,8 +1,8 @@
 ---
 title: Conservative GC가 객체 이동 시 포인터를 갱신하면 생기는 사고
 tags: [유니티, GC, 메모리]
-related: []
-parent: [[Boehm GC가 객체를 이동시키지 못하는 이유]]
+related: ["Boehm GC의 blacklisting은 어떻게 오식별 피해를 줄이는가", "Conservative GC에서 죽은 객체가 잘못 살아남는 현상", "List 리사이즈가 힙에 남기는 쓰레기", "유니티 GC의 내부 동작", "GC 스파이크와 프레임 예산"]
+parent: "Boehm GC가 객체를 이동시키지 못하는 이유"
 date: 2026-07-19
 result: 맞음
 status: 완성

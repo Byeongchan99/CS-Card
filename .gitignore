@@ -6,5 +6,3 @@ tsconfig.tsbuildinfo
 .obsidian
 .quartz-cache
 private/
-content/cards/
-content/quiz-data.json

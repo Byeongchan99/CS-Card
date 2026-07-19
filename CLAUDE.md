@@ -11,7 +11,9 @@ CS 면접 준비용 질문 카드 저장소. 카드는 claude.ai 프로젝트의
 - `content/` — 사이트 전용 페이지: 홈 `index.md`, 랜덤 퀴즈 `quiz.md`.
   카드는 빌드 시 `scripts/sync-content.mjs`가 `content/cards/`로 복사하면서
   상위 질문 링크와 "연관 카드" 섹션을 주입한다(원본 카드는 수정하지 않음).
-  `content/cards/`와 `content/quiz-data.json`은 생성물이라 gitignore됨.
+  `content/cards/`와 `content/quiz-data.json`은 CI 빌드 중에만 생성되는 산출물이다.
+  로컬에 생기더라도 커밋하지 말 것. 단 .gitignore에는 넣지 않는다 —
+  Quartz의 파일 수집이 .gitignore를 존중해 빌드에서도 제외해버리기 때문.
 - `.github/workflows/deploy.yml` — main 푸시 시 GitHub Pages 자동 빌드·배포.
   로컬에는 Node가 없으므로 빌드 검증은 GitHub Actions로 한다.
 

@@ -7,7 +7,13 @@ CS 면접 준비용 질문 카드 저장소. 카드는 claude.ai 프로젝트의
 - `cards/` — 질문 카드 (.md). 카드 하나 = 질문 하나.
 - `index.md` — 카드 인덱스. 정비 시 자동 재생성되며, claude.ai 프로젝트 지식에
   연동되어 공부 세션의 중복 출제 방지에 사용된다.
-- 사이트 소스는 Quartz 구축 시 추가.
+- `quartz/`, `quartz.config.ts`, `quartz.layout.ts` — Quartz 4 사이트 소스(vendored).
+- `content/` — 사이트 전용 페이지: 홈 `index.md`, 랜덤 퀴즈 `quiz.md`.
+  카드는 빌드 시 `scripts/sync-content.mjs`가 `content/cards/`로 복사하면서
+  상위 질문 링크와 "연관 카드" 섹션을 주입한다(원본 카드는 수정하지 않음).
+  `content/cards/`와 `content/quiz-data.json`은 생성물이라 gitignore됨.
+- `.github/workflows/deploy.yml` — main 푸시 시 GitHub Pages 자동 빌드·배포.
+  로컬에는 Node가 없으므로 빌드 검증은 GitHub Actions로 한다.
 
 ## 카드 형식
 frontmatter 필드:

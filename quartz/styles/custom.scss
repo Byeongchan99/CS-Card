@@ -1,3 +1,135 @@
 @use "./base.scss";
 
-// put your custom CSS here!
+// ================================
+// 1a 레이아웃 개선 — 여백/가독성 + 홈 카테고리 그리드
+// ================================
+
+// 본문 한 줄 길이 제한 + 여백 확대 (읽기 편하게)
+.page > #quartz-body .center {
+  & > .page-header,
+  & > article,
+  & > .page-footer {
+    max-width: 46rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+article {
+  line-height: 1.75;
+}
+
+p,
+li {
+  margin: 0.9rem 0;
+}
+
+// 사이드바 상단 여백 살짝 확대
+.page > #quartz-body .sidebar.left,
+.page > #quartz-body .sidebar.right {
+  padding-top: 5rem;
+}
+
+// ================================
+// 홈페이지 전용 (body[data-slug="index"])
+// ================================
+body[data-slug="index"] {
+  article > h1 {
+    font-size: 2.1rem;
+  }
+
+  // 랜덤퀴즈 / 전체카드 / 태그별보기 목록 → 알약 버튼
+  article > ul:first-of-type {
+    display: flex;
+    gap: 0.6rem;
+    list-style: none;
+    padding: 0;
+    margin: 1.4rem 0 2.2rem;
+    flex-wrap: wrap;
+
+    li {
+      margin: 0;
+    }
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1.1rem;
+      border-radius: 999px;
+      border: 1px solid var(--lightgray);
+      background: var(--light);
+      font-weight: 600;
+      font-size: 0.92rem;
+
+      &:hover {
+        background: var(--highlight);
+        color: var(--dark);
+      }
+    }
+
+    li:first-child a {
+      background: var(--secondary);
+      border-color: var(--secondary);
+      color: var(--light);
+
+      &:hover {
+        color: var(--light);
+        opacity: 0.9;
+      }
+    }
+  }
+
+  // 카테고리 카드 그리드
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.9rem;
+    margin: 1.6rem 0 2.2rem;
+
+    @media all and (max-width: 800px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .category-card {
+    display: block;
+    border: 1px solid var(--lightgray);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    background: var(--light);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .accent {
+      height: 4px;
+      background: var(--tertiary);
+    }
+
+    &:nth-child(3n + 2) .accent {
+      background: var(--secondary);
+    }
+
+    .body {
+      padding: 0.9rem 1rem;
+    }
+
+    .name {
+      font-family: var(--headerFont);
+      font-weight: 600;
+      font-size: 0.98rem;
+      color: var(--dark);
+    }
+
+    .count {
+      font-family: var(--codeFont);
+      font-size: 0.78rem;
+      color: var(--gray);
+      margin-top: 0.2rem;
+    }
+  }
+}

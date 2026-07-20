@@ -10,14 +10,8 @@ CS 면접 준비용 질문 카드 저장소입니다. 공부 세션에서 만든
 
 ## 카테고리
 
-<!-- 카드가 추가/삭제되면 아래 개수를 수동으로 맞춰주세요 -->
-<div class="category-grid">
-  <a class="category-card" href="./tags/GC"><div class="accent"></div><div class="body"><div class="name">GC</div><div class="count">11개 카드</div></div></a>
-  <a class="category-card" href="./tags/유니티"><div class="accent"></div><div class="body"><div class="name">유니티</div><div class="count">10개 카드</div></div></a>
-  <a class="category-card" href="./tags/메모리"><div class="accent"></div><div class="body"><div class="name">메모리</div><div class="count">7개 카드</div></div></a>
-  <a class="category-card" href="./tags/자료구조"><div class="accent"></div><div class="body"><div class="name">자료구조</div><div class="count">6개 카드</div></div></a>
-  <a class="category-card" href="./tags/CSharp"><div class="accent"></div><div class="body"><div class="name">CSharp</div><div class="count">3개 카드</div></div></a>
-  <a class="category-card" href="./tags/상환분석"><div class="accent"></div><div class="body"><div class="name">상환분석</div><div class="count">2개 카드</div></div></a>
-</div>
+<!-- CATEGORIES:START -->
+<!-- 이 영역은 scripts/sync-content.mjs가 빌드 시 태그별 카드 수로 자동 생성합니다. 직접 수정하지 마세요. -->
+<!-- CATEGORIES:END -->
 
 왼쪽의 탐색기와 검색으로도 카드를 찾을 수 있습니다.

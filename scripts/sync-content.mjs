@@ -2,6 +2,8 @@
 // - parent가 있는 카드: 본문 상단에 상위 질문 링크 주입
 // - related가 있는 카드: 본문 하단에 "연관 카드" 섹션 주입
 // - 퀴즈 풀(status 완성 && parent 없음)로 content/quiz-data.json 생성
+// - content/index.md의 CATEGORIES 마커 영역에 태그별 카드 수 그리드를 주입
+//   (빌드 시에만 채워지며, 커밋된 index.md에는 빈 마커만 남는다)
 // 원본 cards/*.md는 절대 수정하지 않는다.
 import fs from "node:fs"
 import path from "node:path"
@@ -96,4 +98,40 @@ for (const card of cards) {
 }
 
 fs.writeFileSync(path.join(contentDir, "quiz-data.json"), JSON.stringify(quizPool, null, 2))
-console.log(`synced ${cards.length} cards → content/cards, quiz pool: ${quizPool.length}`)
+
+// 홈 카테고리 그리드 자동 생성: 태그별 카드 수를 세어 index.md의 마커 영역에 주입
+const tagCounts = new Map()
+for (const card of cards) {
+  const tags = Array.isArray(card.fm.tags) ? card.fm.tags : []
+  for (const tag of tags) {
+    const t = String(tag).trim()
+    if (t) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1)
+  }
+}
+
+const sortedTags = [...tagCounts.entries()].sort(
+  (a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "ko"),
+)
+
+const cardsHtml = sortedTags
+  .map(
+    ([tag, count]) =>
+      `  <a class="category-card" href="./tags/${sluggify(tag)}">` +
+      `<div class="accent"></div><div class="body">` +
+      `<div class="name">${tag}</div><div class="count">${count}개 카드</div></div></a>`,
+  )
+  .join("\n")
+
+const grid = `<!-- CATEGORIES:START -->\n<div class="category-grid">\n${cardsHtml}\n</div>\n<!-- CATEGORIES:END -->`
+const indexPath = path.join(contentDir, "index.md")
+const indexRaw = fs.readFileSync(indexPath, "utf8")
+const marker = /<!-- CATEGORIES:START -->[\s\S]*?<!-- CATEGORIES:END -->/
+if (marker.test(indexRaw)) {
+  fs.writeFileSync(indexPath, indexRaw.replace(marker, grid))
+} else {
+  console.warn("index.md에 CATEGORIES 마커가 없어 카테고리 그리드를 주입하지 못했습니다")
+}
+
+console.log(
+  `synced ${cards.length} cards → content/cards, quiz pool: ${quizPool.length}, categories: ${sortedTags.length}`,
+)

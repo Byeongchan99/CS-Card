@@ -1,7 +1,7 @@
 ---
 title: Destroy를 호출해도 C# 래퍼 객체가 힙에 남아있는 이유
 tags: [유니티, GC, 메모리]
-related: [[Instantiate와 Destroy는 각각 왜 비싼 연산인가]]
+related: ["Instantiate와 Destroy는 각각 왜 비싼 연산인가", "오브젝트 풀링은 무엇이고 어떻게 GC 부담을 줄이는가", "유니티가 쓰는 GC는 무엇이고 닷넷 표준 GC와 구조적으로 어떻게 다른가", "유니티의 fake null은 무엇이고 왜 발생하는가", "Conservative GC에서 죽은 객체가 잘못 살아남는 현상과 어떤 객체가 취약한가"]
 parent:
 date: 2026-07-20
 result: 맞음

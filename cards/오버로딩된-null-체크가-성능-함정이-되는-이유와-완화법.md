@@ -1,7 +1,7 @@
 ---
 title: 오버로딩된 == 의 null 체크가 성능 함정이 되는 이유와 완화법
 tags: [유니티, CSharp, 성능]
-related: [[유니티의 fake null은 무엇이고 왜 발생하는가]]
+related: ["유니티의 fake null은 무엇이고 왜 발생하는가", "네이티브 객체의 생존 여부를 C# bool로 캐싱할 때의 함정", "오브젝트 풀링은 무엇이고 어떻게 GC 부담을 줄이는가", "Instantiate와 Destroy는 각각 왜 비싼 연산인가", "풀에서 꺼낸 오브젝트의 상태 리셋은 어떻게 하는가"]
 parent:
 date: 2026-07-20
 result: 부분

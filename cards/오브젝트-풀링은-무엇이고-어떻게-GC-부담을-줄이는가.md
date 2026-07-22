@@ -1,5 +1,6 @@
 ---
 title: 오브젝트 풀링은 무엇이고 어떻게 GC 부담을 줄이는가
+aliases: ["오브젝트 풀링", "cards/오브젝트 풀링"]
 tags: [유니티, GC, 성능, 메모리]
 related: ["유니티가 쓰는 GC는 무엇이고 닷넷 표준 GC와 구조적으로 어떻게 다른가", "Instantiate와 Destroy는 각각 왜 비싼 연산인가", "Destroy를 호출해도 C# 래퍼 객체가 힙에 남아있는 이유", "풀에서 꺼낸 오브젝트의 상태 리셋은 어떻게 하는가", "UnityEngine.Pool의 ObjectPool과 그 변형들은 무엇인가"]
 parent:

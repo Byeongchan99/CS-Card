@@ -54,13 +54,34 @@ const cards = files.map((file) => {
 })
 
 const byBase = new Set(cards.map((c) => c.base))
-const byTitle = new Map(cards.map((c) => [String(c.fm.title ?? "").trim(), c.base]))
+
+// 제목 → 파일명. 제목이 겹치면 완성 카드가 이기도록 완성을 뒤에 놓아 덮어쓴다
+// (스텁이 같은 제목의 실제 카드를 가리는 것을 방지)
+const byTitle = new Map()
+for (const c of [...cards].sort(
+  (a, b) => (a.fm.status === "완성" ? 1 : 0) - (b.fm.status === "완성" ? 1 : 0),
+)) {
+  const t = String(c.fm.title ?? "").trim()
+  if (t) byTitle.set(t, c.base)
+}
 
 // parent·related 값(제목 또는 파일명)을 실제 카드 파일명으로 해석
 function resolveName(name) {
   const n = String(name).trim()
   if (byBase.has(n)) return n
   return byTitle.get(n) ?? null
+}
+
+// 본문 위키링크가 파일명이 아닌 "제목"으로 적혀 있으면 파일명으로 바꿔 링크가 깨지지 않게 한다.
+// 제목에 #, ==, . 같은 문자가 있으면 Quartz가 파일명으로 해석하지 못하기 때문.
+// 원본 카드는 건드리지 않고 content/ 사본에서만 교정한다.
+function rewriteWikilinks(text) {
+  return text.replace(/\[\[([^\]]+)\]\]/g, (full, inner) => {
+    const trimmed = inner.trim()
+    if (byBase.has(trimmed)) return full // 이미 파일명이면 그대로
+    const target = byTitle.get(trimmed)
+    return target ? `[[${target}]]` : full
+  })
 }
 
 fs.rmSync(outDir, { recursive: true, force: true })
@@ -70,7 +91,7 @@ const quizPool = []
 for (const card of cards) {
   const { head, body } = splitFrontmatter(card.raw)
   const parent = typeof card.fm.parent === "string" ? card.fm.parent.trim() : ""
-  let newBody = body
+  let newBody = rewriteWikilinks(body)
 
   if (parent) {
     const target = resolveName(parent)

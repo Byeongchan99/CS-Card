@@ -14,7 +14,7 @@ Conservative GC가 객체 이동 시 포인터를 갱신하면 생기는 사고 
 Conservative GC에서 죽은 객체가 잘못 살아남는 현상과 어떤 객체가 취약한가 | 유니티 | GC, 메모리 | 부분 | 완성
 Destroy를 호출해도 C# 래퍼 객체가 힙에 남아있는 이유 | 유니티 | GC, 메모리 | 맞음 | 완성
 Instantiate와 Destroy는 각각 왜 비싼 연산인가 | 유니티 | GC, 메모리, 성능 | 맞음 | 완성
-UnityEngine.Pool의 ObjectPool과 그 변형들은 무엇인가 | 유니티 | 성능, 메모리 | 모름 | 스텁
+UnityEngine.Pool의 ObjectPool과 그 변형들은 무엇인가 | 유니티 | 성능, 메모리 | 틀림 | 완성
 네이티브 객체의 생존 여부를 C# bool로 캐싱할 때의 함정 | 유니티 | CSharp, 성능 | 부분 | 완성
 오버로딩된 == 의 null 체크가 성능 함정이 되는 이유와 완화법 | 유니티 | CSharp, 성능 | 부분 | 완성
 오브젝트 풀링은 무엇이고 어떻게 GC 부담을 줄이는가 | 유니티 | GC, 성능, 메모리 | 부분 | 완성

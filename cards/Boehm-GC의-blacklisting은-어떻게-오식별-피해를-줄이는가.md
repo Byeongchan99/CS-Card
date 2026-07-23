@@ -1,7 +1,7 @@
 ---
 title: Boehm GC의 blacklisting은 어떻게 오식별 피해를 줄이는가
 tags: [유니티, GC, 메모리]
-related: [[Conservative GC에서 죽은 객체가 잘못 살아남는 현상과 어떤 객체가 취약한가], [Boehm GC가 객체를 이동(압축)시키지 못하는 구조적 이유], [Conservative GC가 객체 이동 시 포인터를 갱신하면 생기는 사고]]
+related: ["Conservative GC에서 죽은 객체가 잘못 살아남는 현상과 어떤 객체가 취약한가", "Boehm GC가 객체를 이동(압축)시키지 못하는 구조적 이유", "Conservative GC가 객체 이동 시 포인터를 갱신하면 생기는 사고", "유니티가 쓰는 GC는 무엇이고 닷넷 표준 GC와 구조적으로 어떻게 다른가", "List 리사이즈가 힙에 남기는 쓰레기"]
 parent:
 date: 2026-07-22
 result: 부분

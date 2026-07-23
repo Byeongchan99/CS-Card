@@ -1,7 +1,7 @@
 ---
 title: 유니티에서 IL2CPP는 GC에 어떤 영향을 주는가
 tags: [유니티, GC, IL2CPP]
-related: ["유니티 GC의 내부 동작", "Boehm GC가 객체를 이동시키지 못하는 이유", "Conservative GC에서 죽은 객체가 잘못 살아남는 현상", "Conservative GC에서 포인터를 갱신하면 나는 사고", "GC 스파이크와 프레임 예산"]
+related: ["유니티-GC의-내부-동작", "Boehm-GC가-객체를-이동시키지-못하는-이유", "Conservative-GC에서-죽은-객체가-잘못-살아남는-현상", "Conservative-GC에서-포인터를-갱신하면-나는-사고", "GC 스파이크와 프레임 예산"]
 parent:
 date: 2026-07-19
 result: 모름

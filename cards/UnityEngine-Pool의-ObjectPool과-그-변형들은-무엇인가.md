@@ -30,9 +30,3 @@ ListPool<T>, DictionaryPool<K,V>, HashSetPool<T>는 CollectionPool 기반의 컬
 - 풀이 부족하면 크기를 2배로 늘린다는 것은 자작 풀이나 List의 백킹 배열 성장 방식이지 ObjectPool의 동작이 아니다.
 - 컬렉션 풀과 GenericPool은 static 기반이라 에디터에서 도메인 리로드 비활성화를 쓰면 풀 내용이 플레이 세션을 넘어 남는다.
 - 이 풀들은 스레드 안전하지 않다. 메인 스레드 전용이다.
-
-## 꼬리 질문
-- [[고전적인 오브젝트 풀과 UnityEngine.Pool.ObjectPool은 설계 목적이 어떻게 다른가]]
-- [[오브젝트 풀의 maxSize는 무엇을 근거로 정해야 하는가]]
-- [[ObjectPool의 defaultCapacity는 무엇을 정하는 값인가]]
-- [[컬렉션 풀은 언제 쓰고 무엇을 주의해야 하는가]]

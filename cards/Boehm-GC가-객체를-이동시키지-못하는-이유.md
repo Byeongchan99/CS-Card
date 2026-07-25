@@ -31,4 +31,3 @@ Boehm은 conservative GC라 메모리의 어떤 값이 진짜 포인터인지 �
 
 ## 꼬리 질문
 - [[Conservative GC에서 포인터를 갱신하면 나는 사고]]
-- [[캐파시티 지정이 GC 부담을 줄이는 이유]]

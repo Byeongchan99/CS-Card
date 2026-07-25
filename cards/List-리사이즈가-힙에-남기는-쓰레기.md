@@ -2,7 +2,7 @@
 title: List 리사이즈가 힙에 남기는 쓰레기
 tags: [자료구조, GC, 메모리]
 related: ["List의 Add가 상환 O(1)인 이유", "캐파시티 지정이 GC 부담을 줄이는 이유", "GC 스파이크와 프레임 예산", "유니티-GC의-내부-동작", "Boehm-GC가-객체를-이동시키지-못하는-이유"]
-parent:
+parent: "List의 Add가 상환 O(1)인 이유"
 date: 2026-07-18
 result: 부분
 status: 완성

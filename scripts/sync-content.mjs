@@ -120,14 +120,13 @@ for (const card of cards) {
 
 fs.writeFileSync(path.join(contentDir, "quiz-data.json"), JSON.stringify(quizPool, null, 2))
 
-// 홈 카테고리 그리드 자동 생성: 태그별 카드 수를 세어 index.md의 마커 영역에 주입
+// 홈 카테고리 그리드 자동 생성: 대분류(첫 태그)별 카드 수를 세어 index.md의 마커 영역에 주입
+// (세부태그는 그리드에서 제외 — Quartz 태그 페이지로 접근)
 const tagCounts = new Map()
 for (const card of cards) {
   const tags = Array.isArray(card.fm.tags) ? card.fm.tags : []
-  for (const tag of tags) {
-    const t = String(tag).trim()
-    if (t) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1)
-  }
+  const dae = tags.length ? String(tags[0]).trim() : ""
+  if (dae) tagCounts.set(dae, (tagCounts.get(dae) ?? 0) + 1)
 }
 
 const sortedTags = [...tagCounts.entries()].sort(

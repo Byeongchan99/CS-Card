@@ -157,6 +157,33 @@ button.desktop-explorer {
     margin-left: 6px;
     padding-left: 0.8rem;
     border-left: 1px solid var(--lightgray);
+    opacity: 0;
+    transition: opacity 0.25s ease-in-out;
+  }
+
+  .folder-outer.open > ul {
+    opacity: 1;
+  }
+}
+
+// 목록 전체 펼침/접힘을 부드럽게 (데스크탑) — 모바일은 기존 슬라이드 애니메이션 유지
+@media all and not ($mobile) {
+  .explorer > .explorer-content {
+    max-height: 70vh;
+    opacity: 1;
+    transition:
+      max-height 0.3s ease-in-out,
+      opacity 0.2s ease-in-out;
+  }
+
+  .explorer.collapsed {
+    flex-basis: auto;
+  }
+
+  .explorer.collapsed > .explorer-content {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
   }
 }
 

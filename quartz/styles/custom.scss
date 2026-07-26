@@ -1,6 +1,69 @@
 @use "./base.scss";
 
 // ================================
+// 0. 노트/메모장 테마 — 데스크·종이·여백선·세리프 제목
+// (색은 quartz.config.ts의 CSS 변수를 최대한 사용해 라이트/다크 자동 대응)
+// ================================
+
+// 바깥 배경은 살짝 쿨한 데스크 → 종이 카드(var(--light))가 그 위에 떠 보이게
+body {
+  background: #eef0f2;
+}
+:root[saved-theme="dark"] body {
+  background: #131417;
+}
+
+// 제목(헤더)은 한글 세리프로 — Google Fonts의 Nanum Myeongjo, 폴백 명시
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.page-title {
+  font-family: var(--headerFont), "Nanum Myeongjo", serif;
+}
+
+// 카드 읽기 페이지(cards/…)만 종이 시트 + 왼쪽 빨간 여백선 (은은하게)
+body[data-slug^="cards/"] .center > article {
+  position: relative;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 12px;
+  padding: 1.8rem 2rem 2rem 2.6rem;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 1.1rem;
+    bottom: 1.1rem;
+    left: 1.5rem;
+    width: 2px;
+    background: #e2a7a0;
+    border-radius: 2px;
+  }
+
+  @media all and (max-width: 800px) {
+    padding: 1.3rem 1.1rem 1.4rem 1.7rem;
+
+    &::before {
+      left: 0.9rem;
+    }
+  }
+}
+:root[saved-theme="dark"] body[data-slug^="cards/"] .center > article::before {
+  background: #b9756a;
+  opacity: 0.75;
+}
+
+// 왼쪽 사이드바 탐색기 위에 은은한 점선 구분(노트 느낌)
+.page > #quartz-body .sidebar.left .explorer {
+  border-top: 1px dashed var(--lightgray);
+  padding-top: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+// ================================
 // 1a 레이아웃 개선 — 여백/가독성 + 홈 카테고리 그리드
 // ================================
 
@@ -107,11 +170,15 @@ body[data-slug="index"] {
 
     .accent {
       height: 4px;
-      background: var(--tertiary);
+      background: var(--secondary);
     }
 
     &:nth-child(3n + 2) .accent {
-      background: var(--secondary);
+      background: #7ba38f;
+    }
+
+    &:nth-child(3n + 3) .accent {
+      background: var(--tertiary);
     }
 
     .body {
@@ -146,6 +213,7 @@ body[data-slug="index"] {
 }
 
 .section-li {
+  background: var(--light);
   border: 1px solid var(--lightgray);
   border-radius: 10px;
   padding: 1rem 1.2rem;
@@ -215,6 +283,20 @@ body[data-slug="quiz"] {
   font-family: var(--codeFont);
   font-size: 0.8rem;
   margin: 0.3rem 0 1rem;
+}
+
+// 태그 알약 — 쿨 중립 회색 (기본 앰버 하이라이트 대신)
+.tags a.internal.tag-link {
+  background-color: color-mix(in srgb, var(--gray) 16%, var(--light));
+  color: var(--darkgray);
+  border: 1px solid var(--lightgray);
+  border-radius: 999px;
+  padding: 0.15rem 0.65rem;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--secondary) 14%, var(--light));
+    color: var(--secondary);
+  }
 }
 
 // ================================

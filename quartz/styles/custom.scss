@@ -283,11 +283,6 @@ button,
     color 0.18s ease;
 }
 
-// 앵커 이동은 부드럽게
-html {
-  scroll-behavior: smooth;
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

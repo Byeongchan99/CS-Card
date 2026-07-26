@@ -225,10 +225,16 @@ async function setupExplorer(currentSlug: FullSlug) {
     if (scrollTop) {
       explorerUl.scrollTop = parseInt(scrollTop)
     } else {
-      // try to scroll to the active element if it exists
+      // scroll the active element into view — but only within the explorer,
+      // never the page window. scrollIntoView() would scroll the whole
+      // document when the active entry sits below the fold, jumping the
+      // reader to the bottom of a card on navigation.
       const activeElement = explorerUl.querySelector(".active")
       if (activeElement) {
-        activeElement.scrollIntoView({ behavior: "smooth" })
+        const aRect = activeElement.getBoundingClientRect()
+        const ulRect = explorerUl.getBoundingClientRect()
+        const delta = aRect.top - ulRect.top - explorerUl.clientHeight / 2
+        explorerUl.scrollTo({ top: explorerUl.scrollTop + delta, behavior: "smooth" })
       }
     }
 

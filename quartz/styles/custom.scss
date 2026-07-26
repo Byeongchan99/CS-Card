@@ -216,3 +216,85 @@ body[data-slug="quiz"] {
   font-size: 0.8rem;
   margin: 0.3rem 0 1rem;
 }
+
+// ================================
+// 모션 — 부드러운 진입 · 순차 등장 · 일관된 호버
+// (접근성: prefers-reduced-motion 존중, 맨 아래에서 전부 끔)
+// ================================
+
+@keyframes cs-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cs-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// 페이지 콘텐츠는 살짝 떠오르며, 사이드바는 은은하게 페이드인
+.page > #quartz-body article {
+  animation: cs-rise 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.page > #quartz-body .sidebar {
+  animation: cs-fade 0.6s ease both;
+}
+
+// 목록(홈 카테고리 · 카드/태그 리스트 · 체인 맵)은 순차로 등장
+.category-grid > *,
+.section-ul > *,
+.chain-list > * {
+  animation: cs-rise 0.42s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@for $i from 1 through 10 {
+  .category-grid > *:nth-child(#{$i}),
+  .section-ul > *:nth-child(#{$i}),
+  .chain-list > *:nth-child(#{$i}) {
+    animation-delay: #{0.05 * $i}s;
+  }
+}
+
+// 인터랙션 요소 전환을 일관되게
+a,
+button,
+.tag-link {
+  transition:
+    color 0.18s ease,
+    background-color 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.chain-map li.chain-item > a.internal,
+.chain-map li.chain-item > .chain-self {
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+// 앵커 이동은 부드럽게
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

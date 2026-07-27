@@ -22,7 +22,8 @@ const config: QuartzConfig = {
       fontOrigin: "googleFonts",
       cdnCaching: true,
       typography: {
-        header: "Nanum Myeongjo",
+        // 본문 Noto Sans KR과 같은 Noto 슈퍼패밀리의 세리프 — 자획·글자폭이 맞물린다
+        header: "Noto Serif KR",
         // 본문은 한글 글리프가 있는 폰트여야 OS 기본 폰트로 떨어지지 않는다.
         // Noto Sans KR에는 italic 축이 없으므로 includeItalic을 꺼야 한다 —
         // 켜두면 Google Fonts CSS2가 400을 반환해 세 폰트가 전부 로드 실패한다.

@@ -1,34 +1,71 @@
+// 부모 → 자식 관계를 중첩 ul + 가이드선(├─ └─)으로 그린다.
+// ChainMap.tsx가 li 안에 ul.chain-children을 중첩해 내보내는 구조에 맞춰져 있다.
 .chain-map {
-  .chain-list {
+  .chain-list,
+  .chain-children {
     list-style: none;
-    margin: 0.5rem 0 0;
     padding: 0;
   }
 
-  li.chain-item {
-    margin: 0.2rem 0;
-    font-size: 0.8rem;
-    line-height: 1.35;
-    padding-left: calc(var(--depth, 0) * 0.8rem);
+  .chain-list {
+    margin: 0.5rem 0 0;
+  }
 
-    & > a.internal,
-    & > .chain-self {
-      border-radius: 5px;
-      padding: 1px 4px;
+  .chain-children {
+    margin: 0.2rem 0 0;
+  }
+
+  li.chain-item {
+    margin: 0.25rem 0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  // 자식 항목에만 트리 가이드선. 세로선은 형제가 이어지는 동안 계속되고,
+  // 마지막 형제에서는 엘보 지점까지만 내려온다(└─).
+  .chain-children > li.chain-item {
+    position: relative;
+    padding-left: 0.85rem;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0.18rem;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--lightgray);
     }
 
-    // base.scss의 a.internal 앰버 배경을 끈다(백링크 패널과 동일한 처리).
-    // 항목마다 같은 형광 배경이 깔리면 강조의 의도가 안 읽히므로,
-    // 강조는 아래 현재 카드 하나에만 몰아준다.
-    & > a.internal {
-      background: none;
-      color: var(--darkgray);
-      font-weight: 400;
+    &:last-child::before {
+      bottom: auto;
+      height: 0.6em;
+    }
 
-      &:hover {
-        color: var(--secondary);
-        text-decoration: underline;
-      }
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0.18rem;
+      top: 0.6em;
+      width: 0.5rem;
+      height: 1px;
+      background: var(--lightgray);
+    }
+  }
+
+  // base.scss의 a.internal 앰버 배경을 끈다(백링크 패널과 동일한 처리).
+  // 항목마다 같은 형광 배경이 깔리면 강조의 의도가 안 읽히므로,
+  // 강조는 현재 카드 하나에만 몰아준다.
+  li.chain-item > a.internal {
+    background: none;
+    color: var(--darkgray);
+    font-weight: 400;
+    border-radius: 5px;
+    padding: 1px 4px;
+
+    &:hover {
+      color: var(--secondary);
+      text-decoration: underline;
     }
   }
 
@@ -36,17 +73,14 @@
     color: var(--darkgray);
   }
 
-  // 현재 보고 있는 카드 — 좌측 액센트 바 + 배경 + 굵은 글씨
-  // 액센트 바는 li에 걸어 패널 왼쪽 끝에 정렬하고, depth 들여쓰기는 padding-left 안에서 유지
-  li.chain-cur {
-    border-left: 3px solid var(--tertiary);
-    background: color-mix(in srgb, var(--tertiary) 10%, transparent);
-    border-radius: 0 6px 6px 0;
-    padding: 2px 4px 2px calc(var(--depth, 0) * 0.8rem + 0.45rem);
-  }
-
+  // 현재 보고 있는 카드 — 좌측 액센트 바 + 배경 + 굵은 글씨.
+  // li가 아니라 라벨에 걸어야 트리 가이드선과 겹치지 않는다.
   li.chain-cur > .chain-self {
-    background: none;
+    display: inline-block;
+    border-left: 3px solid var(--tertiary);
+    background: color-mix(in srgb, var(--tertiary) 12%, transparent);
+    border-radius: 0 5px 5px 0;
+    padding: 1px 5px 1px 6px;
     color: var(--dark);
     font-weight: 600;
   }

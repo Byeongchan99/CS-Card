@@ -77,33 +77,36 @@ export default ((opts?: Partial<ChainOptions>) => {
       return null
     }
 
+    // 계층이 CSS 가이드선으로 그려지도록 중첩 ul 로 낸다
+    // (평평한 목록 + 들여쓰기로는 부모-자식 관계가 표현되지 않는다)
     const visited = new Set<string>()
-    const render = (f: Card, depth: number): any => {
+    const render = (f: Card): any => {
       if (visited.has(f.slug!)) return null
       visited.add(f.slug!)
       const isCur = f.slug === cur.slug
       const isRoot = f.slug === root.slug
+      const children = kids(f)
+        .map((c) => render(c))
+        .filter(Boolean)
       return (
-        <>
-          <li class={`chain-item${isCur ? " chain-cur" : ""}`} style={`--depth:${depth}`}>
-            {isCur ? (
-              <span class="chain-self">{f.frontmatter?.title}</span>
-            ) : (
-              <a href={resolveRelative(fileData.slug!, f.slug!)} class="internal">
-                {f.frontmatter?.title}
-              </a>
-            )}
-            {isRoot ? <span class="chain-badge">메인</span> : null}
-          </li>
-          {kids(f).map((c) => render(c, depth + 1))}
-        </>
+        <li class={`chain-item${isCur ? " chain-cur" : ""}`}>
+          {isCur ? (
+            <span class="chain-self">{f.frontmatter?.title}</span>
+          ) : (
+            <a href={resolveRelative(fileData.slug!, f.slug!)} class="internal">
+              {f.frontmatter?.title}
+            </a>
+          )}
+          {isRoot ? <span class="chain-badge">메인</span> : null}
+          {children.length > 0 ? <ul class="chain-children">{children}</ul> : null}
+        </li>
       )
     }
 
     return (
       <div class={classNames(displayClass, "chain-map")}>
         <h3>이 카드의 체인</h3>
-        <ul class="chain-list">{render(root, 0)}</ul>
+        <ul class="chain-list">{render(root)}</ul>
       </div>
     )
   }

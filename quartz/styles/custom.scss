@@ -31,7 +31,8 @@ body {
   background: #131417;
 }
 
-// 제목(헤더)은 한글 세리프로 — Google Fonts의 Nanum Myeongjo, 폴백 명시
+// 제목(헤더)은 한글 세리프로 — Google Fonts의 Noto Serif KR, 폴백 명시
+// (--headerFont의 기본 폴백 체인은 산세리프라, 마지막 serif는 이 줄이 공급한다)
 h1,
 h2,
 h3,
@@ -39,7 +40,7 @@ h4,
 h5,
 h6,
 .page-title {
-  font-family: var(--headerFont), "Nanum Myeongjo", serif;
+  font-family: var(--headerFont), "Noto Serif KR", serif;
 }
 
 // 카드 읽기 페이지(cards/…)만 종이 시트 + 왼쪽 빨간 여백선 (은은하게)
@@ -306,10 +307,11 @@ body[data-slug="quiz"] {
 // ================================
 // 형광펜 — 본문 내부 링크를 실제 마커 자국처럼
 // (base.scss의 배경 블록 var(--highlight)는 너무 옅어 의도가 안 읽힘)
-// article 스코프라 우측 사이드바(체인·백링크)에는 적용되지 않는다.
+// 카드 페이지 본문에만 건다 — 홈의 알약 버튼·카테고리 카드도 a.internal이라
+// 전역으로 걸면 버튼에까지 형광이 칠해진다. 우측 사이드바는 article 밖이라 제외.
 // 제목 앵커(<a class="internal" href="#...">)도 .internal이 붙으므로 href^="#"로 뺀다.
 // ================================
-article a.internal:not(.tag-link):not([href^="#"]) {
+body[data-slug^="cards/"] article a.internal:not(.tag-link):not([href^="#"]) {
   background-color: transparent;
   background-image: linear-gradient(var(--marker), var(--marker));
   background-repeat: no-repeat;

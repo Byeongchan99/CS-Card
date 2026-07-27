@@ -15,7 +15,9 @@
 $indent: 18px; // 한 단계 들여쓰기 = 라벨 왼쪽 거터 폭
 $dot: 7px; // 점 지름 (left:0 기준이므로 중심은 3.5px)
 $rail: 1px;
-$mid: 0.58em; // 첫 줄의 세로 중앙 — 점·엘보·레일 분기점의 y
+// 점·엘보·레일 분기점의 y. 첫 줄 라인박스의 정중앙 = line-height(1.4) / 2.
+// li.chain-item 의 line-height 를 바꾸면 이 값도 같이 바꿔야 점이 어긋난다.
+$mid: 0.7em;
 
 .chain-map {
   .chain-list,
@@ -94,6 +96,7 @@ $mid: 0.58em; // 첫 줄의 세로 중앙 — 점·엘보·레일 분기점의 y
       position: absolute;
       left: -15px;
       top: $mid;
+      margin-top: -0.5px; // 두께의 절반만큼 올려 엘보 중심을 점 중심에 맞춘다
       width: 15px;
       height: $rail;
       background: var(--gray);

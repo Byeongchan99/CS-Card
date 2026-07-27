@@ -1,8 +1,8 @@
 ---
 title: 유니티에서 IL2CPP는 GC에 어떤 영향을 주는가
 tags: [유니티, GC, IL2CPP]
-related: ["유니티가 쓰는 GC는 무엇이고 닷넷 표준 GC와 구조적으로 어떻게 다른가", "Boehm GC가 객체를 이동(압축)시키지 못하는 구조적 이유", "Boehm GC의 blacklisting은 어떻게 오식별 피해를 줄이는가", "GC 스파이크와 프레임 예산"]
-parent: "유니티가 쓰는 GC는 무엇이고 닷넷 표준 GC와 구조적으로 어떻게 다른가"
+related: ["유니티-GC의-내부-동작", "Boehm-GC가-객체를-이동시키지-못하는-이유", "Boehm-GC의-blacklisting은-어떻게-오식별-피해를-줄이는가", "GC-스파이크와-프레임-예산", "Conservative-GC에서-죽은-객체가-잘못-살아남는-현상"]
+parent: "유니티-GC의-내부-동작"
 date: 2026-07-24
 result: 모름
 status: 완성

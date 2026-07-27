@@ -1,8 +1,8 @@
 ---
 title: 셰이더가 깊이를 직접 쓰면 Early-Z가 무효화되는 이유
 tags: [그래픽스, EarlyZ, 깊이버퍼, 셰이더]
-related: [알파 테스트 셰이더에서 Early-Z가 온전히 동작하지 못하는 이유]
-parent: front-to-back 정렬이 절약하는 것과 Early-Z
+related: ["알파-테스트-셰이더에서-Early-Z가-온전히-동작하지-못하는-이유", "front-to-back-정렬이-절약하는-것과-Early-Z", "알파-테스트-셰이더의-early-reject는-안전하고-early-write는-위험한-이유", "반투명-오브젝트를-그릴-때-ZWrite를-끄는-이유", "정렬이-맞아도-반투명-오브젝트가-깊이-테스트에-막히는-상황"]
+parent: "front-to-back-정렬이-절약하는-것과-Early-Z"
 date: 2026-07-27
 result: 맞음
 status: 완성

@@ -19,8 +19,8 @@ $rail: 1px;
 // 라인박스 중앙(line-height/2 = 0.7em)이 아니다 — Noto Sans KR은 ascent+descent가
 // line-height(1.4)보다 커서 한글이 라인박스 안에서 아래쪽에 앉는다. 실측한 잉크
 // 중앙은 라인박스 중앙보다 1.05px(≈0.08em) 아래.
-// 폰트나 line-height 를 바꾸면 이 값을 다시 실측해야 점이 어긋난다.
-$mid: 0.78em;
+// 폰트나 line-height, 라벨 세로 패딩을 바꾸면 이 값을 다시 실측해야 점이 어긋난다.
+$mid: 0.86em;
 
 .chain-map {
   .chain-list,
@@ -108,12 +108,20 @@ $mid: 0.78em;
 
   // base.scss의 a.internal 앰버 배경을 끈다(백링크 패널과 동일한 처리).
   // 강조는 현재 카드 하나에만 몰아준다.
+  // 두 라벨(링크 / 현재 카드)의 박스를 동일하게 맞춘다.
+  // 세로 패딩이 있는 인라인블록은 라인박스를 키워 베이스라인을 내리므로,
+  // 한쪽만 인라인블록이면 그 항목의 글자만 어긋나고 점 보정이 안 맞는다.
+  .chain-row > a.internal,
+  .chain-row > .chain-self {
+    display: inline-block;
+    padding: 0 5px;
+    border-radius: 5px;
+  }
+
   .chain-row > a.internal {
     background: none;
     color: var(--darkgray);
     font-weight: 400;
-    border-radius: 5px;
-    padding: 1px 4px;
 
     &:hover {
       color: var(--secondary);
@@ -132,10 +140,7 @@ $mid: 0.78em;
   }
 
   li.chain-cur > .chain-row > .chain-self {
-    display: inline-block;
     background: color-mix(in srgb, var(--tertiary) 12%, transparent);
-    border-radius: 5px;
-    padding: 1px 5px;
     color: var(--dark);
     font-weight: 600;
   }

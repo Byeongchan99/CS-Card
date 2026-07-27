@@ -53,7 +53,7 @@ const cards = files.map((file) => {
   return { file, base: file.replace(/\.md$/, ""), raw, fm: matter(raw).data ?? {} }
 })
 
-const byBase = new Set(cards.map((c) => c.base))
+const byBase = new Map(cards.map((c) => [c.base, c]))
 
 // 제목 → 파일명. 제목이 겹치면 완성 카드가 이기도록 완성을 뒤에 놓아 덮어쓴다
 // (스텁이 같은 제목의 실제 카드를 가리는 것을 방지)
@@ -65,22 +65,34 @@ for (const c of [...cards].sort(
   if (t) byTitle.set(t, c.base)
 }
 
-// parent·related 값(제목 또는 파일명)을 실제 카드 파일명으로 해석
+// parent·related·위키링크 값(파일명 또는 제목 또는 공백 표기)을 실제 카드 파일명으로 해석
 function resolveName(name) {
   const n = String(name).trim()
   if (byBase.has(n)) return n
-  return byTitle.get(n) ?? null
+  const byT = byTitle.get(n)
+  if (byT) return byT
+  // "Boehm GC가 객체를 …" 처럼 공백으로 적혔지만 제목과는 안 맞는 표기 → 슬러그로 한 번 더
+  const s = sluggify(n)
+  return byBase.has(s) ? s : null
 }
 
-// 본문 위키링크가 파일명이 아닌 "제목"으로 적혀 있으면 파일명으로 바꿔 링크가 깨지지 않게 한다.
-// 제목에 #, ==, . 같은 문자가 있으면 Quartz가 파일명으로 해석하지 못하기 때문.
+const titleOf = (base) => String(byBase.get(base)?.fm?.title ?? "").trim() || base
+
+// 링크는 위키링크가 아니라 마크다운 링크로 낸다.
+// - Quartz는 위키링크 표시 텍스트로 대상의 title이 아니라 원문 문자열을 그대로 쓴다.
+//   링크 대상은 파일명이어야 안 깨지므로, 그대로 두면 하이픈이 그대로 노출된다.
+// - 별칭 [[파일명|제목]]은 ofm.ts의 wikilinkRegex가 별칭에 #을 허용하지 않아
+//   제목에 C#이 든 카드가 [[...]] 리터럴로 찍힌다.
+// 꺾쇠 목적지 <...>는 괄호가 든 파일명(List의-Add가-상환-O(1)인-이유)을 안전하게 감싼다.
+const mdLink = (base) => `[${titleOf(base)}](<${base}>)`
+
+// 본문 위키링크를 "파일명으로 연결되고 제목으로 보이는" 마크다운 링크로 바꾼다.
+// 해석되지 않는 링크(예: aliases로만 존재하는 이름)는 그대로 둬서 Quartz가 처리하게 한다.
 // 원본 카드는 건드리지 않고 content/ 사본에서만 교정한다.
 function rewriteWikilinks(text) {
   return text.replace(/\[\[([^\]]+)\]\]/g, (full, inner) => {
-    const trimmed = inner.trim()
-    if (byBase.has(trimmed)) return full // 이미 파일명이면 그대로
-    const target = byTitle.get(trimmed)
-    return target ? `[[${target}]]` : full
+    const target = resolveName(inner)
+    return target ? mdLink(target) : full
   })
 }
 
@@ -95,14 +107,14 @@ for (const card of cards) {
 
   if (parent) {
     const target = resolveName(parent)
-    newBody = `> 상위 질문: ${target ? `[[${target}]]` : parent}\n\n${newBody}`
+    newBody = `> 상위 질문: ${target ? mdLink(target) : parent}\n\n${newBody}`
   }
 
   const related = Array.isArray(card.fm.related) ? card.fm.related : []
   if (related.length > 0) {
     const items = related.map((r) => {
       const target = resolveName(r)
-      return `- ${target ? `[[${target}]]` : r}`
+      return `- ${target ? mdLink(target) : r}`
     })
     newBody = `${newBody.replace(/\s*$/, "\n")}\n## 연관 카드\n\n${items.join("\n")}\n`
   }

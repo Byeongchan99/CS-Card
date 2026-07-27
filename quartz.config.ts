@@ -23,7 +23,10 @@ const config: QuartzConfig = {
       cdnCaching: true,
       typography: {
         header: "Nanum Myeongjo",
-        body: "Source Sans Pro",
+        // 본문은 한글 글리프가 있는 폰트여야 OS 기본 폰트로 떨어지지 않는다.
+        // Noto Sans KR에는 italic 축이 없으므로 includeItalic을 꺼야 한다 —
+        // 켜두면 Google Fonts CSS2가 400을 반환해 세 폰트가 전부 로드 실패한다.
+        body: { name: "Noto Sans KR", weights: [400, 600], includeItalic: false },
         code: "IBM Plex Mono",
       },
       colors: {
@@ -70,7 +73,9 @@ const config: QuartzConfig = {
       Plugin.ObsidianFlavoredMarkdown({ enableInHtmlEmbed: false }),
       Plugin.GitHubFlavoredMarkdown(),
       Plugin.TableOfContents(),
-      Plugin.CrawlLinks({ markdownLinkResolution: "shortest" }),
+      // prettyLinks는 링크 표시 텍스트에 path.basename을 돌린다. sync-content.mjs가
+      // 항상 카드 제목을 라벨로 넣으므로 이득이 없고, 제목에 /가 들어가면 잘리기만 한다.
+      Plugin.CrawlLinks({ markdownLinkResolution: "shortest", prettyLinks: false }),
       Plugin.Description(),
       Plugin.Latex({ renderEngine: "katex" }),
     ],

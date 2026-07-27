@@ -16,14 +16,37 @@
       border-radius: 5px;
       padding: 1px 4px;
     }
+
+    // base.scss의 a.internal 앰버 배경을 끈다(백링크 패널과 동일한 처리).
+    // 항목마다 같은 형광 배경이 깔리면 강조의 의도가 안 읽히므로,
+    // 강조는 아래 현재 카드 하나에만 몰아준다.
+    & > a.internal {
+      background: none;
+      color: var(--darkgray);
+      font-weight: 400;
+
+      &:hover {
+        color: var(--secondary);
+        text-decoration: underline;
+      }
+    }
   }
 
   .chain-self {
     color: var(--darkgray);
   }
 
+  // 현재 보고 있는 카드 — 좌측 액센트 바 + 배경 + 굵은 글씨
+  // 액센트 바는 li에 걸어 패널 왼쪽 끝에 정렬하고, depth 들여쓰기는 padding-left 안에서 유지
+  li.chain-cur {
+    border-left: 3px solid var(--tertiary);
+    background: color-mix(in srgb, var(--tertiary) 10%, transparent);
+    border-radius: 0 6px 6px 0;
+    padding: 2px 4px 2px calc(var(--depth, 0) * 0.8rem + 0.45rem);
+  }
+
   li.chain-cur > .chain-self {
-    background: var(--highlight);
+    background: none;
     color: var(--dark);
     font-weight: 600;
   }

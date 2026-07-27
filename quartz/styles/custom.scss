@@ -1,6 +1,24 @@
 @use "./base.scss";
 
 // ================================
+// 0-. 토큰 보정 (theme.ts가 :root에 심은 값 위에 덮어쓴다)
+// ================================
+:root {
+  // IBM Plex Mono에는 한글이 없다. --codeFont를 쓰는 .content-meta(날짜·"N분 읽기"),
+  // .section-li .meta, .count의 한글이 OS 기본 폰트로 떨어지지 않게 한글 폴백을 끼운다.
+  // 꼬리는 theme.ts의 DEFAULT_MONO 그대로.
+  --codeFont: "IBM Plex Mono", "Noto Sans KR", ui-monospace, SFMono-Regular, SF Mono, Menlo,
+    monospace;
+
+  // 본문 링크 형광펜용. --highlight는 홈 알약/퀴즈 버튼 hover·검색 결과·코드
+  // 하이라이트 라인에도 쓰이므로 건드리지 않고 전용 토큰을 따로 둔다.
+  --marker: rgba(240, 200, 120, 0.55);
+}
+:root[saved-theme="dark"] {
+  --marker: rgba(240, 200, 120, 0.3);
+}
+
+// ================================
 // 0. 노트/메모장 테마 — 데스크·종이·여백선·세리프 제목
 // (색은 quartz.config.ts의 CSS 변수를 최대한 사용해 라이트/다크 자동 대응)
 // ================================
@@ -285,6 +303,31 @@ body[data-slug="quiz"] {
   margin: 0.3rem 0 1rem;
 }
 
+// ================================
+// 형광펜 — 본문 내부 링크를 실제 마커 자국처럼
+// (base.scss의 배경 블록 var(--highlight)는 너무 옅어 의도가 안 읽힘)
+// article 스코프라 우측 사이드바(체인·백링크)에는 적용되지 않는다.
+// ================================
+article a.internal:not(.tag-link) {
+  background-color: transparent;
+  background-image: linear-gradient(var(--marker), var(--marker));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 45%; // 글자 아래 45%만 지나가는 밴드
+  border-radius: 2px;
+  padding: 0 0.12rem;
+  transition: background-size 0.18s ease, color 0.18s ease;
+
+  &:hover {
+    background-size: 100% 100%; // 글자 전체 높이로 차오름
+  }
+
+  &:has(> img) {
+    background-image: none;
+    padding: 0;
+  }
+}
+
 // 태그 알약 — 쿨 중립 회색 (기본 앰버 하이라이트 대신)
 .tags a.internal.tag-link {
   background-color: color-mix(in srgb, var(--gray) 16%, var(--light));
@@ -296,6 +339,32 @@ body[data-slug="quiz"] {
   &:hover {
     background-color: color-mix(in srgb, var(--secondary) 14%, var(--light));
     color: var(--secondary);
+  }
+}
+
+// ================================
+// 목차(TOC) 접기/펴기 애니메이션 — explorer.scss의 방식과 맞춤
+// 스톡 toc.scss는 .toc의 flex-basis를 1.4rem으로 즉시 스냅해 접는다(전환 선언 없음).
+// flex-basis를 auto로 되돌리고 max-height/opacity로 전환한다.
+// TOC는 quartz.layout.ts에서 DesktopOnly라 모바일 분기는 필요 없다.
+// ================================
+.toc {
+  &:has(button.toc-header.collapsed) {
+    flex: 0 1 auto;
+  }
+
+  > ul.toc-content {
+    max-height: 70vh;
+    overflow-y: auto;
+    opacity: 1;
+    transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out, margin 0.3s ease-in-out;
+
+    &.collapsed {
+      max-height: 0;
+      opacity: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
   }
 }
 

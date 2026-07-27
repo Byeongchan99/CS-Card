@@ -88,17 +88,23 @@ export default ((opts?: Partial<ChainOptions>) => {
       const children = kids(f)
         .map((c) => render(c))
         .filter(Boolean)
+      const hasKids = children.length > 0
+      // chain-row 는 "점 + 라벨" 한 줄만 감싼다. 자식 ul 은 밖에 둬야
+      // 부모 점에서 자식 목록 상단까지 내려오는 레일 길이가 고정값이 된다.
       return (
-        <li class={`chain-item${isCur ? " chain-cur" : ""}`}>
-          {isCur ? (
-            <span class="chain-self">{f.frontmatter?.title}</span>
-          ) : (
-            <a href={resolveRelative(fileData.slug!, f.slug!)} class="internal">
-              {f.frontmatter?.title}
-            </a>
-          )}
-          {isRoot ? <span class="chain-badge">메인</span> : null}
-          {children.length > 0 ? <ul class="chain-children">{children}</ul> : null}
+        <li class={`chain-item${isCur ? " chain-cur" : ""}${hasKids ? " has-children" : ""}`}>
+          <span class="chain-row">
+            <span class="chain-dot" aria-hidden="true"></span>
+            {isCur ? (
+              <span class="chain-self">{f.frontmatter?.title}</span>
+            ) : (
+              <a href={resolveRelative(fileData.slug!, f.slug!)} class="internal">
+                {f.frontmatter?.title}
+              </a>
+            )}
+            {isRoot ? <span class="chain-badge">메인</span> : null}
+          </span>
+          {hasKids ? <ul class="chain-children">{children}</ul> : null}
         </li>
       )
     }

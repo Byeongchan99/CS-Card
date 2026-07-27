@@ -431,8 +431,8 @@ button,
     opacity 0.18s ease;
 }
 
-.chain-map li.chain-item > a.internal,
-.chain-map li.chain-item > .chain-self {
+.chain-map .chain-row > a.internal,
+.chain-map .chain-row > .chain-self {
   transition:
     background-color 0.18s ease,
     color 0.18s ease;

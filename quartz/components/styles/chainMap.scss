@@ -34,7 +34,7 @@
       top: 0;
       bottom: 0;
       width: 1px;
-      background: var(--lightgray);
+      background: var(--gray);
     }
 
     &:last-child::before {
@@ -49,7 +49,7 @@
       top: 0.6em;
       width: 0.5rem;
       height: 1px;
-      background: var(--lightgray);
+      background: var(--gray);
     }
   }
 

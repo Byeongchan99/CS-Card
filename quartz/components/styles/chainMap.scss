@@ -147,19 +147,4 @@ $mid: 0.74em;
     color: var(--dark);
     font-weight: 600;
   }
-
-  // 제목 아래 자기 줄에 둔다.
-  // 제목 옆에 인라인으로 두면 제목 길이에 따라 줄바꿈이 되기도 안 되기도 해서
-  // 일관성이 없다. 그렇다고 제목 앞으로 옮기면 배지가 첫 줄이 되는데, 점이
-  // 첫 줄에 맞춰져 있으므로($mid) 점이 제목에서 떨어져 버린다.
-  .chain-badge {
-    display: block;
-    width: fit-content;
-    margin: 2px 0 0 5px; // 5px = 라벨 가로 패딩. 제목 글자 시작점과 맞춘다
-    font-size: 0.62rem;
-    padding: 0 6px;
-    border-radius: 8px;
-    background: var(--secondary);
-    color: var(--light);
-  }
 }

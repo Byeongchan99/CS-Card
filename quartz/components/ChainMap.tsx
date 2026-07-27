@@ -84,7 +84,6 @@ export default ((opts?: Partial<ChainOptions>) => {
       if (visited.has(f.slug!)) return null
       visited.add(f.slug!)
       const isCur = f.slug === cur.slug
-      const isRoot = f.slug === root.slug
       const children = kids(f)
         .map((c) => render(c))
         .filter(Boolean)
@@ -102,7 +101,6 @@ export default ((opts?: Partial<ChainOptions>) => {
                 {f.frontmatter?.title}
               </a>
             )}
-            {isRoot ? <span class="chain-badge">메인</span> : null}
           </span>
           {hasKids ? <ul class="chain-children">{children}</ul> : null}
         </li>

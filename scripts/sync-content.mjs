@@ -1,4 +1,5 @@
-// cards/ → content/cards/ 동기화 (빌드 전 실행)
+// cards/ → content/cards/<대분류>/ 동기화 (빌드 전 실행)
+// - 대분류(tags[0])별 하위 폴더로 나눠 좌측 탐색기가 카테고리로 묶이게 한다
 // - parent가 있는 카드: 본문 상단에 상위 질문 링크 주입
 // - related가 있는 카드: 본문 하단에 "연관 카드" 섹션 주입
 // - 퀴즈 풀(status 완성 && parent 없음)로 content/quiz-data.json 생성
@@ -55,6 +56,23 @@ const cards = files.map((file) => {
 
 const byBase = new Map(cards.map((c) => [c.base, c]))
 
+// 대분류(tags[0])별 하위 폴더로 나눈다 → Quartz 탐색기가 카테고리별로 묶어 보여준다.
+// 폴더명은 화면에도 그대로 노출되므로(탐색기는 슬러그가 아니라 파일 경로 세그먼트를
+// 표시한다) 공백을 하이픈으로 바꾸지 않는다. URL을 깨뜨리는 문자만 치환.
+function categoryDir(fm) {
+  const tags = Array.isArray(fm.tags) ? fm.tags : []
+  const raw = String(tags[0] ?? "").trim()
+  if (!raw) return "기타"
+  return raw.replace(/#/g, "샵").replace(/[/:?%&=.]/g, "-")
+}
+
+const dirOf = new Map(cards.map((c) => [c.base, categoryDir(c.fm)]))
+
+// 링크는 파일명만 쓰지 않고 항상 전체 경로로 낸다.
+// CrawlLinks 의 "shortest" 전략은 파일명이 유일할 때만 매칭하는데, 전체 경로로
+// 적으면 그 휴리스틱을 아예 타지 않아 폴더가 바뀌어도 해석이 흔들리지 않는다.
+const slugOf = (base) => `cards/${dirOf.get(base)}/${base}`
+
 // 제목 → 파일명. 제목이 겹치면 완성 카드가 이기도록 완성을 뒤에 놓아 덮어쓴다
 // (스텁이 같은 제목의 실제 카드를 가리는 것을 방지)
 const byTitle = new Map()
@@ -84,7 +102,7 @@ const titleOf = (base) => String(byBase.get(base)?.fm?.title ?? "").trim() || ba
 // - 별칭 [[파일명|제목]]은 ofm.ts의 wikilinkRegex가 별칭에 #을 허용하지 않아
 //   제목에 C#이 든 카드가 [[...]] 리터럴로 찍힌다.
 // 꺾쇠 목적지 <...>는 괄호가 든 파일명(List의-Add가-상환-O(1)인-이유)을 안전하게 감싼다.
-const mdLink = (base) => `[${titleOf(base)}](<${base}>)`
+const mdLink = (base) => `[${titleOf(base)}](<${slugOf(base)}>)`
 
 // 본문 위키링크를 "파일명으로 연결되고 제목으로 보이는" 마크다운 링크로 바꾼다.
 // 해석되지 않는 링크(예: aliases로만 존재하는 이름)는 그대로 둬서 Quartz가 처리하게 한다.
@@ -119,11 +137,13 @@ for (const card of cards) {
     newBody = `${newBody.replace(/\s*$/, "\n")}\n## 연관 카드\n\n${items.join("\n")}\n`
   }
 
-  fs.writeFileSync(path.join(outDir, card.file), head + newBody)
+  const cardOutDir = path.join(outDir, dirOf.get(card.base))
+  fs.mkdirSync(cardOutDir, { recursive: true })
+  fs.writeFileSync(path.join(cardOutDir, card.file), head + newBody)
 
   if (String(card.fm.status ?? "").trim() === "완성" && !parent) {
     quizPool.push({
-      slug: sluggify(`cards/${card.base}`),
+      slug: sluggify(slugOf(card.base)),
       title: String(card.fm.title ?? card.base),
       question: extractQuestion(body),
     })

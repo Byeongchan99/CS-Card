@@ -37,7 +37,16 @@ export const defaultContentPageLayout: PageLayout = {
         { Component: Component.ReaderMode() },
       ],
     }),
-    Component.Explorer(),
+    // 카드는 sync-content.mjs 가 대분류(tags[0])별 하위 폴더로 나눠 복사한다.
+    // 파일명에 #을 쓸 수 없어 C# 대분류만 폴더가 C샵이 되므로 표시만 되돌린다.
+    // (mapFn 은 문자열로 직렬화돼 브라우저에서 실행되므로 바깥 값을 참조하면 안 된다)
+    Component.Explorer({
+      mapFn: (node) => {
+        if (node.slugSegment === "C샵") {
+          node.displayName = "C#"
+        }
+      },
+    }),
   ],
   right: [
     Component.ChainMap(),

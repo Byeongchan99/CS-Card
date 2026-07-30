@@ -1,10 +1,14 @@
 // cards/ → content/cards/<대분류>/ 동기화 (빌드 전 실행)
 // - 대분류(tags[0])별 하위 폴더로 나눠 좌측 탐색기가 카테고리로 묶이게 한다
 // - parent가 있는 카드: 본문 상단에 상위 질문 링크 주입
+// - 심화 노트가 다루는 카드: 본문 상단에 심화 노트 링크 주입
 // - related가 있는 카드: 본문 하단에 "연관 카드" 섹션 주입
 // - 퀴즈 풀(status 완성 && parent 없음)로 content/quiz-data.json 생성
 // - content/index.md의 CATEGORIES 마커 영역에 태그별 카드 수 그리드를 주입
 //   (빌드 시에만 채워지며, 커밋된 index.md에는 빈 마커만 남는다)
+//
+// deep-notes/ → content/deep-notes/ (심화 노트: 질문 체인 하나를 통으로 해설)
+// summary-notes/ → content/summary-notes/ (요약 노트: 분야를 얕고 넓게. 카드와 무관)
 // 원본 cards/*.md는 절대 수정하지 않는다.
 import fs from "node:fs"
 import path from "node:path"
@@ -12,6 +16,8 @@ import matter from "gray-matter"
 
 const root = process.cwd()
 const cardsDir = path.join(root, "cards")
+const deepDir = path.join(root, "deep-notes")
+const summaryDir = path.join(root, "summary-notes")
 const contentDir = path.join(root, "content")
 const outDir = path.join(contentDir, "cards")
 
@@ -48,11 +54,24 @@ function extractQuestion(body) {
     .replace(/&amp;/g, "&")
 }
 
-const files = fs.readdirSync(cardsDir).filter((f) => f.endsWith(".md"))
-const cards = files.map((file) => {
-  const raw = fs.readFileSync(path.join(cardsDir, file), "utf8")
-  return { file, base: file.replace(/\.md$/, ""), raw, fm: matter(raw).data ?? {} }
-})
+// frontmatter 값이 문자열 하나로 와도 배열로 다룬다 (chains: "루트카드" 표기 허용)
+const asArray = (v) =>
+  Array.isArray(v) ? v : typeof v === "string" && v.trim() ? [v.trim()] : []
+
+function readDocs(dir) {
+  if (!fs.existsSync(dir)) return []
+  return fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith(".md"))
+    .map((file) => {
+      const raw = fs.readFileSync(path.join(dir, file), "utf8")
+      return { file, base: file.replace(/\.md$/, ""), raw, fm: matter(raw).data ?? {} }
+    })
+}
+
+const cards = readDocs(cardsDir)
+const deepNotes = readDocs(deepDir)
+const summaryNotes = readDocs(summaryDir)
 
 const byBase = new Map(cards.map((c) => [c.base, c]))
 
@@ -104,6 +123,62 @@ const titleOf = (base) => String(byBase.get(base)?.fm?.title ?? "").trim() || ba
 // 꺾쇠 목적지 <...>는 괄호가 든 파일명(List의-Add가-상환-O(1)인-이유)을 안전하게 감싼다.
 const mdLink = (base) => `[${titleOf(base)}](<${slugOf(base)}>)`
 
+// ── 심화 노트 ↔ 카드 연결 ───────────────────────────────────────────────
+// 노트가 frontmatter로 카드를 가리키는 단방향이다. 원본 카드는 건드리지 않는다.
+//   chains: 체인 루트 카드 → parent 트리를 타고 자손까지 전부 전개
+//   cards:  체인 일부만 다루는 노트를 위한 개별 지정
+// 한 노트가 여러 체인을 아우르고 한 카드가 여러 노트에 걸리므로 양쪽 다 다대다다.
+const deepByBase = new Map(deepNotes.map((n) => [n.base, n]))
+const noteTitleOf = (base) => String(deepByBase.get(base)?.fm?.title ?? "").trim() || base
+const noteLink = (base) => `[${noteTitleOf(base)}](<deep-notes/${base}>)`
+
+// parent → 자식 목록. ChainMap.tsx 와 같은 규칙(자식 = 자신을 parent 로 가리키는 카드)
+const childrenOf = new Map()
+for (const c of cards) {
+  const p = typeof c.fm.parent === "string" ? resolveName(c.fm.parent) : null
+  if (!p) continue
+  const arr = childrenOf.get(p) ?? []
+  arr.push(c.base)
+  childrenOf.set(p, arr)
+}
+
+// 루트에서 시작해 자손을 전위 순회로 펼친다. 형제는 ChainMap 과 같이 제목순.
+function expandChain(rootBase, out = []) {
+  if (out.includes(rootBase)) return out // 사이클 방어
+  out.push(rootBase)
+  const kids = (childrenOf.get(rootBase) ?? [])
+    .slice()
+    .sort((a, b) => titleOf(a).localeCompare(titleOf(b), "ko"))
+  for (const kid of kids) expandChain(kid, out)
+  return out
+}
+
+const notesOfCard = new Map() // 카드 base → 심화 노트 base[]
+const cardsOfNote = new Map() // 심화 노트 base → 카드 base[]
+
+for (const note of deepNotes) {
+  const covered = []
+  const add = (base) => {
+    if (base && !covered.includes(base)) covered.push(base)
+  }
+  for (const name of asArray(note.fm.chains)) {
+    const target = resolveName(name)
+    if (target) expandChain(target).forEach(add)
+    else console.warn(`심화 노트 ${note.file}: chains "${name}"에 해당하는 카드가 없습니다`)
+  }
+  for (const name of asArray(note.fm.cards)) {
+    const target = resolveName(name)
+    if (target) add(target)
+    else console.warn(`심화 노트 ${note.file}: cards "${name}"에 해당하는 카드가 없습니다`)
+  }
+  cardsOfNote.set(note.base, covered)
+  for (const base of covered) {
+    const arr = notesOfCard.get(base) ?? []
+    arr.push(note.base)
+    notesOfCard.set(base, arr)
+  }
+}
+
 // 본문 위키링크를 "파일명으로 연결되고 제목으로 보이는" 마크다운 링크로 바꾼다.
 // 해석되지 않는 링크(예: aliases로만 존재하는 이름)는 그대로 둬서 Quartz가 처리하게 한다.
 // 원본 카드는 건드리지 않고 content/ 사본에서만 교정한다.
@@ -122,6 +197,12 @@ for (const card of cards) {
   const { head, body } = splitFrontmatter(card.raw)
   const parent = typeof card.fm.parent === "string" ? card.fm.parent.trim() : ""
   let newBody = rewriteWikilinks(body)
+
+  // 심화 노트 → 상위 질문 순으로 prepend 하면 최종 표시는 상위 질문이 위, 심화 노트가 아래
+  const notes = notesOfCard.get(card.base) ?? []
+  if (notes.length > 0) {
+    newBody = `> 심화 노트: ${notes.map(noteLink).join(" · ")}\n\n${newBody}`
+  }
 
   if (parent) {
     const target = resolveName(parent)
@@ -151,6 +232,30 @@ for (const card of cards) {
 }
 
 fs.writeFileSync(path.join(contentDir, "quiz-data.json"), JSON.stringify(quizPool, null, 2))
+
+// 노트는 카드와 달리 하위 폴더로 쪼개지 않는다 (편수가 적어 한 목록으로 충분).
+// 위키링크 교정은 카드와 같은 경로를 타므로 노트 본문에서도 [[카드 제목]]이 그대로 통한다.
+function syncNotes(docs, outSubdir, decorate) {
+  const dir = path.join(contentDir, outSubdir)
+  fs.rmSync(dir, { recursive: true, force: true })
+  if (docs.length === 0) return
+  fs.mkdirSync(dir, { recursive: true })
+  for (const doc of docs) {
+    const { head, body } = splitFrontmatter(doc.raw)
+    let newBody = rewriteWikilinks(body)
+    if (decorate) newBody = decorate(doc, newBody)
+    fs.writeFileSync(path.join(dir, doc.file), head + newBody)
+  }
+}
+
+syncNotes(deepNotes, "deep-notes", (note, body) => {
+  const covered = cardsOfNote.get(note.base) ?? []
+  if (covered.length === 0) return body
+  const items = covered.map((base) => `- ${mdLink(base)}`)
+  return `${body.replace(/\s*$/, "\n")}\n## 다루는 카드\n\n${items.join("\n")}\n`
+})
+
+syncNotes(summaryNotes, "summary-notes")
 
 // 홈 카테고리 그리드 자동 생성: 대분류(첫 태그)별 카드 수를 세어 index.md의 마커 영역에 주입
 // (세부태그는 그리드에서 제외 — Quartz 태그 페이지로 접근)
@@ -185,5 +290,8 @@ if (marker.test(indexRaw)) {
 }
 
 console.log(
-  `synced ${cards.length} cards → content/cards, quiz pool: ${quizPool.length}, categories: ${sortedTags.length}`,
+  `synced ${cards.length} cards → content/cards, quiz pool: ${quizPool.length}, categories: ${sortedTags.length}\n` +
+    `       ${deepNotes.length} deep notes → content/deep-notes ` +
+    `(카드 ${notesOfCard.size}장에 심화 노트 링크 주입), ` +
+    `${summaryNotes.length} summary notes → content/summary-notes`,
 )

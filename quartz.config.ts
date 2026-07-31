@@ -8,7 +8,7 @@ import * as Plugin from "./quartz/plugins"
  */
 const config: QuartzConfig = {
   configuration: {
-    pageTitle: "CS 면접 카드",
+    pageTitle: "게임 개발 CS 노트",
     pageTitleSuffix: "",
     // 랜덤 퀴즈 페이지의 인라인 스크립트는 SPA 내비게이션에서 재실행되지 않으므로 비활성화
     enableSPA: false,

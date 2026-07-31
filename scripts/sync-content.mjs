@@ -78,11 +78,17 @@ const byBase = new Map(cards.map((c) => [c.base, c]))
 // 대분류(tags[0])별 하위 폴더로 나눈다 → Quartz 탐색기가 카테고리별로 묶어 보여준다.
 // 폴더명은 화면에도 그대로 노출되므로(탐색기는 슬러그가 아니라 파일 경로 세그먼트를
 // 표시한다) 공백을 하이픈으로 바꾸지 않는다. URL을 깨뜨리는 문자만 치환.
-function categoryDir(fm) {
-  const tags = Array.isArray(fm.tags) ? fm.tags : []
-  const raw = String(tags[0] ?? "").trim()
+// 대분류(태그) → 카드 하위 폴더명. URL을 깨뜨리는 문자만 치환한다(#→샵 등).
+// 공백은 여기서 바꾸지 않는다 — 폴더명은 화면에 그대로 노출되기 때문(탐색기).
+function catDirName(tag) {
+  const raw = String(tag ?? "").trim()
   if (!raw) return "기타"
   return raw.replace(/#/g, "샵").replace(/[/:?%&=.]/g, "-")
+}
+
+function categoryDir(fm) {
+  const tags = Array.isArray(fm.tags) ? fm.tags : []
+  return catDirName(tags[0])
 }
 
 const dirOf = new Map(cards.map((c) => [c.base, categoryDir(c.fm)]))
@@ -259,6 +265,8 @@ syncNotes(summaryNotes, "summary-notes")
 
 // 홈 카테고리 그리드 자동 생성: 대분류(첫 태그)별 카드 수를 세어 index.md의 마커 영역에 주입
 // (세부태그는 그리드에서 제외 — Quartz 태그 페이지로 접근)
+// 링크는 태그 페이지가 아니라 카드 폴더 페이지로 보낸다 — 태그 페이지에는 심화·요약 노트가
+// 섞이지만, 카드 폴더 페이지에는 그 대분류의 카드만 나와 "N개 카드" 카운트와 일치한다.
 const tagCounts = new Map()
 for (const card of cards) {
   const tags = Array.isArray(card.fm.tags) ? card.fm.tags : []
@@ -273,7 +281,7 @@ const sortedTags = [...tagCounts.entries()].sort(
 const cardsHtml = sortedTags
   .map(
     ([tag, count]) =>
-      `  <a class="category-card" href="./tags/${sluggify(tag)}">` +
+      `  <a class="category-card" href="./cards/${sluggify(catDirName(tag))}/">` +
       `<div class="accent"></div><div class="body">` +
       `<div class="name">${tag}</div><div class="count">${count}개 카드</div></div></a>`,
   )

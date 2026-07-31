@@ -147,17 +147,7 @@ body[data-slug="index"] {
       &:hover {
         background: var(--highlight);
         color: var(--dark);
-      }
-    }
-
-    li:first-child a {
-      background: var(--secondary);
-      border-color: var(--secondary);
-      color: var(--light);
-
-      &:hover {
-        color: var(--light);
-        opacity: 0.9;
+        border-color: var(--tertiary);
       }
     }
   }

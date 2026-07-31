@@ -120,29 +120,45 @@ body[data-slug="index"] {
     font-size: 2.1rem;
   }
 
-  // 랜덤퀴즈 / 전체카드 / 태그별보기 목록 → 알약 버튼
+  // 진입 링크 목록 → 알약 + 설명, 세로 정렬 메뉴
+  // 알약 폭을 통일해 한 열로 정렬하고, 그 오른쪽에서 설명 시작점이 맞는다.
   article > ul:first-of-type {
     display: flex;
-    gap: 0.6rem;
+    flex-direction: column;
+    gap: 0.5rem;
     list-style: none;
     padding: 0;
     margin: 1.4rem 0 2.2rem;
-    flex-wrap: wrap;
 
     li {
       margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      // 알약 밖 설명 텍스트
+      color: var(--gray);
+      font-size: 0.88rem;
+
+      @media all and (max-width: 500px) {
+        flex-wrap: wrap;
+        gap: 0.3rem 0.7rem;
+      }
     }
 
     a {
+      flex: none;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 0.4rem;
-      padding: 0.55rem 1.1rem;
+      min-width: 9rem;
+      padding: 0.5rem 1rem;
       border-radius: 999px;
       border: 1px solid var(--lightgray);
       background: var(--light);
       font-weight: 600;
       font-size: 0.92rem;
+      color: var(--dark);
 
       &:hover {
         background: var(--highlight);

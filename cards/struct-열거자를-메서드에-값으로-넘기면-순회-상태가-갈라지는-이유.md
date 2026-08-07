@@ -1,7 +1,7 @@
 ---
 title: struct 열거자를 메서드에 값으로 넘기면 순회 상태가 갈라지는 이유
 tags: ["C#", 컬렉션, 값형식]
-related: []
+related: ["List를-IEnumerable-필드로-선언하면-foreach에서-GC-Alloc이-생기는-이유", "IEnumerable을-구현하지-않은-타입에서도-foreach가-컴파일되는-이유", "IEnumerable로-순회할-때-열거자-박싱은-호출자와-컬렉션-중-어디서-일어나는가"]
 parent: List를 IEnumerable 필드로 선언하면 foreach에서 GC Alloc이 생기는 이유
 date: 2026-07-29
 result: 맞음

@@ -1,7 +1,7 @@
 ---
 title: A*에서 admissible한 h만으로는 closed set 사용 시 최적이 깨지는 이유
 tags: [알고리즘, 길찾기, A스타, 휴리스틱]
-related: []
+related: ["A스타-휴리스틱이-admissible하다는-것의-의미와-위반-시-생기는-문제", "8방향-격자에-맨해튼-거리-휴리스틱을-쓰면-생기는-일-추론"]
 parent: A* 휴리스틱이 admissible하다는 것의 의미와 위반 시 생기는 문제
 date: 2026-07-31
 result: 맞음

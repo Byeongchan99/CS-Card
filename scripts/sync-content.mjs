@@ -7,7 +7,8 @@
 // - content/index.md의 CATEGORIES 마커 영역에 태그별 카드 수 그리드를 주입
 //   (빌드 시에만 채워지며, 커밋된 index.md에는 빈 마커만 남는다)
 //
-// deep-notes/ → content/deep-notes/ (심화 노트: 질문 체인 하나를 통으로 해설)
+// deep-notes/ → content/deep-notes/<대분류>/ (심화 노트: 질문 체인 하나를 통으로 해설.
+//   카드처럼 대분류별 하위 폴더로 나눠 탐색기가 카테고리로 묶게 한다)
 // summary-notes/ → content/summary-notes/ (요약 노트: 분야를 얕고 넓게. 카드와 무관)
 // 원본 cards/*.md는 절대 수정하지 않는다.
 import fs from "node:fs"
@@ -135,8 +136,12 @@ const mdLink = (base) => `[${titleOf(base)}](<${slugOf(base)}>)`
 //   cards:  체인 일부만 다루는 노트를 위한 개별 지정
 // 한 노트가 여러 체인을 아우르고 한 카드가 여러 노트에 걸리므로 양쪽 다 다대다다.
 const deepByBase = new Map(deepNotes.map((n) => [n.base, n]))
+// 심화 노트도 카드와 같이 대분류(tags[0])별 하위 폴더로 나눈다 → 탐색기가 카테고리로 묶는다.
+// 폴더명은 카드와 동일한 catDirName 규칙(공백은 그대로, URL 깨뜨리는 문자만 치환)이라
+// 같은 대분류면 카드와 심화 노트가 같은 이름의 폴더로 나란히 표시된다.
+const deepDirOf = new Map(deepNotes.map((n) => [n.base, categoryDir(n.fm)]))
 const noteTitleOf = (base) => String(deepByBase.get(base)?.fm?.title ?? "").trim() || base
-const noteLink = (base) => `[${noteTitleOf(base)}](<deep-notes/${base}>)`
+const noteLink = (base) => `[${noteTitleOf(base)}](<deep-notes/${deepDirOf.get(base)}/${base}>)`
 
 // parent → 자식 목록. ChainMap.tsx 와 같은 규칙(자식 = 자신을 parent 로 가리키는 카드)
 const childrenOf = new Map()
@@ -239,9 +244,9 @@ for (const card of cards) {
 
 fs.writeFileSync(path.join(contentDir, "quiz-data.json"), JSON.stringify(quizPool, null, 2))
 
-// 노트는 카드와 달리 하위 폴더로 쪼개지 않는다 (편수가 적어 한 목록으로 충분).
 // 위키링크 교정은 카드와 같은 경로를 타므로 노트 본문에서도 [[카드 제목]]이 그대로 통한다.
-function syncNotes(docs, outSubdir, decorate) {
+// subdirOf 를 주면 doc 별 하위 폴더로 나눈다(심화 노트를 대분류별로 묶을 때 사용).
+function syncNotes(docs, outSubdir, decorate, subdirOf) {
   const dir = path.join(contentDir, outSubdir)
   fs.rmSync(dir, { recursive: true, force: true })
   if (docs.length === 0) return
@@ -250,17 +255,26 @@ function syncNotes(docs, outSubdir, decorate) {
     const { head, body } = splitFrontmatter(doc.raw)
     let newBody = rewriteWikilinks(body)
     if (decorate) newBody = decorate(doc, newBody)
-    fs.writeFileSync(path.join(dir, doc.file), head + newBody)
+    const targetDir = subdirOf ? path.join(dir, subdirOf(doc)) : dir
+    fs.mkdirSync(targetDir, { recursive: true })
+    fs.writeFileSync(path.join(targetDir, doc.file), head + newBody)
   }
 }
 
-syncNotes(deepNotes, "deep-notes", (note, body) => {
-  const covered = cardsOfNote.get(note.base) ?? []
-  if (covered.length === 0) return body
-  const items = covered.map((base) => `- ${mdLink(base)}`)
-  return `${body.replace(/\s*$/, "\n")}\n## 다루는 카드\n\n${items.join("\n")}\n`
-})
+// 심화 노트: 카드처럼 대분류별 하위 폴더로 나눠 탐색기에서 카테고리로 묶이게 한다.
+syncNotes(
+  deepNotes,
+  "deep-notes",
+  (note, body) => {
+    const covered = cardsOfNote.get(note.base) ?? []
+    if (covered.length === 0) return body
+    const items = covered.map((base) => `- ${mdLink(base)}`)
+    return `${body.replace(/\s*$/, "\n")}\n## 다루는 카드\n\n${items.join("\n")}\n`
+  },
+  (note) => deepDirOf.get(note.base),
+)
 
+// 요약 노트: 파일 하나가 곧 대분류이므로 하위 폴더로 쪼개지 않는다.
 syncNotes(summaryNotes, "summary-notes")
 
 // 홈 카테고리 그리드 자동 생성: 대분류(첫 태그)별 카드 수를 세어 index.md의 마커 영역에 주입

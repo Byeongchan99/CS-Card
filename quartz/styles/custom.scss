@@ -454,3 +454,11 @@ button,
     scroll-behavior: auto !important;
   }
 }
+
+// Mermaid 다이어그램 엣지 라벨 — 배경은 종이색(불투명, mermaid.inline.ts의 edgeLabelBackground)
+// 이고, 얇은 회색 테두리를 둘러 "칩"처럼 보이게 한다. border 대신 box-shadow 링을 써서
+// 라벨 박스 크기를 안 밀어 글자가 잘리지 않는다.
+.mermaid span.edgeLabel {
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px var(--lightgray);
+}

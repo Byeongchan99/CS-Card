@@ -6,6 +6,7 @@ import { pageResources, renderPage } from "../../components/renderPage"
 import { ProcessedContent, QuartzPluginData, defaultProcessedContent } from "../vfile"
 import { FullPageLayout } from "../../cfg"
 import { FullSlug, getAllSegmentPrefixes, joinSegments, pathToRoot } from "../../util/path"
+import { prettyLabel } from "../../util/prettyLabel"
 import { defaultListPageLayout, sharedPageComponents } from "../../../quartz.layout"
 import { TagContent } from "../../components"
 import { write } from "./helpers"
@@ -34,7 +35,7 @@ function computeTagInfo(
       const title =
         tag === "index"
           ? i18n(locale).pages.tagContent.tagIndex
-          : `${i18n(locale).pages.tagContent.tag}: ${tag}`
+          : `${i18n(locale).pages.tagContent.tag}: ${prettyLabel(tag)}`
       return [
         tag,
         defaultProcessedContent({
@@ -53,7 +54,7 @@ function computeTagInfo(
       if (tags.has(tag)) {
         tagDescriptions[tag] = [tree, file]
         if (file.data.frontmatter?.title === tag) {
-          file.data.frontmatter.title = `${i18n(locale).pages.tagContent.tag}: ${tag}`
+          file.data.frontmatter.title = `${i18n(locale).pages.tagContent.tag}: ${prettyLabel(tag)}`
         }
       }
     }

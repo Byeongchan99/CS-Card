@@ -3,6 +3,7 @@ import breadcrumbsStyle from "./styles/breadcrumbs.scss"
 import { FullSlug, SimpleSlug, resolveRelative, simplifySlug } from "../util/path"
 import { classNames } from "../util/lang"
 import { trieFromAllFiles } from "../util/ctx"
+import { prettyLabel } from "../util/prettyLabel"
 
 type CrumbData = {
   displayName: string
@@ -37,7 +38,9 @@ const defaultOptions: BreadcrumbOptions = {
 
 function formatCrumb(displayName: string, baseSlug: FullSlug, currentSlug: SimpleSlug): CrumbData {
   return {
-    displayName: displayName.replaceAll("-", " "),
+    // explorerMapFn과 같은 규칙으로 폴더 세그먼트 표시명을 보정한다(C샵→C# 등).
+    // 탐색기 밖의 경로 표시(빵부스러기)도 탐색기와 일관되게 보이도록.
+    displayName: prettyLabel(displayName.replaceAll("-", " ")),
     path: resolveRelative(baseSlug, currentSlug),
   }
 }

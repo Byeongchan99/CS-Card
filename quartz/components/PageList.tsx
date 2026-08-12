@@ -1,4 +1,5 @@
 import { FullSlug, isFolderPath, resolveRelative } from "../util/path"
+import { prettyLabel } from "../util/prettyLabel"
 import { QuartzPluginData } from "../plugins/vfile"
 import { Date, getDate } from "./Date"
 import { QuartzComponent, QuartzComponentProps } from "./types"
@@ -90,7 +91,7 @@ export const PageList: QuartzComponent = ({ cfg, fileData, allFiles, limit, sort
                       class="internal tag-link"
                       href={resolveRelative(fileData.slug!, `tags/${tag}` as FullSlug)}
                     >
-                      {tag}
+                      {prettyLabel(tag)}
                     </a>
                   </li>
                 ))}

@@ -2,6 +2,7 @@ import FlexSearch, { DefaultDocumentSearchResults } from "flexsearch"
 import { ContentDetails } from "../../plugins/emitters/contentIndex"
 import { registerEscapeHandler, removeAllChildren } from "./util"
 import { FullSlug, normalizeRelativeURLs, resolveRelative } from "../../util/path"
+import { prettyLabel } from "../../util/prettyLabel"
 
 interface Item {
   id: number
@@ -326,9 +327,9 @@ async function setupSearch(searchElement: Element, currentSlug: FullSlug, data: 
     return tags
       .map((tag) => {
         if (tag.toLowerCase().includes(term.toLowerCase())) {
-          return `<li><p class="match-tag">#${tag}</p></li>`
+          return `<li><p class="match-tag">#${prettyLabel(tag)}</p></li>`
         } else {
-          return `<li><p>#${tag}</p></li>`
+          return `<li><p>#${prettyLabel(tag)}</p></li>`
         }
       })
       .slice(0, numTagResults)

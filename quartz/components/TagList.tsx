@@ -1,6 +1,7 @@
 import { FullSlug, resolveRelative } from "../util/path"
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 import { classNames } from "../util/lang"
+import { prettyLabel } from "../util/prettyLabel"
 
 const TagList: QuartzComponent = ({ fileData, displayClass }: QuartzComponentProps) => {
   const tags = fileData.frontmatter?.tags
@@ -12,7 +13,7 @@ const TagList: QuartzComponent = ({ fileData, displayClass }: QuartzComponentPro
           return (
             <li>
               <a href={linkDest} class="internal tag-link">
-                {tag}
+                {prettyLabel(tag)}
               </a>
             </li>
           )

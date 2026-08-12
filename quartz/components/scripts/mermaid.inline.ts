@@ -233,7 +233,7 @@ document.addEventListener("nav", async () => {
         secondaryColor: computedStyleMap["--secondary"],
         tertiaryColor: computedStyleMap["--tertiary"],
         clusterBkg: computedStyleMap["--light"],
-        edgeLabelBackground: computedStyleMap["--highlight"],
+        edgeLabelBackground: computedStyleMap["--light"],
       },
     })
 

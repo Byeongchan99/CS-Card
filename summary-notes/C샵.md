@@ -10,6 +10,8 @@ date: 2026-07-30
 
 struct는 값 타입(`=`에서 값 복사), class는 참조 타입(같은 객체 공유). 그래서 복사 후 한쪽만 바꾸면 struct는 원본이 유지되고 class는 함께 변함.
 
+<svg viewBox="0 0 340 185" width="340" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="값 타입은 복사되고 참조 타입은 공유된다"><defs><marker id="vr-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="#4f83e0"/></marker></defs><text x="80" y="22" font-size="12" fill="currentColor" opacity="0.7" text-anchor="middle">struct — 값 복사</text><g fill="none" stroke="currentColor" opacity="0.65"><rect x="28" y="40" width="104" height="36" rx="4"/><rect x="28" y="92" width="104" height="36" rx="4"/></g><text x="80" y="63" font-size="13" fill="currentColor" text-anchor="middle">a  { hp:10 }</text><text x="80" y="115" font-size="13" fill="currentColor" text-anchor="middle">b  { hp:10 }</text><text x="80" y="150" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">서로 독립</text><line x1="162" y1="30" x2="162" y2="158" stroke="currentColor" opacity="0.2"/><text x="258" y="22" font-size="12" fill="currentColor" opacity="0.7" text-anchor="middle">class — 참조 공유</text><g fill="none" stroke="currentColor" opacity="0.65"><rect x="184" y="46" width="44" height="30" rx="4"/><rect x="184" y="104" width="44" height="30" rx="4"/><rect x="274" y="74" width="56" height="34" rx="4"/></g><text x="206" y="66" font-size="13" fill="currentColor" text-anchor="middle">a</text><text x="206" y="124" font-size="13" fill="currentColor" text-anchor="middle">b</text><text x="302" y="95" font-size="12" fill="currentColor" text-anchor="middle">{ hp:10 }</text><line x1="228" y1="61" x2="272" y2="86" stroke="#4f83e0" stroke-width="2" marker-end="url(#vr-a)"/><line x1="228" y1="119" x2="272" y2="96" stroke="#4f83e0" stroke-width="2" marker-end="url(#vr-a)"/><text x="258" y="150" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">같은 객체 공유</text></svg>
+
 ## struct vs class의 기본 Equals
 
 | | 기본 `Equals` | 결과 |
@@ -40,6 +42,13 @@ struct는 값 타입(`=`에서 값 복사), class는 참조 타입(같은 객체
 ## 세대별 GC
 
 힙을 Gen0/1/2로 나눔. Gen0이 빠른 이유는 최근 할당된 작은 영역만 스캔하면 되고, 대부분의 객체는 금방 죽어(generational hypothesis) 적은 일로 많이 회수하기 때문. 수집에서 살아남으면 상위 세대로 승격돼 덜 자주 수거됨. 매 프레임 임시 할당이 많으면 Gen0이 자주 차 GC가 잦아짐.
+
+```mermaid
+flowchart LR
+    N["새 객체"] --> G0["Gen 0"]
+    G0 -->|살아남음| G1["Gen 1"]
+    G1 -->|살아남음| G2["Gen 2"]
+```
 
 ## virtual/override vs new
 

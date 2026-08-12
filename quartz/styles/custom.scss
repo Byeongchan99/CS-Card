@@ -456,10 +456,13 @@ button,
 }
 
 // Mermaid 다이어그램 엣지 라벨 — 배경은 종이색(불투명, mermaid.inline.ts의 edgeLabelBackground)
-// 이고, 얇은 회색 테두리를 둘러 "칩"처럼 보이게 한다. 링은 inset(안쪽)으로 그린다 —
-// 라벨의 foreignObject가 텍스트에 딱 맞는 크기라 바깥으로 그린 box-shadow는 잘려 안 보인다.
-// 색은 --lightgray가 종이 배경과 대비가 약해 안 보이므로 한 단계 진한 --gray를 쓴다.
-.mermaid span.edgeLabel {
+// 이고, 얇은 회색 테두리를 둘러 "칩"처럼 보이게 한다. 주의점 두 가지:
+//   1) 링은 inset(안쪽)이어야 한다. 라벨 foreignObject가 텍스트에 딱 맞는 크기라 바깥
+//      box-shadow는 잘려 안 보인다.
+//   2) 라벨 텍스트는 span > p 구조이고 맨 위 p가 불투명 배경으로 덮으므로, p에 그려야 보인다.
+// 색은 --lightgray가 종이 배경과 대비가 약해, 한 단계 진한 --gray를 쓴다.
+.mermaid .edgeLabel span.edgeLabel,
+.mermaid .edgeLabel p {
   border-radius: 4px;
   box-shadow: inset 0 0 0 1px var(--gray);
 }

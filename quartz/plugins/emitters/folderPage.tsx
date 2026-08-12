@@ -15,6 +15,7 @@ import {
   simplifySlug,
 } from "../../util/path"
 import { defaultListPageLayout, sharedPageComponents } from "../../../quartz.layout"
+import { prettyLabel } from "../../util/prettyLabel"
 import { FolderContent } from "../../components"
 import { write } from "./helpers"
 import { i18n, TRANSLATIONS } from "../../i18n"
@@ -71,7 +72,11 @@ function computeFolderInfo(
       defaultProcessedContent({
         slug: joinSegments(folder, "index") as FullSlug,
         frontmatter: {
-          title: `${i18n(locale).pages.folderContent.folder}: ${folder}`,
+          // 경로 세그먼트를 각각 표시명으로 보정한다(cards/C샵 → 질문 카드/C#).
+          title: `${i18n(locale).pages.folderContent.folder}: ${folder
+            .split("/")
+            .map((seg) => prettyLabel(seg))
+            .join("/")}`,
           tags: [],
         },
       }),

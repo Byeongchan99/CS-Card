@@ -45,10 +45,10 @@ struct는 값 타입(`=`에서 값 복사), class는 참조 타입(같은 객체
 
 ```mermaid
 flowchart LR
-    N["새 객체"] --> G0["Gen 0"] --> G1["Gen 1"] --> G2["Gen 2"]
+    N["새 객체"] --> G0["Gen 0"]
+    G0 -->|살아남음| G1["Gen 1"]
+    G1 -->|살아남음| G2["Gen 2"]
 ```
-
-수집에서 살아남을수록 오른쪽 상위 세대로 승격돼 점점 덜 수거된다.
 
 ## virtual/override vs new
 

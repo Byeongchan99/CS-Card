@@ -70,6 +70,10 @@ static은 클래스당 하나라 모든 인스턴스가 공유. 인스턴스 필
 
 `GetNumbers()` 호출 시점엔 본문이 전혀 안 돎(이터레이터 객체만 생성). foreach가 `MoveNext()`를 부를 때마다 다음 `yield`까지 한 조각씩 실행됨. 컴파일러가 메서드를 state 변수 기반 switch문(상태 기계)으로 변환하기 때문. foreach가 없으면 본문은 영영 실행 안 됨(호출 ≠ 실행).
 
+## LINQ 지연 실행(deferred execution)
+
+`Where`·`Select` 같은 LINQ 쿼리는 정의 시점엔 안 돌고, `foreach`·`ToList`·`Count` 등으로 열거할 때 비로소 실행됨(yield 기반). 그래서 쿼리를 만든 뒤 원본 컬렉션이 바뀌면 결과도 바뀌고, 같은 쿼리를 두 번 열거하면 두 번 계산됨. 결과를 고정하거나 반복 사용하려면 `ToList()`로 즉시 실체화.
+
 ## 순회 중 컬렉션 수정
 
 `foreach`로 순회하는 도중 `Add`/`Remove`로 컬렉션 크기를 바꾸면 `InvalidOperationException`. 열거자가 "보던 게 바뀜"을 감지해 예외를 던짐 → 이후 코드 미실행. 해법은 for 역순 루프, 복사본 순회, 또는 `RemoveAll(조건)`.
@@ -92,9 +96,17 @@ static은 클래스당 하나라 모든 인스턴스가 공유. 인스턴스 필
 
 `+=`로 반복 연결하면 매번 전체를 복사해 전체 O(n²)이고 객체도 많이 생김. `StringBuilder`는 가변 버퍼라 O(n).
 
+## 확장 메서드
+
+기존 타입(수정할 수 없는 것 포함)에 인스턴스 메서드처럼 보이는 static 메서드를 덧붙임. static 클래스의 static 메서드 첫 인자에 `this`를 붙이면 그 타입의 메서드처럼 호출 가능. LINQ 전체가 `IEnumerable<T>`의 확장 메서드이고, 유니티에서 Transform·Vector 유틸을 붙일 때 흔히 씀. 실제 타입을 안 건드리므로 private 멤버엔 접근 못 함.
+
 ## 제네릭 where 제약
 
 제약이 없으면 컴파일러가 T를 object 수준으로만 취급 → object의 멤버만 보장돼 `CompareTo` 호출 불가. `where T : IComparable<T>`를 걸면 모든 T가 `CompareTo`를 가짐이 보장돼 호출 가능. 제약은 T의 멤버·기능을 컴파일러에게 약속하는 것.
+
+## 제네릭 공변성·반공변성(in/out)
+
+`IEnumerable<out T>`는 공변 — `IEnumerable<Cat>`을 `IEnumerable<Animal>`에 대입 가능(T를 꺼내기만 해 안전). `Action<in T>`는 반공변 — `Action<Animal>`을 `Action<Cat>`에 대입 가능(T를 받기만 함). `out`은 반환 위치, `in`은 입력 위치에만 T가 쓰일 때 허용. `List<T>` 같은 가변 컬렉션은 넣고 빼기를 다 해 불변(둘 다 불가).
 
 ## as vs 형변환 캐스트
 
@@ -118,6 +130,10 @@ static은 클래스당 하나라 모든 인스턴스가 공유. 인스턴스 필
 ## ?? 와 ?. 연산자
 
 `??`(null 병합)는 좌변이 null이면 우변 반환. `?.`(null 조건부)는 좌변이 null이면 평가를 멈추고 null 반환. `a`가 null일 때 `a ?? "default"` → `"default"`, `a?.Length` → null(`int?`로 받음).
+
+## async/await와 Task
+
+`async` 메서드는 `await`를 만나면 그 지점에서 제어를 호출자에게 돌려주고, 기다리던 작업이 끝나면 이어서 실행 — 스레드를 붙잡지 않아 UI·서버가 안 멈춤. 컴파일러가 메서드를 상태 기계로 변환(yield와 같은 원리). `Task`는 진행 중이거나 완료될 작업의 핸들. async void는 예외를 못 잡으니 이벤트 핸들러 외엔 `Task`를 반환하고, 무작정 `.Result`/`.Wait()`로 기다리면 교착(deadlock) 위험.
 
 ## IDisposable과 using
 

@@ -1,7 +1,7 @@
 ---
 title: Setup이 끝난 뒤에도 람다가 지역 변수를 계속 쓸 수 있는 이유
 tags: [C#, 클로저, GC, 컴파일러]
-related: [GC 스파이크와 프레임 예산]
+related: ["GC-스파이크와-프레임-예산", "IEnumerable을-구현하지-않은-타입에서도-foreach가-컴파일되는-이유", "foreach의-Dispose-호출이-struct-열거자를-박싱하지-않는-이유"]
 parent:
 date: 2026-08-09
 result: 모름

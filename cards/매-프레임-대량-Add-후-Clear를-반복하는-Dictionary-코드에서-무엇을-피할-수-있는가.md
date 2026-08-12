@@ -1,7 +1,7 @@
 ---
 title: 매 프레임 대량 Add 후 Clear를 반복하는 Dictionary 코드에서 무엇을 피할 수 있는가
 tags: [자료구조, 해시테이블, GC, 성능]
-related: [캐파시티 지정이 GC 부담을 줄이는 이유, GC 스파이크와 프레임 예산]
+related: ["캐파시티-지정이-GC-부담을-줄이는-이유", "GC-스파이크와-프레임-예산", "Dictionary에서-중간-항목을-Remove하면-entries-배열의-구멍을-어떻게-처리하는가"]
 parent: Dictionary에서 중간 항목을 Remove하면 entries 배열의 구멍을 어떻게 처리하는가
 date: 2026-08-10
 result: 부분

@@ -1,7 +1,7 @@
 ---
 title: C# event로 옵저버를 구현하면 순회·즉시반영·생명주기 문제가 각각 어떻게 되는가
 tags: [디자인 패턴, 옵저버, CSharp]
-related: []
+related: ["Notify-순회-중-구독-변경-깨짐을-막는-Subject-설계-선택지", "Notify-순회-도중-옵저버가-자기-자신을-구독-해제하면"]
 parent: Notify 순회 중 구독 변경으로 깨지는 것을 막는 Subject 설계 선택지
 date: 2026-08-11
 result: 부분

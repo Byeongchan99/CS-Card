@@ -1,7 +1,7 @@
 ---
 title: Notify 순회 중 구독 변경으로 깨지는 것을 막는 Subject 설계 선택지
 tags: [디자인 패턴, 옵저버, 성능]
-related: []
+related: ["Notify-순회-도중-옵저버가-자기-자신을-구독-해제하면", "Csharp-event로-옵저버를-구현하면-세-문제가-어떻게-되는가"]
 parent: 옵저버 Notify 순회 도중 옵저버가 자기 자신을 구독 해제하면 무슨 일이 일어나는가
 date: 2026-08-11
 result: 맞음

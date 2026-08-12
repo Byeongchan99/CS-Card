@@ -1,7 +1,7 @@
 ---
 title: 반복문에서 string을 += 로 이어붙이면 왜 O(n²)가 되는가
 tags: [C#, 문자열, GC, 성능]
-related: []
+related: ["참조-타입인-string이-값-타입처럼-복사된-것처럼-동작하는-이유", "StringBuilder는-어떻게-문자열-이어붙이기를-O(n)으로-낮추는가"]
 parent: 참조 타입인 string이 값 타입처럼 복사된 것처럼 동작하는 이유
 date: 2026-08-12
 result: 부분

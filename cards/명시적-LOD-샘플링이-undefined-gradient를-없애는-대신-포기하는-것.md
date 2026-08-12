@@ -1,7 +1,7 @@
 ---
 title: 명시적 LOD 샘플링이 undefined gradient를 없애는 대신 포기하는 것
 tags: [그래픽스, 셰이더, 밉맵]
-related: []
+related: ["동적-분기-안에서-자동-밉-텍스처-샘플링을-하면-gradient가-undefined가-되는-이유"]
 parent: 동적 분기 안에서 자동 밉 텍스처 샘플링을 하면 gradient가 undefined가 되는 이유
 date: 2026-08-12
 result: 맞음

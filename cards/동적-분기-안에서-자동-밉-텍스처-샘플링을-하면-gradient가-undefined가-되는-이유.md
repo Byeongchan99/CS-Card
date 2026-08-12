@@ -1,7 +1,7 @@
 ---
 title: 동적 분기 안에서 자동 밉 텍스처 샘플링을 하면 gradient가 undefined가 되는 이유
 tags: [그래픽스, 셰이더, 밉맵]
-related: [삼각형 밖 픽셀이 헬퍼 인보케이션으로 실행되는 이유]
+related: ["삼각형-밖-픽셀이-헬퍼-인보케이션으로-실행되는-이유", "GPU는-화면-공간-UV-미분값-ddx-ddy를-어떤-메커니즘으로-계산하는가", "명시적-LOD-샘플링이-undefined-gradient를-없애는-대신-포기하는-것"]
 parent: GPU는 화면 공간 UV 미분값 ddx ddy를 어떤 메커니즘으로 계산하는가
 date: 2026-08-12
 result: 부분

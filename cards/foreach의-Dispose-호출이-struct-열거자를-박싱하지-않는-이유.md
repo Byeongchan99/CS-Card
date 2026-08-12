@@ -1,7 +1,7 @@
 ---
 title: foreach의 Dispose 호출이 struct 열거자를 박싱하지 않는 이유
 tags: ["C#", 박싱, 컴파일러]
-related: ["IEnumerable로-순회할-때-열거자-박싱은-호출자와-컬렉션-중-어디서-일어나는가", "List를-IEnumerable-필드로-선언하면-foreach에서-GC-Alloc이-생기는-이유", "IEnumerable을-구현하지-않은-타입에서도-foreach가-컴파일되는-이유"]
+related: ["IEnumerable로-순회할-때-열거자-박싱은-호출자와-컬렉션-중-어디서-일어나는가", "List를-IEnumerable-필드로-선언하면-foreach에서-GC-Alloc이-생기는-이유", "IEnumerable을-구현하지-않은-타입에서도-foreach가-컴파일되는-이유", "Setup이-끝난-뒤에도-람다가-지역-변수를-계속-쓸-수-있는-이유"]
 parent: IEnumerable로 순회할 때 열거자 박싱은 호출자와 컬렉션 중 어디서 일어나는가
 date: 2026-07-29
 result: 부분

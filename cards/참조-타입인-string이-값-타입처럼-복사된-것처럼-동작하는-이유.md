@@ -1,7 +1,7 @@
 ---
 title: 참조 타입인 string이 값 타입처럼 복사된 것처럼 동작하는 이유
 tags: [C#, 문자열, 메모리]
-related: []
+related: ["반복문에서-string을-이어붙이면-왜-O(n제곱)가-되는가", "StringBuilder는-어떻게-문자열-이어붙이기를-O(n)으로-낮추는가"]
 date: 2026-08-12
 result: 맞음
 status: 완성

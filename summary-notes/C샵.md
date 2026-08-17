@@ -19,6 +19,15 @@ struct는 값 타입(`=`에서 값 복사), class는 참조 타입(같은 객체
 | struct | 모든 필드 값을 비교(값 동등) | 값이 같으면 true |
 | class | 참조 비교(같은 객체인지) | 다른 객체면 false |
 
+## record와 값 동등성
+
+`record`(및 `record struct`)는 값 동등성을 자동 구현 — 모든 프로퍼티 값이 같으면 `==`도 true(class의 기본 참조 비교와 반대). 불변 객체를 간결히 만들고, `with` 식으로 일부만 바꾼 복사본을 생성(`p with { hp = 5 }`).
+
+| | 기본 `==` | 용도 |
+| --- | --- | --- |
+| class | 참조 비교 | 식별자·가변 상태 객체 |
+| record | 값 비교(전 프로퍼티) | 불변 데이터, DTO |
+
 ## ref — 참조도 값으로 복사된다
 
 참조 타입도 파라미터로 넘기면 참조가 값으로 복사됨. 메서드 안에서 `e = new Enemy(...)`로 재할당하면 지역 복사본만 새 객체를 가리키고 원본은 안 바뀜. 내부 필드 수정(`e.hp = ...`)은 전파되지만 재할당은 전파 안 됨. 진짜 바꾸려면 `ref`.
@@ -38,6 +47,12 @@ struct는 값 타입(`=`에서 값 복사), class는 참조 타입(같은 객체
 ## 박싱(boxing)
 
 값 타입을 object로 변환할 때 힙에 할당 → GC 부담. `Debug.Log(int)`처럼 값 타입을 object 파라미터로 넘길 때 발생. 문자열(참조 타입)을 넘기면 박싱 없음. 핵심 핫 패스에선 로그·박싱을 피할 것.
+
+## Span과 stackalloc
+
+`Span<T>`는 배열·문자열의 일부를 복사 없이 가리키는 뷰. `Substring` 대신 `Slice`로 부분을 잘라 쓰면 힙 할당·복사를 피함. `stackalloc`으로 스택에 임시 버퍼를 잡으면 GC 대상이 아님. 파싱·버퍼 처리 핫 패스에서 할당을 없애는 데 씀.
+
+<svg viewBox="0 0 340 115" width="340" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Span은 배열의 일부를 복사 없이 가리키는 뷰"><g font-size="14" fill="currentColor" text-anchor="middle"><rect x="20" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="42" y="67">3</text><rect x="66" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="88" y="67">1</text><rect x="112" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="134" y="67">4</text><rect x="158" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="180" y="67">1</text><rect x="204" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="226" y="67">5</text><rect x="250" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="272" y="67">9</text></g><path d="M112 34 L112 28 L248 28 L248 34" fill="none" stroke="#4f83e0" stroke-width="1.6"/><text x="180" y="22" font-size="12" fill="#4f83e0" text-anchor="middle">Span — 복사 없이 참조</text><text x="20" y="104" font-size="12" fill="currentColor" opacity="0.7">AsSpan(2, 3) — 원본 배열의 일부를 그대로 가리킴</text></svg>
 
 ## 세대별 GC
 
@@ -121,6 +136,10 @@ static은 클래스당 하나라 모든 인스턴스가 공유. 인스턴스 필
 
 `as`는 실패 시 null을 반환하고 예외가 없으며, 참조 타입·Nullable에만 사용 가능. `(Type)` 캐스트는 실패 시 `InvalidCastException`.
 
+## 패턴 매칭
+
+`is`·`switch` 식으로 타입·구조·값을 한 번에 검사·분해. `if (obj is Enemy e)`는 형 검사와 변수 바인딩을 동시에, `switch { > 90 => "A", … }`는 값 범위를, `(0, var y)`는 튜플을 분해. if/switch로 타입을 분기하던 코드를 간결·안전하게. 단 다형성(가상 디스패치)으로 풀 수 있으면 그쪽이 우선.
+
 ## 정수 나눗셈
 
 `25 / 4`는 둘 다 int라 정수 나눗셈으로 6 → float에 대입돼도 6.0. `1 / 3 * 100f`는 `1/3`이 먼저 int 0이 된 뒤 ×100f → 0. 나눗셈이 int끼리 먼저 평가되는 게 함정. 고치려면 `(float)`로 캐스팅.
@@ -143,6 +162,18 @@ static은 클래스당 하나라 모든 인스턴스가 공유. 인스턴스 필
 ## async/await와 Task
 
 `async` 메서드는 `await`를 만나면 그 지점에서 제어를 호출자에게 돌려주고, 기다리던 작업이 끝나면 이어서 실행 — 스레드를 붙잡지 않아 UI·서버가 안 멈춤. 컴파일러가 메서드를 상태 기계로 변환(yield와 같은 원리). `Task`는 진행 중이거나 완료될 작업의 핸들. async void는 예외를 못 잡으니 이벤트 핸들러 외엔 `Task`를 반환하고, 무작정 `.Result`/`.Wait()`로 기다리면 교착(deadlock) 위험.
+
+## 예외 처리 — try/catch/finally
+
+`try`에서 예외가 나면 그 지점부터 남은 코드를 건너뛰고 맞는 `catch`로 점프, `finally`는 정상·예외에 상관없이 항상 실행돼 자원을 해제. `catch`는 구체 타입부터 잡고, 빈 catch로 삼키지 말고 처리·로깅·재던지기. `using`이 곧 try/finally의 축약.
+
+```mermaid
+flowchart TD
+    T["try 블록"] -->|정상| F["finally"]
+    T -->|예외 발생| C["catch"]
+    C --> F
+    F --> E["이후 코드"]
+```
 
 ## IDisposable과 using
 

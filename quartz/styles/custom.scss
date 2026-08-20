@@ -112,6 +112,17 @@ li {
   padding-top: 5rem;
 }
 
+// 오른쪽 사이드바는 base.scss에서 height:100vh; position:sticky 지만 overflow가 없어,
+// 내용(목차 + 백링크)이 화면보다 길면 하단이 잘려 도달할 수 없다. 데스크톱에서만
+// 패널 자체를 세로 스크롤 가능하게 해, 고정된 패널 안에서 스크롤하면 백링크까지 보이게 한다.
+// (태블릿/모바일은 base.scss가 position:initial; flex-direction:row 로 따로 처리하므로 제외)
+@media all and (min-width: 1200px) {
+  .page > #quartz-body .sidebar.right {
+    overflow-y: auto;
+    overscroll-behavior: contain; // 고정된 패널을 스크롤할 때 페이지로 스크롤이 새지 않게
+  }
+}
+
 // ================================
 // 홈페이지 전용 (body[data-slug="index"])
 // ================================

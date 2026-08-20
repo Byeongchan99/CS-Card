@@ -45,16 +45,17 @@ function syncTocScroll() {
     if (!anchor) continue
 
     const el = (anchor.closest("li") as HTMLElement | null) ?? anchor
+    const maxScroll = content.scrollHeight - content.clientHeight
     const elTop = el.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop
-    const elBottom = elTop + el.offsetHeight
-    const viewTop = content.scrollTop
-    const viewBottom = viewTop + content.clientHeight
-    const margin = Math.min(el.offsetHeight * 2, content.clientHeight / 3)
+    const elCenter = elTop + el.offsetHeight / 2
 
-    if (elTop < viewTop + margin) {
-      content.scrollTo({ top: Math.max(0, elTop - margin), behavior: "smooth" })
-    } else if (elBottom > viewBottom - margin) {
-      content.scrollTo({ top: elBottom - content.clientHeight + margin, behavior: "smooth" })
+    // 활성 항목을 목차 창 가운데 밴드(위·아래 25%) 안에 유지한다. 밴드를 벗어나면 가운데로
+    // 되돌리므로 스크롤 방향에 상관없이 대칭이고, 문서 양 끝에선 clamp로 목차도 끝까지 간다.
+    const relative = elCenter - content.scrollTop
+    const band = content.clientHeight * 0.25
+    if (relative < band || relative > content.clientHeight - band) {
+      const target = Math.max(0, Math.min(elCenter - content.clientHeight / 2, maxScroll))
+      content.scrollTo({ top: target, behavior: "smooth" })
     }
   }
 }

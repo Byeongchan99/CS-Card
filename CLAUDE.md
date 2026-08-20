@@ -107,6 +107,14 @@ frontmatter는 `title`, `tags`(첫 항목 대분류 + `요약`), `date`.
 만들지 말고 그 노트에 `##` 절을 덧붙인다.** 대상 노트의 `##`가 8개를 넘으면 그때 쪼갠다.
 
 ## 정비 작업 ("정비해줘" 요청 시)
+아래 1~6단계는 `scripts/maintain.ps1`로 자동화돼 있다. 파서를 새로 짜지 말고 이 스크립트를 쓴다.
+- `pwsh scripts/maintain.ps1` (또는 `powershell -ExecutionPolicy Bypass -File scripts/maintain.ps1`) — 리포트만
+- `pwsh scripts/maintain.ps1 -Apply` — related 상호 채우기 적용 + index.md 재생성
+
+리포트로 점검 결과(빈 위키링크·심화 노트 참조·해설 없는 체인)를 확인하고, 문제 없으면 `-Apply` 후
+diff를 검토해 7단계(요약 보고 → 커밋·푸시)를 밟는다. 스크립트의 링크 해석(resolveName/sluggify)은
+`scripts/sync-content.mjs`와 동일해야 하며, 그 규칙이 바뀌면 둘을 같이 고친다.
+
 아래 순서로 수행한다. 카드의 본문 내용(질문, 답변, 정리)은 절대 수정하지
 않는다. 정비는 메타데이터와 링크만 다룬다.
 

@@ -67,7 +67,12 @@ export const defaultContentPageLayout: PageLayout = {
   right: [
     Component.ChainMap(),
     Component.DesktopOnly(Component.TableOfContents()),
-    Component.Backlinks(),
+    // 백링크는 심화 노트에선 유용하지만 질문 카드에선 '이 카드의 체인'(ChainMap)으로
+    // 더 편히 이동할 수 있어 불필요하다. 카드 페이지(slug이 cards/로 시작)에서만 뺀다.
+    Component.ConditionalRender({
+      component: Component.Backlinks(),
+      condition: (page) => !page.fileData.slug?.startsWith("cards/"),
+    }),
   ],
 }
 

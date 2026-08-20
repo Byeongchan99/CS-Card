@@ -1,7 +1,7 @@
 ---
 title: 같은 bucket으로 간 키들을 Dictionary는 메모리에 어떤 구조로 저장하는가
 tags: [자료구조, 해시테이블, GC, CSharp]
-related: ["Dictionary가-평균-O1-조회를-달성하는-내부-원리", "Dictionary의-buckets-배열과-entries-배열은-각각-무엇을-담고-체인은-어디에-표현되는가", "Dictionary에서-중간-항목을-Remove하면-entries-배열의-구멍을-어떻게-처리하는가"]
+related: ["Dictionary가-평균-O1-조회를-달성하는-내부-원리", "Dictionary의-buckets-배열과-entries-배열은-각각-무엇을-담고-체인은-어디에-표현되는가", "Dictionary에서-중간-항목을-Remove하면-entries-배열의-구멍을-어떻게-처리하는가", "List-Clear의-내부-동작", "매-프레임-대량-Add-후-Clear를-반복하는-Dictionary-코드에서-무엇을-피할-수-있는가"]
 parent: Dictionary가 평균 O(1) 조회를 달성하는 내부 원리
 date: 2026-08-10
 result: 맞음

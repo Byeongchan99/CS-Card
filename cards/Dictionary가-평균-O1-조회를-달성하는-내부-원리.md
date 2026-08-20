@@ -1,7 +1,7 @@
 ---
 title: Dictionary가 평균 O(1) 조회를 달성하는 내부 원리
 tags: [자료구조, 해시테이블, CSharp]
-related: ["캐파시티-지정이-GC-부담을-줄이는-이유", "같은-bucket으로-간-키들을-Dictionary는-메모리에-어떤-구조로-저장하는가", "Dictionary의-buckets-배열과-entries-배열은-각각-무엇을-담고-체인은-어디에-표현되는가", "Dictionary에서-중간-항목을-Remove하면-entries-배열의-구멍을-어떻게-처리하는가"]
+related: ["캐파시티-지정이-GC-부담을-줄이는-이유", "같은-bucket으로-간-키들을-Dictionary는-메모리에-어떤-구조로-저장하는가", "Dictionary의-buckets-배열과-entries-배열은-각각-무엇을-담고-체인은-어디에-표현되는가", "Dictionary에서-중간-항목을-Remove하면-entries-배열의-구멍을-어떻게-처리하는가", "List-Clear의-내부-동작"]
 parent:
 date: 2026-08-10
 result: 부분

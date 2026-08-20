@@ -14,8 +14,10 @@ const observer = new IntersectionObserver((entries) => {
 })
 
 // 읽는 위치를 따라 목차가 스스로 스크롤되게 한다(스크롤스파이).
-// 기준은 뷰포트 상단에서 조금 아래의 "읽는 줄"을 마지막으로 지난 헤딩이다.
-// (.in-view는 뷰포트 바닥 기준이라 위로 스크롤할 때 본문과 어긋나므로 쓰지 않는다.)
+// 현재 섹션은 "읽는 줄"을 마지막으로 지난 헤딩인데, 이 줄을 스크롤 진행도에 따라
+// 뷰포트 위→아래로 내린다. 맨 위(0%)면 줄이 뷰포트 상단이라 첫 헤딩, 맨 아래(100%)면
+// 줄이 하단이라 마지막 헤딩까지 확실히 닿는다. 고정된 상단 줄을 쓰면 마지막 화면 안의
+// 헤딩들이 줄을 못 넘겨 목차가 끝까지 안 내려가는 문제가 생긴다.
 // 그 헤딩의 목차 항목이 목차 창 밖으로 나가면 목차 컨테이너의 scrollTop만 직접 조정해
 // 다시 창 안으로 들인다(페이지 스크롤에는 영향을 주지 않는다).
 let headers: HTMLElement[] = []
@@ -23,10 +25,12 @@ let rafPending = false
 
 function activeHeadingSlug(): string | null {
   if (headers.length === 0) return null
-  const line = Math.min(160, window.innerHeight * 0.25) // 이 줄을 지난 마지막 헤딩이 현재 섹션
+  const maxPageScroll = document.documentElement.scrollHeight - window.innerHeight
+  const frac = maxPageScroll > 0 ? Math.min(1, Math.max(0, window.scrollY / maxPageScroll)) : 0
+  const line = window.innerHeight * frac
   let current: HTMLElement | null = null
   for (const h of headers) {
-    if (h.getBoundingClientRect().top - line <= 0) current = h
+    if (h.getBoundingClientRect().top <= line) current = h
     else break // 헤딩은 문서 순서(위→아래)라 줄 아래로 처음 벗어나면 멈춤
   }
   // 첫 헤딩도 아직 안 지났으면(문서 맨 위) 첫 헤딩을 현재로 삼아 목차도 맨 위로

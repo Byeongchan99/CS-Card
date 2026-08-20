@@ -28,6 +28,10 @@ struct는 값 타입(`=`에서 값 복사), class는 참조 타입(같은 객체
 | class | 참조 비교 | 식별자·가변 상태 객체 |
 | record | 값 비교(전 프로퍼티) | 불변 데이터, DTO |
 
+## 연산자 오버로딩
+
+`operator +`·`==` 등을 정의해 사용자 타입에 연산자 문법을 부여 — Vector·복소수·통화처럼 수학적 의미가 뚜렷한 값 타입에 적합. `==`를 오버로드하면 `Equals`·`GetHashCode`도 일관되게 함께 고쳐야 컬렉션이 올바로 동작. 의미가 불분명한 곳에 남용하면 오히려 읽기 어려워지므로 값 의미가 자연스러운 경우에만.
+
 ## ref — 참조도 값으로 복사된다
 
 참조 타입도 파라미터로 넘기면 참조가 값으로 복사됨. 메서드 안에서 `e = new Enemy(...)`로 재할당하면 지역 복사본만 새 객체를 가리키고 원본은 안 바뀜. 내부 필드 수정(`e.hp = ...`)은 전파되지만 재할당은 전파 안 됨. 진짜 바꾸려면 `ref`.
@@ -53,6 +57,10 @@ struct는 값 타입(`=`에서 값 복사), class는 참조 타입(같은 객체
 `Span<T>`는 배열·문자열의 일부를 복사 없이 가리키는 뷰. `Substring` 대신 `Slice`로 부분을 잘라 쓰면 힙 할당·복사를 피함. `stackalloc`으로 스택에 임시 버퍼를 잡으면 GC 대상이 아님. 파싱·버퍼 처리 핫 패스에서 할당을 없애는 데 씀.
 
 <svg viewBox="0 0 340 115" width="340" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Span은 배열의 일부를 복사 없이 가리키는 뷰"><g font-size="14" fill="currentColor" text-anchor="middle"><rect x="20" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="42" y="67">3</text><rect x="66" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="88" y="67">1</text><rect x="112" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="134" y="67">4</text><rect x="158" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="180" y="67">1</text><rect x="204" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="226" y="67">5</text><rect x="250" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="272" y="67">9</text></g><path d="M112 34 L112 28 L248 28 L248 34" fill="none" stroke="#4f83e0" stroke-width="1.6"/><text x="180" y="22" font-size="12" fill="#4f83e0" text-anchor="middle">Span — 복사 없이 참조</text><text x="20" y="104" font-size="12" fill="currentColor" opacity="0.7">AsSpan(2, 3) — 원본 배열의 일부를 그대로 가리킴</text></svg>
+
+## Index·Range 연산자
+
+`^`(끝 기준 인덱스)와 `..`(범위)로 컬렉션 일부를 간결히 지목. `a[^1]`은 마지막 원소, `a[2..5]`는 인덱스 2부터 4까지. 배열에 `..`를 쓰면 새 배열이 복사되지만, `Span`·`ReadOnlySpan`에 쓰면 복사 없는 슬라이스라 할당이 없음. 파싱·버퍼 처리에서 Span과 함께 쓰면 부분 접근이 깔끔하고 저비용.
 
 ## 세대별 GC
 
@@ -114,6 +122,10 @@ static은 클래스당 하나라 모든 인스턴스가 공유. 인스턴스 필
 
 `for (int i...)`의 람다는 변수 i 자체를 캡처(공유). 루프는 i가 (마지막 사용값 2가 아니라) 3이 되어 끝나므로 람다 실행 시 모두 3 3 3을 출력. 고치려면 루프 안에서 지역 변수에 복사한 뒤 그걸 캡처.
 
+## 로컬 함수 vs 람다
+
+메서드 안에 이름 있는 함수를 두는 로컬 함수는, 델리게이트 객체를 만드는 람다와 달리 힙 할당·델리게이트 호출 오버헤드가 없음(캡처가 없으면 특히). 재귀·이터레이터 분리·인자 검증 분리에 적합하고, 캡처한 지역 변수를 `ref`로도 다룰 수 있음. 이벤트 구독처럼 델리게이트 인스턴스 자체가 필요한 자리엔 람다가 맞음.
+
 ## 문자열 불변성과 StringBuilder
 
 문자열은 불변이라 `Replace`·`ToUpper`는 원본을 안 바꾸고 새 문자열을 반환. 반환값을 안 받으면 원본은 그대로라 `s = s.Replace(...)`가 필요. 불변인 이유는 보안, 해시 키 캐싱, 멀티스레드 안전.
@@ -132,6 +144,10 @@ static은 클래스당 하나라 모든 인스턴스가 공유. 인스턴스 필
 
 `IEnumerable<out T>`는 공변 — `IEnumerable<Cat>`을 `IEnumerable<Animal>`에 대입 가능(T를 꺼내기만 해 안전). `Action<in T>`는 반공변 — `Action<Animal>`을 `Action<Cat>`에 대입 가능(T를 받기만 함). `out`은 반환 위치, `in`은 입력 위치에만 T가 쓰일 때 허용. `List<T>` 같은 가변 컬렉션은 넣고 빼기를 다 해 불변(둘 다 불가).
 
+## 리플렉션과 어트리뷰트
+
+리플렉션은 런타임에 타입의 메타데이터(필드·메서드·어트리뷰트)를 읽고 동적으로 호출. 어트리뷰트는 코드에 붙이는 선언적 메타데이터(`[SerializeField]`, `[Obsolete]`)로, 리플렉션으로 읽어 동작을 바꿈 — 유니티 인스펙터·직렬화·테스트 프레임워크가 이 방식. 유연하나 느리고 컴파일 타임 검사를 우회하므로 핫 패스에선 캐싱하거나 소스 제너레이터로 대체.
+
 ## as vs 형변환 캐스트
 
 `as`는 실패 시 null을 반환하고 예외가 없으며, 참조 타입·Nullable에만 사용 가능. `(Type)` 캐스트는 실패 시 `InvalidCastException`.
@@ -139,6 +155,14 @@ static은 클래스당 하나라 모든 인스턴스가 공유. 인스턴스 필
 ## 패턴 매칭
 
 `is`·`switch` 식으로 타입·구조·값을 한 번에 검사·분해. `if (obj is Enemy e)`는 형 검사와 변수 바인딩을 동시에, `switch { > 90 => "A", … }`는 값 범위를, `(0, var y)`는 튜플을 분해. if/switch로 타입을 분기하던 코드를 간결·안전하게. 단 다형성(가상 디스패치)으로 풀 수 있으면 그쪽이 우선.
+
+## 튜플과 분해
+
+`(int, string)` 값 튜플(`ValueTuple`)은 이름 붙인 여러 값을 가벼운 값 타입으로 묶어 반환 — 임시 클래스나 여러 개의 out을 대신. `var (id, name) = GetUser()`로 분해해 받고, 필드명을 주면 `.min`·`.max`처럼 접근. 옛 `Tuple`(참조 타입, `.Item1`)과 달리 값 타입이라 할당이 없고, 사용자 타입도 `Deconstruct`를 정의하면 같은 분해 문법을 지원.
+
+## 열거형과 [Flags]
+
+enum은 이름 붙인 정수 상수 집합이라 매직 넘버 대신 의미를 드러냄. `[Flags]`를 붙이고 값을 1, 2, 4, 8…로 주면 비트 OR로 여러 상태를 한 변수에 조합(`Fire | Ice`)하고 AND로 검사 — 상태 효과·LayerMask가 이 방식. 기본 밑 타입은 int이나 지정 가능하고, 정의 안 된 정수값도 담길 수 있어 검증이 필요.
 
 ## 정수 나눗셈
 
@@ -159,9 +183,17 @@ static은 클래스당 하나라 모든 인스턴스가 공유. 인스턴스 필
 
 `??`(null 병합)는 좌변이 null이면 우변 반환. `?.`(null 조건부)는 좌변이 null이면 평가를 멈추고 null 반환. `a`가 null일 때 `a ?? "default"` → `"default"`, `a?.Length` → null(`int?`로 받음).
 
+## nullable 참조 타입(#nullable)
+
+참조 타입도 `string?`처럼 null 허용 여부를 타입에 표기해, 컴파일러가 null 가능성을 흐름 분석으로 경고. `string`은 non-null 의도라 null 대입·미초기화에 경고가 뜨고, `string?`은 역참조 전에 null 검사를 요구. 런타임 강제가 아니라 컴파일 타임 경고라 `!`(null 무시 연산자)로 끌 수 있음. NullReferenceException을 설계 단계에서 줄이는 장치.
+
 ## async/await와 Task
 
 `async` 메서드는 `await`를 만나면 그 지점에서 제어를 호출자에게 돌려주고, 기다리던 작업이 끝나면 이어서 실행 — 스레드를 붙잡지 않아 UI·서버가 안 멈춤. 컴파일러가 메서드를 상태 기계로 변환(yield와 같은 원리). `Task`는 진행 중이거나 완료될 작업의 핸들. async void는 예외를 못 잡으니 이벤트 핸들러 외엔 `Task`를 반환하고, 무작정 `.Result`/`.Wait()`로 기다리면 교착(deadlock) 위험.
+
+## lock과 스레드 안전 컬렉션
+
+`lock(obj)`은 한 번에 한 스레드만 임계 구역에 들이는 문법 설탕(Monitor.Enter/Exit) — 공유 상태 갱신을 감쌈. 잠글 객체는 외부에 노출 안 된 전용 인스턴스를 쓰고, `this`·타입 객체 잠금은 피함. 잦은 동시 접근엔 락 대신 `ConcurrentDictionary`·`ConcurrentQueue` 같은 스레드 안전 컬렉션이나 `Interlocked`가 경합을 줄여 유리.
 
 ## 예외 처리 — try/catch/finally
 

@@ -8,7 +8,9 @@ date: 2026-07-30
 
 ## 값 타입 vs 참조 타입
 
-struct는 값 타입(`=`에서 값 복사), class는 참조 타입(같은 객체 공유). 그래서 복사 후 한쪽만 바꾸면 struct는 원본이 유지되고 class는 함께 변함.
+변수 자리에 무엇이 놓이느냐가 갈림길. 값 타입은 데이터 자체가, 참조 타입은 데이터가 있는 힙 주소가 놓임. `=` 대입·인자 전달·배열 저장은 전부 "변수에 담긴 것을 복사"하는 같은 동작이라, 값 타입은 내용이 통째로 복사되고 참조 타입은 주소만 복사돼 객체 하나를 둘이 가리킴.
+
+값 타입 — `int`·`float`·`bool`·`char`·`enum`·`struct`·`ValueTuple`·`Nullable<T>`. 참조 타입 — `class`·`interface`·`delegate`·배열·`string`. string만 참조 타입이면서 불변이라 값처럼 굴어 헷갈리는 자리.
 
 <svg viewBox="0 0 340 185" width="340" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="값 타입은 복사되고 참조 타입은 공유된다"><defs><marker id="vr-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="#4f83e0"/></marker></defs><text x="80" y="22" font-size="12" fill="currentColor" opacity="0.7" text-anchor="middle">struct — 값 복사</text><g fill="none" stroke="currentColor" opacity="0.65"><rect x="28" y="40" width="104" height="36" rx="4"/><rect x="28" y="92" width="104" height="36" rx="4"/></g><text x="80" y="63" font-size="13" fill="currentColor" text-anchor="middle">a  { hp:10 }</text><text x="80" y="115" font-size="13" fill="currentColor" text-anchor="middle">b  { hp:10 }</text><text x="80" y="150" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">서로 독립</text><line x1="162" y1="30" x2="162" y2="158" stroke="currentColor" opacity="0.2"/><text x="258" y="22" font-size="12" fill="currentColor" opacity="0.7" text-anchor="middle">class — 참조 공유</text><g fill="none" stroke="currentColor" opacity="0.65"><rect x="184" y="46" width="44" height="30" rx="4"/><rect x="184" y="104" width="44" height="30" rx="4"/><rect x="274" y="74" width="56" height="34" rx="4"/></g><text x="206" y="66" font-size="13" fill="currentColor" text-anchor="middle">a</text><text x="206" y="124" font-size="13" fill="currentColor" text-anchor="middle">b</text><text x="302" y="95" font-size="12" fill="currentColor" text-anchor="middle">{ hp:10 }</text><line x1="228" y1="61" x2="272" y2="86" stroke="#4f83e0" stroke-width="2" marker-end="url(#vr-a)"/><line x1="228" y1="119" x2="272" y2="96" stroke="#4f83e0" stroke-width="2" marker-end="url(#vr-a)"/><text x="258" y="150" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">같은 객체 공유</text></svg>
 
@@ -18,16 +20,26 @@ var a = new SPos { hp = 10 }; var b = a; b.hp = 5;   // a.hp = 10 (독립)
 var x = new CPos { hp = 10 }; var y = x; y.hp = 5;   // x.hp = 5  (공유)
 ```
 
+작고 수명이 짧은 데이터는 struct가 유리 — 힙 할당이 없어 GC를 안 건드리고, 배열에 담으면 값이 연속으로 깔려 캐시 지역성도 좋음. 대가는 복사 비용이라 필드가 많아질수록 불리하고, 필드를 바꿀 수 있는 mutable struct는 "복사본만 고쳐놓고 원본은 그대로"인 버그의 단골이라 `readonly struct`로 두는 편이 안전.
+
+유니티에서 `transform.position.x = 5f`가 컴파일 에러인 것도 같은 이유. Vector3가 struct라 프로퍼티 `position`이 돌려준 건 복사본이고, 그 복사본의 x를 고쳐봐야 즉시 버려지므로 컴파일러가 아예 막음. `transform.position = new Vector3(5f, p.y, p.z)`처럼 통째로 다시 대입해야 함.
+
 ## struct vs class의 기본 Equals
 
-| | 기본 `Equals` | 결과 |
+`object.Equals`의 기본 동작은 참조 비교인데, 모든 struct의 부모인 `ValueType`이 이를 필드 값 비교로 재정의해 struct만 기본이 값 동등이 됨. `==`는 가상 메서드가 아니라 연산자 문법이라 사정이 다름 — struct에 직접 정의하지 않으면 아예 못 씀.
+
+| | 기본 `Equals` | 기본 `==` |
 | --- | --- | --- |
-| struct | 모든 필드 값을 비교(값 동등) | 값이 같으면 true |
-| class | 참조 비교(같은 객체인지) | 다른 객체면 false |
+| struct | 모든 필드 값을 비교(`ValueType`이 재정의) | 없음 — `operator ==`를 정의해야 사용 가능 |
+| class | 참조 비교(같은 객체인지) | 참조 비교 |
+
+`ValueType.Equals`의 기본 경로는 리플렉션으로 필드를 훑고 인자를 박싱까지 해 느림. 비교가 잦은 struct라면 `Equals`·`GetHashCode`를 직접 오버라이드하고 `IEquatable<T>`를 구현해 박싱 없는 비교 경로를 여는 게 정석.
+
+`Equals`를 손대면 `GetHashCode`도 반드시 같이 손댐. Dictionary·HashSet은 해시로 버킷을 고른 뒤 그 안에서만 `Equals`로 확인하는 2단 구조라, 값이 같은데 해시가 다르면 서로 다른 버킷에 떨어져 방금 넣은 키를 못 찾음.
 
 ## record와 값 동등성
 
-`record`(및 `record struct`)는 값 동등성을 자동 구현 — 모든 프로퍼티 값이 같으면 `==`도 true(class의 기본 참조 비교와 반대). 불변 객체를 간결히 만들고, `with` 식으로 일부만 바꾼 복사본을 생성(`p with { hp = 5 }`).
+`record`는 값 동등성을 컴파일러가 자동 구현 — 모든 프로퍼티 값이 같으면 `Equals`도 `==`도 true(class의 기본 참조 비교와 반대). `ToString`·`Deconstruct`와 일부만 바꾼 복사본을 만드는 `with` 식도 함께 생성. 위치 매개변수로 선언하면 프로퍼티가 `init` 전용이라 생성 후 못 바꾸는 불변 데이터가 됨.
 
 ```csharp
 record Point(int X, int Hp);
@@ -36,6 +48,8 @@ var q = p with { Hp = 5 };          // 일부만 바꾼 복사본
 bool same = p == new Point(0, 10);  // true (값 동등)
 ```
 
+`record`는 `record class`의 줄임말이라 여전히 참조 타입이고 힙에 할당됨 — 바뀌는 건 동등성 규칙뿐. 값 타입으로 쓰려면 `record struct`. `with`는 얕은 복사라 안에 든 참조 객체는 원본과 그대로 공유하고, 상속을 쓰면 런타임 타입까지 함께 비교해 필드 값이 같아도 파생 타입이 다르면 false.
+
 | | 기본 `==` | 용도 |
 | --- | --- | --- |
 | class | 참조 비교 | 식별자·가변 상태 객체 |
@@ -43,7 +57,7 @@ bool same = p == new Point(0, 10);  // true (값 동등)
 
 ## 연산자 오버로딩
 
-`operator +`·`==` 등을 정의해 사용자 타입에 연산자 문법을 부여 — Vector·복소수·통화처럼 수학적 의미가 뚜렷한 값 타입에 적합. `==`를 오버로드하면 `Equals`·`GetHashCode`도 일관되게 함께 고쳐야 컬렉션이 올바로 동작. 의미가 불분명한 곳에 남용하면 오히려 읽기 어려워지므로 값 의미가 자연스러운 경우에만.
+`operator +`·`==` 등을 `public static` 메서드로 정의해 사용자 타입에 연산자 문법을 부여 — Vector·복소수·통화처럼 수학적 의미가 뚜렷한 값 타입에 적합. 의미가 자명하지 않은 곳에 붙이면 읽는 쪽이 동작을 추측해야 해 오히려 손해.
 
 ```csharp
 struct Vec {
@@ -52,6 +66,10 @@ struct Vec {
 }
 var v = new Vec { x = 1 } + new Vec { x = 2 };   // v.x = 3
 ```
+
+짝을 이루는 연산자는 함께 정의하도록 컴파일러가 강제 — `==`/`!=`, `<`/`>`, `<=`/`>=`. `==`를 정의했으면 `Equals`·`GetHashCode`도 같은 기준으로 맞춰야 함. 컬렉션·LINQ는 `==`가 아니라 `Equals`를 쓰므로, 문법만 바꾸고 `Equals`를 참조 비교로 남겨두면 `a == b`는 true인데 `list.Contains(a)`는 false인 상황이 생김.
+
+대입 `=`와 `&&`·`||`·`?:`·`??`는 오버로딩 불가. 단 `&`·`|`와 `true`/`false` 연산자를 정의하면 `&&`·`||`가 그로부터 파생되고, `+`를 정의하면 `+=`는 자동으로 따라옴.
 
 ## ref — 참조도 값으로 복사된다
 

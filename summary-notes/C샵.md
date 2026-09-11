@@ -8,21 +8,80 @@ date: 2026-07-30
 
 ## 값 타입 vs 참조 타입
 
-변수 자리에 무엇이 놓이느냐가 갈림길. 값 타입은 데이터 자체가, 참조 타입은 데이터가 있는 힙 주소가 놓임. `=` 대입·인자 전달·배열 저장은 전부 "변수에 담긴 것을 복사"하는 같은 동작이라, 값 타입은 내용이 통째로 복사되고 참조 타입은 주소만 복사돼 객체 하나를 둘이 가리킴.
+변수는 메모리의 한 칸이고, 그 칸에 무엇이 들어가느냐로 갈림. 값 타입(struct)은 칸 안에 데이터가 직접 들어가고, 참조 타입(class)은 데이터(객체)가 힙에 따로 만들어지고 칸에는 그 객체의 위치(참조)만 들어감.
 
-값 타입 — `int`·`float`·`bool`·`char`·`enum`·`struct`·`ValueTuple`·`Nullable<T>`. 참조 타입 — `class`·`interface`·`delegate`·배열·`string`. string만 참조 타입이면서 불변이라 값처럼 굴어 헷갈리는 자리.
+`=` 대입은 양쪽 모두 "오른쪽 칸의 내용을 왼쪽 칸에 복사"하는 같은 동작. 결과가 갈리는 건 복사되는 내용이 달라서 — struct는 데이터가 복사돼 두 벌이 되고, class는 위치가 복사돼 같은 객체 하나를 둘이 가리킴. 그래서 복사 후 한쪽을 고치면 struct는 원본이 그대로고, class는 둘이 보는 객체 하나가 바뀌어 원본 쪽에서 읽어도 바뀐 값이 나옴.
 
-<svg viewBox="0 0 340 185" width="340" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="값 타입은 복사되고 참조 타입은 공유된다"><defs><marker id="vr-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="#4f83e0"/></marker></defs><text x="80" y="22" font-size="12" fill="currentColor" opacity="0.7" text-anchor="middle">struct — 값 복사</text><g fill="none" stroke="currentColor" opacity="0.65"><rect x="28" y="40" width="104" height="36" rx="4"/><rect x="28" y="92" width="104" height="36" rx="4"/></g><text x="80" y="63" font-size="13" fill="currentColor" text-anchor="middle">a  { hp:10 }</text><text x="80" y="115" font-size="13" fill="currentColor" text-anchor="middle">b  { hp:10 }</text><text x="80" y="150" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">서로 독립</text><line x1="162" y1="30" x2="162" y2="158" stroke="currentColor" opacity="0.2"/><text x="258" y="22" font-size="12" fill="currentColor" opacity="0.7" text-anchor="middle">class — 참조 공유</text><g fill="none" stroke="currentColor" opacity="0.65"><rect x="184" y="46" width="44" height="30" rx="4"/><rect x="184" y="104" width="44" height="30" rx="4"/><rect x="274" y="74" width="56" height="34" rx="4"/></g><text x="206" y="66" font-size="13" fill="currentColor" text-anchor="middle">a</text><text x="206" y="124" font-size="13" fill="currentColor" text-anchor="middle">b</text><text x="302" y="95" font-size="12" fill="currentColor" text-anchor="middle">{ hp:10 }</text><line x1="228" y1="61" x2="272" y2="86" stroke="#4f83e0" stroke-width="2" marker-end="url(#vr-a)"/><line x1="228" y1="119" x2="272" y2="96" stroke="#4f83e0" stroke-width="2" marker-end="url(#vr-a)"/><text x="258" y="150" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">같은 객체 공유</text></svg>
+<svg viewBox="0 0 560 372" width="560" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="같은 세 줄 코드를 struct와 class로 실행했을 때 줄마다 메모리 상태"><defs><marker id="vr-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><g font-size="13" fill="currentColor" text-anchor="middle" opacity="0.8"><text x="140" y="20">struct — 값 타입</text><text x="420" y="20">class — 참조 타입</text></g><line x1="280" y1="32" x2="280" y2="345" stroke="currentColor" opacity="0.2"/><g font-size="11" font-family="monospace" fill="currentColor" opacity="0.75"><text x="16" y="54">var a = new SPos { hp = 10 };</text><text x="296" y="54">var x = new CPos { hp = 10 };</text><text x="16" y="158">var b = a;</text><text x="296" y="158">var y = x;</text><text x="16" y="262">b.hp = 5;</text><text x="296" y="262">y.hp = 5;</text></g><g fill="none" stroke="currentColor" stroke-opacity="0.6"><rect x="20" y="64" width="112" height="36" rx="4"/><rect x="300" y="76" width="36" height="30" rx="4"/><rect x="420" y="73" width="110" height="36" rx="4"/><rect x="20" y="168" width="112" height="36" rx="4"/><rect x="300" y="166" width="36" height="26" rx="4"/><rect x="420" y="177" width="110" height="36" rx="4"/><rect x="20" y="272" width="112" height="36" rx="4"/><rect x="300" y="270" width="36" height="26" rx="4"/><rect x="300" y="302" width="36" height="26" rx="4"/></g><g fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"><rect x="150" y="168" width="112" height="36" rx="4"/><rect x="300" y="198" width="36" height="26" rx="4"/><rect x="176" y="353" width="10" height="10" rx="2"/></g><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="150" y="272" width="112" height="36" rx="4"/><rect x="420" y="281" width="110" height="36" rx="4"/><rect x="316" y="353" width="10" height="10" rx="2"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="76" y="87">a { hp: 10 }</text><text x="318" y="96">x</text><text x="475" y="96">{ hp: 10 }</text><text x="76" y="191">a { hp: 10 }</text><text x="206" y="191">b { hp: 10 }</text><text x="318" y="184">x</text><text x="318" y="216">y</text><text x="475" y="200">{ hp: 10 }</text><text x="76" y="295">a { hp: 10 }</text><text x="206" y="295">b { hp: 5 }</text><text x="318" y="288">x</text><text x="318" y="320">y</text><text x="475" y="304">{ hp: 5 }</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#vr-a)"><line x1="336" y1="91" x2="414" y2="91"/><line x1="336" y1="179" x2="414" y2="190"/><line x1="336" y1="211" x2="414" y2="200"/><line x1="336" y1="283" x2="414" y2="294"/><line x1="336" y1="315" x2="414" y2="304"/></g><g font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle"><text x="140" y="120">칸 안에 직접 저장</text><text x="475" y="134">힙에 객체 생성</text><text x="140" y="224">hp: 10이 두 벌</text><text x="475" y="238">객체는 여전히 1개</text><text x="140" y="328">a는 그대로 10</text><text x="475" y="342">x로 읽어도 5</text></g><g font-size="11" fill="currentColor" opacity="0.7"><text x="192" y="362">= 로 복사된 칸</text><text x="332" y="362">값이 바뀐 곳</text></g></svg>
 
 ```csharp
-struct SPos { public int hp; }   class CPos { public int hp; }
-var a = new SPos { hp = 10 }; var b = a; b.hp = 5;   // a.hp = 10 (독립)
-var x = new CPos { hp = 10 }; var y = x; y.hp = 5;   // x.hp = 5  (공유)
+struct SPos { public int hp; }   // 값 타입
+class  CPos { public int hp; }   // 참조 타입
+
+var a = new SPos { hp = 10 };
+var b = a;               // 데이터 복사 → hp:10이 두 벌
+b.hp = 5;                // b 칸만 바뀜 → a.hp = 10
+
+var x = new CPos { hp = 10 };
+var y = x;               // 위치 복사 → 객체는 1개
+y.hp = 5;                // 그 객체가 바뀜 → x.hp = 5
+ReferenceEquals(x, y);   // true — 같은 객체
 ```
 
-작고 수명이 짧은 데이터는 struct가 유리 — 힙 할당이 없어 GC를 안 건드리고, 배열에 담으면 값이 연속으로 깔려 캐시 지역성도 좋음. 대가는 복사 비용이라 필드가 많아질수록 불리하고, 필드를 바꿀 수 있는 mutable struct는 "복사본만 고쳐놓고 원본은 그대로"인 버그의 단골이라 `readonly struct`로 두는 편이 안전.
+struct도 `new`를 쓰지만 필드를 채우는 초기화 문법일 뿐 힙 할당이 아님. 데이터는 변수 칸 안에 그대로 있고(지역 변수면 스택), 힙에 객체를 새로 만드는 건 class의 `new`뿐.
 
-유니티에서 `transform.position.x = 5f`가 컴파일 에러인 것도 같은 이유. Vector3가 struct라 프로퍼티 `position`이 돌려준 건 복사본이고, 그 복사본의 x를 고쳐봐야 즉시 버려지므로 컴파일러가 아예 막음. `transform.position = new Vector3(5f, p.y, p.z)`처럼 통째로 다시 대입해야 함.
+| | 값 타입 | 참조 타입 |
+| --- | --- | --- |
+| 기본 제공 | `int` `float` `bool` `char` `enum` | `string` 배열 `List<T>` |
+| 직접 정의 | `struct` | `class` |
+| 유니티 | `Vector3` `Quaternion` `Color` | `GameObject` `Transform` MonoBehaviour |
+| 대입하면 | 데이터가 한 벌 더 생김 | 같은 객체를 함께 가리킴 |
+
+배열은 원소 타입과 무관하게 항상 참조 타입. `int[] b = a;` 후 `b[0]`을 바꾸면 `a[0]`도 바뀜.
+
+고르는 기준은 복사했을 때 따로 노는 게 자연스러운가. 좌표·색상처럼 복사한 쪽을 고쳐도 원본은 지켜져야 하는 작은 데이터는 struct(힙 할당이 없어 GC 부담이 없는 대신 클수록 복사 비용이 커짐). 적 캐릭터처럼 여러 스크립트가 같은 대상 하나를 봐야 하는 건 class — AI가 체력을 깎으면 UI도 깎인 체력을 봐야 하므로.
+
+```csharp
+var enemy = new Enemy();   var ui = enemy;
+enemy.hp -= 30;            // ui.hp도 70 — 같은 적 하나
+
+Vector3 spawn = Vector3.zero;   Vector3 pos = spawn;
+pos.x += 10;               // spawn은 (0, 0, 0) 그대로 — 원본 보존
+```
+
+## 반환된 struct 수정 — 원본 vs 복사본
+
+`transform.position.x = 5f`는 컴파일 에러(CS1612)인데 `b.hp = 5`는 되는 이유. 값 타입은 `=`뿐 아니라 메서드가 `return`할 때도 복사본이 나감. 메서드가 돌려준 복사본의 필드를 고치면 그 복사본을 담은 변수가 없어 바로 사라지고 원본은 그대로라, 아무 효과 없는 코드가 됨 — 컴파일러가 실수로 보고 막음.
+
+```csharp
+Vector3 saved = Vector3.zero;
+Vector3 GetSaved() => saved;   // saved를 복사해서 반환
+
+Vector3 v = GetSaved();
+v.x = 5f;                      // 복사본 수정 → saved.x는 0 그대로
+GetSaved().x = 5f;             // 에러 — 고쳐도 버려질 복사본
+```
+
+프로퍼티와 `List`의 `[]`는 겉모양만 필드·배열이고 실제로는 메서드 호출(`get_position()`, `get_Item(0)`)이라 같은 경우. 배열의 `arr[0]`은 메서드가 아니라 원소 자리에 직접 접근하는 언어 내장 문법이라 원본을 고침. 배열과 List는 둘 다 참조 타입이고, 갈리는 건 원소에 접근하는 방식 — 값·참조 타입 여부와는 무관.
+
+| 코드 | 실제 동작 | 고치는 대상 | 결과 |
+| --- | --- | --- | --- |
+| `b.hp = 5` | 내 변수 b를 직접 수정 | 원본 | OK |
+| `arr[0].x = 5f` | 배열 0번 자리를 직접 수정 | 원본 | OK |
+| `list[0].x = 5f` | `get_Item(0)`이 돌려준 값을 수정 | 복사본 | 에러 |
+| `transform.position.x = 5f` | `get_position()`이 돌려준 값을 수정 | 복사본 | 에러 |
+
+해법은 복사본을 변수로 받아 고친 뒤 set으로 다시 넣기. 에러 코드에 빠져 있던 게 이 set 호출.
+
+```csharp
+Vector3 p = transform.position;   // get — 복사본 받기
+p.x = 5f;
+transform.position = p;           // set — 원본에 반영
+
+Vector3 e = list[0];   e.x = 5f;   list[0] = e;   // List도 같은 방식
+```
+
+프로퍼티가 class 타입을 반환하면 에러가 안 남. 돌려준 게 위치 값의 복사본이라 따라가면 원본 객체이므로 `transform.parent.name = "Root"`는 제대로 반영됨.
 
 ## struct vs class의 기본 Equals
 

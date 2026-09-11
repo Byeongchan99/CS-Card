@@ -147,21 +147,64 @@ struct Cell : IEquatable<Cell> {
 
 ## record와 값 동등성
 
-`record`는 값 동등성을 컴파일러가 자동 구현 — 모든 프로퍼티 값이 같으면 `Equals`도 `==`도 true(class의 기본 참조 비교와 반대). `ToString`·`Deconstruct`와 일부만 바꾼 복사본을 만드는 `with` 식도 함께 생성. 위치 매개변수로 선언하면 프로퍼티가 `init` 전용이라 생성 후 못 바꾸는 불변 데이터가 됨.
+데이터를 묶는 타입은 "내용이 같으면 같다"가 자연스러운데, class로 만들면 기본이 위치 비교라 Equals·`GetHashCode`·`==`·`!=`·`ToString`을 전부 직접 써야 함. `record`는 이걸 컴파일러가 대신 만들어주는 문법 — "값을 나타내는 타입"을 한 줄로 만듦.
 
 ```csharp
-record Point(int X, int Hp);
-var p = new Point(0, 10);
-var q = p with { Hp = 5 };          // 일부만 바꾼 복사본
-bool same = p == new Point(0, 10);  // true (값 동등)
+record Point(int X, int Hp);   // 이 한 줄로 아래가 전부 생성됨
 ```
 
-`record`는 `record class`의 줄임말이라 여전히 참조 타입이고 힙에 할당됨 — 바뀌는 건 동등성 규칙뿐. 값 타입으로 쓰려면 `record struct`. `with`는 얕은 복사라 안에 든 참조 객체는 원본과 그대로 공유하고, 상속을 쓰면 런타임 타입까지 함께 비교해 필드 값이 같아도 파생 타입이 다르면 false.
+| 생성되는 것 | 내용 |
+| --- | --- |
+| 생성자 | `new Point(0, 10)` |
+| 프로퍼티 `X`, `Hp` | `init` 전용 — 생성할 때만 값을 넣을 수 있음 |
+| Equals·`GetHashCode`·`==`·`!=` | 모든 프로퍼티 값을 비교 |
+| `ToString` | `Point { X = 0, Hp = 10 }` 형태로 출력 |
+| `with` 식 | 일부만 바꾼 복사본 생성 |
 
-| | 기본 `==` | 용도 |
+`record`는 `record class`의 줄임말이라 여전히 참조 타입 — 힙에 객체가 만들어지고 변수엔 위치가 들어감. 바뀌는 건 "같다"의 기준뿐이라, 내용이 같으면 객체가 2개여도 `==`가 true.
+
+```csharp
+var p1 = new Point(0, 10);   var p2 = new Point(0, 10);
+p1 == p2;                  // true  — 내용 비교
+ReferenceEquals(p1, p2);   // false — 객체는 2개
+```
+
+비교는 프로퍼티마다 그 타입의 Equals로 함. 프로퍼티가 `List`·배열이면 그 부분은 위치 비교가 돼, 원소가 같아도 record끼리 false.
+
+```csharp
+record Inventory(List<int> Items);
+var i1 = new Inventory(new List<int> { 1, 2 });
+var i2 = new Inventory(new List<int> { 1, 2 });
+i1 == i2;   // false — Items끼리 비교하는데 List의 Equals는 위치 비교
+```
+
+위치 매개변수 프로퍼티는 `init` 전용이라 생성 후 못 바꿈. 값을 바꾸려면 `with`로 일부만 바꾼 복사본을 새로 만들고 원본은 그대로 둠. 불변이 값 비교와 짝인 이유는 해시 — `GetHashCode`가 프로퍼티 값으로 계산되는데, Dictionary 키로 넣은 뒤 내용이 바뀌면 해시가 달라져 엉뚱한 버킷을 뒤지게 되고 넣어둔 키를 못 찾음. 아무도 못 바꾸니 여러 곳에서 안심하고 공유할 수 있기도 함.
+
+```csharp
+p1.Hp = 5;                     // 컴파일 에러 — init 전용
+var p3 = p1 with { Hp = 5 };   // 새 객체, Hp만 5 → p1은 { X = 0, Hp = 10 } 그대로
+```
+
+`with`는 얕은 복사 — 프로퍼티 값을 `=`처럼 복사하므로 참조 타입 프로퍼티는 위치만 복사돼 원본과 같은 객체를 공유. 불변도 "프로퍼티에 다른 걸 대입할 수 없다"까지라, 프로퍼티가 가리키는 List 안의 내용은 여전히 바꿀 수 있음.
+
+```csharp
+var i3 = i1 with { };   // record 객체는 새로 생김
+i3.Items.Add(3);        // i1.Items.Count도 3 — List는 새로 안 만들어져 하나를 공유
+```
+
+| | class | `record`(= `record class`) | `record struct` |
+| --- | --- | --- | --- |
+| 계열 | 참조 타입 | 참조 타입 | 값 타입 |
+| 기본 `==` | 위치 비교 | 내용 비교 | 내용 비교 |
+| 위치 매개변수 프로퍼티 | 해당 없음 | `init` 전용(불변) | 수정 가능(`readonly record struct`면 불변) |
+
+`record struct`(C# 10)는 원래 `==`가 없던 struct에 `==`·`ToString` 등을 채워준 것. 유니티는 C# 9까지라 `record struct`는 못 쓰고, `record`도 `init`에 필요한 `IsExternalInit` 타입을 직접 선언해야 컴파일됨.
+
+| | class | record |
 | --- | --- | --- |
-| class | 참조 비교 | 식별자·가변 상태 객체 |
-| record | 값 비교(전 프로퍼티) | 불변 데이터, DTO |
+| 같다의 기준 | 같은 개체인가 | 내용이 같은가 |
+| 상태 | 계속 바뀜 | 만든 뒤 안 바뀜 |
+| 예시 | `Enemy`, 플레이어, 매니저 | 좌표, 아이템 정보, 설정값, 이벤트 메시지, 딕셔너리 키 |
 
 ## 연산자 오버로딩
 

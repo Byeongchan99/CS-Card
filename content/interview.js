@@ -1,10 +1,13 @@
-// 운영체제 면접 대비 페이지 로직 (os-interview.md에서 로드)
+// 면접 대비 문답 페이지 공유 로직 (분야별 *-interview.md에서 <script src="./interview.js">로 로드)
 // 인라인 <script>/<style>는 Quartz 직렬화에서 이스케이프되므로 CSS도 여기서 주입한다.
+// 페이지 구조: .osiv 안에 .q(체크박스+details)들, 툴바 버튼 id는 osiv-open/hide/reset,
+// 진행률 표시는 #osiv-done / #osiv-total. 진행 상태는 페이지 경로별로 localStorage에 저장된다.
 ;(function () {
   var root = document.querySelector(".osiv")
   if (!root) return
 
-  // ---------- 스타일 주입 ----------
+  // ---------- 스타일 주입 (페이지당 한 번; SPA 네비게이션 시 중복 방지) ----------
+  if (!document.getElementById("osiv-style")) {
   var CSS = `
 .osiv {
   --osiv-surface: #ffffff;
@@ -154,11 +157,13 @@
 }
 `
   var styleEl = document.createElement("style")
+  styleEl.id = "osiv-style"
   styleEl.textContent = CSS
   document.head.appendChild(styleEl)
+  }
 
-  // ---------- 체크리스트 ----------
-  var KEY = "os-interview-prep-v1"
+  // ---------- 체크리스트 (페이지 경로별로 저장) ----------
+  var KEY = "interview-prep:" + (location.pathname || "default")
   var boxes = Array.prototype.slice.call(root.querySelectorAll(".chk input"))
   var doneEl = document.getElementById("osiv-done")
   var totalEl = document.getElementById("osiv-total")

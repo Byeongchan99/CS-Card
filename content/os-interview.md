@@ -511,4 +511,4 @@ title: 운영체제 면접 대비 문답
 </section>
 </div>
 
-<script src="./os-interview.js"></script>
+<script src="./interview.js"></script>

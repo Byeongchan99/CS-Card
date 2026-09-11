@@ -85,16 +85,65 @@ Vector3 e = list[0];   e.x = 5f;   list[0] = e;   // List도 같은 방식
 
 ## struct vs class의 기본 Equals
 
-`object.Equals`의 기본 동작은 참조 비교인데, 모든 struct의 부모인 `ValueType`이 이를 필드 값 비교로 재정의해 struct만 기본이 값 동등이 됨. `==`는 가상 메서드가 아니라 연산자 문법이라 사정이 다름 — struct에 직접 정의하지 않으면 아예 못 씀.
+`Equals`는 두 값이 같은지 답하는 메서드로, 모든 타입이 최상위 부모 `object`에서 물려받아 따로 정의하지 않아도 쓸 수 있음. "같다"엔 두 뜻이 있음 — 같은 객체 하나를 가리키는지(참조 동등), 객체는 달라도 필드 값이 모두 같은지(값 동등).
 
-| | 기본 `Equals` | 기본 `==` |
+기본값은 계열로 갈림. 참조 타입은 `object`의 원래 Equals를 그대로 써서 변수에 든 위치를 비교하고, 값 타입은 모든 struct의 부모인 `ValueType`이 Equals를 필드 비교로 재정의해 둬서 데이터를 비교. struct는 대입·전달마다 복사본이 생겨 "같은 객체인가"를 물으면 거의 항상 false라, 쓸모 있는 비교가 내용 비교뿐이기 때문.
+
+```csharp
+struct SPos { public int hp; }
+class  CPos { public int hp; }
+
+var c1 = new CPos { hp = 10 };   var c2 = new CPos { hp = 10 };   var c3 = c1;
+c1.Equals(c2);   // false — hp는 같지만 다른 객체
+c1.Equals(c3);   // true  — 같은 객체
+c1 == c2;        // false — class의 기본 == 도 위치 비교
+
+var s1 = new SPos { hp = 10 };   var s2 = new SPos { hp = 10 };
+s1.Equals(s2);   // true  — 필드 값이 모두 같음
+s1 == s2;        // 컴파일 에러 — struct엔 기본 == 가 없음
+```
+
+`==`는 Equals와 별개. Equals는 메서드라 자식이 부모 것을 물려받지만, `==`는 연산자라 물려받는 구조가 아니고 타입마다 따로 정의해야 생김. 그래서 `ValueType`이 Equals를 바꿔도 struct에 `==`는 생기지 않음. class의 위치 비교 `==`는 언어가 모든 class에 기본으로 붙여주는 것.
+
+| | 기본 Equals | 기본 `==` |
 | --- | --- | --- |
-| struct | 모든 필드 값을 비교(`ValueType`이 재정의) | 없음 — `operator ==`를 정의해야 사용 가능 |
-| class | 참조 비교(같은 객체인지) | 참조 비교 |
+| 참조 타입 | 위치 비교 | 위치 비교 |
+| 값 타입 | 값 비교(`ValueType`이 재정의) | 없음 — 직접 정의해야 사용 가능 |
 
-`ValueType.Equals`의 기본 경로는 리플렉션으로 필드를 훑고 인자를 박싱까지 해 느림. 비교가 잦은 struct라면 `Equals`·`GetHashCode`를 직접 오버라이드하고 `IEquatable<T>`를 구현해 박싱 없는 비교 경로를 여는 게 정석.
+```mermaid
+flowchart TD
+    O["object<br/>Equals = 위치 비교"] --> V["ValueType<br/>Equals를 필드 비교로 재정의"]
+    O --> C["직접 만든 class<br/>Equals·== 위치 비교"]
+    O --> S["string<br/>Equals·== 내용 비교로 정의"]
+    V --> P["직접 만든 struct<br/>Equals 필드 비교 · == 없음"]
+    V --> U["Vector3<br/>Equals·== 값 비교로 정의"]
+```
 
-`Equals`를 손대면 `GetHashCode`도 반드시 같이 손댐. Dictionary·HashSet은 해시로 버킷을 고른 뒤 그 안에서만 `Equals`로 확인하는 2단 구조라, 값이 같은데 해시가 다르면 서로 다른 버킷에 떨어져 방금 넣은 키를 못 찾음.
+`int`·`Vector3`·`string`처럼 표와 다르게 동작하는 타입은 예외가 아니라 그 타입이 Equals나 `==`를 직접 정의해 둔 것. 데이터 자체가 의미인 타입은 내용 비교로 정의하고 대개 Equals와 `==`를 같은 기준으로 맞춤. hp가 같은 적 두 마리가 서로 다른 적이듯, 개체를 나타내는 타입은 기본 위치 비교를 그대로 씀.
+
+| 성격 | 예시 | "같다"의 의미 |
+| --- | --- | --- |
+| 값을 나타냄 | `int` `Vector3` `string` `DateTime` | 내용이 같으면 같음 — Equals·`==`를 내용 비교로 정의 |
+| 대상을 나타냄 | `Enemy` `GameObject` 직접 만든 class | 같은 한 개체여야 같음 — 기본 위치 비교 |
+
+class·struct가 아닌 것처럼 보이는 타입도 결국 두 계열 중 하나를 따름. `int`·`enum`·튜플은 값 타입 계열이라 값 비교, 배열·`List`는 class라 위치 비교. 그래서 원소가 똑같은 배열 두 개도 Equals와 `==`가 false고, 원소끼리 비교하려면 LINQ의 `SequenceEqual`을 씀.
+
+```csharp
+int[] a1 = { 1, 2 };   int[] a2 = { 1, 2 };
+a1.Equals(a2);          // false — 서로 다른 배열 객체
+a1.SequenceEqual(a2);   // true  — 원소를 하나씩 비교
+```
+
+struct의 기본 Equals는 어떤 struct든 처리하는 범용 구현이라, 필드 구성에 따라 리플렉션으로 필드를 찾아 꺼내는 느린 방식을 쓰고 인자를 `object`로 받아 박싱도 일어남. 딕셔너리 키처럼 비교가 잦은 struct는 `IEquatable<T>`로 직접 정의하고, 이때 `GetHashCode`도 같은 필드로 함께 정의. Dictionary는 `GetHashCode`로 버킷을 먼저 고른 뒤 그 안에서만 Equals로 확인하므로, 둘이 어긋나면 넣어둔 키를 못 찾음.
+
+```csharp
+struct Cell : IEquatable<Cell> {
+    public int x, y;
+    public bool Equals(Cell o) => x == o.x && y == o.y;            // 박싱 없는 비교
+    public override bool Equals(object obj) => obj is Cell c && Equals(c);
+    public override int GetHashCode() => HashCode.Combine(x, y);   // Equals와 같은 필드로
+}
+```
 
 ## record와 값 동등성
 

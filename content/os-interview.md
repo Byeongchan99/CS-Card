@@ -7,7 +7,7 @@ title: 운영체제 면접 대비 문답
 <div class="osiv">
 <p class="note"><strong>답변 프레임.</strong> 정의 한 문장으로 결론 먼저 → 왜 그렇게 동작·설계됐는지 → 트레이드오프(꼬리질문의 90%가 여기를 찌릅니다) → 필요하면 실제 예시 한 줄. 단정("절대 안 됩니다")은 반례 하나로 무너지니 "일반적으로 ~지만 ~한 경우엔 다릅니다"로.</p>
 <div class="bar">
-<span class="prog"><b id="osiv-done">0</b> / <span id="osiv-total">31</span> 자신 있음</span>
+<span class="prog"><b id="osiv-done">0</b> / <span id="osiv-total">36</span> 자신 있음</span>
 <span class="bar-sp"></span>
 <button class="tool" id="osiv-open" type="button">모두 펼치기</button>
 <button class="tool" id="osiv-hide" type="button" aria-pressed="false">체크 숨기기</button>
@@ -567,6 +567,98 @@ title: 운영체제 면접 대비 문답
 <p><strong>프로세스는 서로 격리돼 있어서 통신하려면 IPC가 필요한데, 크게 공유 메모리랑 메시지 전달 두 가지입니다.</strong></p>
 <p>공유 메모리는 두 프로세스가 같은 메모리 영역을 같이 보는 방식입니다. 복사가 없어서 빠르지만, 동시에 접근할 때 꼬이지 않게 동기화를 직접 해줘야 하고 잘못 건드리면 오염될 위험이 있습니다. 메시지 전달은 파이프나 소켓으로 커널을 거쳐 데이터를 주고받는 방식입니다. 복사하고 커널을 거치니까 느리지만, 각자 자기 메모리만 만지니까 안전하고 동기화 문제도 적습니다.</p>
 <p>결국 속도를 볼 거냐, 안전하고 단순한 걸 볼 거냐의 선택입니다.</p>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section class="grp">
+<div class="grp-head"><h3>상황형 문제 해결</h3><span class="cnt">5문항</span></div>
+<p class="grp-note">정답보다 접근 순서를 봅니다. 한 상황에 여러 분야가 얽혀 있으니, 측정으로 원인을 좁힌 뒤 CS 개념으로 설명하세요.</p>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q32" aria-label="32번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">SIT-01</span><span class="qtext">게임을 오래 켜둘수록 점점 느려지고 끊깁니다. 무엇을 의심하겠습니까?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>시간이 갈수록 나빠진다는 게 핵심 단서인데, 이건 순간적인 성능 문제가 아니라 뭔가가 계속 쌓이는 문제라는 뜻입니다.</strong></p>
+<p>제일 먼저 메모리 누수를 의심합니다. 안 쓰는 객체를 계속 참조로 붙들고 있으면 가비지 컬렉터가 못 치워서 메모리가 계속 늘어납니다. 그러다 물리 메모리가 부족해지면 운영체제가 페이지를 디스크로 내리기 시작하는데, 이때부터 페이지 폴트가 잦아지면서 프레임이 끊깁니다. 심하면 디스크만 기다리는 스래싱까지 갑니다.</p>
+<p>그래서 추측보다 먼저 메모리 프로파일러로 시간에 따라 어떤 객체가 계속 늘어나는지 스냅샷을 비교합니다. 이벤트 구독을 해제 안 했거나, 컬렉션에 계속 쌓기만 하는 코드가 흔한 원인입니다.</p>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q33" aria-label="33번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">SIT-02</span><span class="qtext">매 프레임 수천 개 객체를 순회하는데, CPU는 한가한데도 느립니다. 왜일까요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>CPU가 한가한데 느리다는 건, CPU가 계산을 못 해서가 아니라 메모리에서 데이터가 오기를 기다리고 있다는 신호입니다.</strong></p>
+<p>객체들이 힙 여기저기에 흩어져 있으면, 순회할 때마다 캐시에 없는 데이터를 메모리에서 새로 가져와야 해서 캐시 미스가 잔뜩 납니다. CPU는 그 데이터를 기다리느라 노는 거죠.</p>
+<p>그래서 자주 같이 쓰는 데이터를 연속된 배열로 모아두면, 캐시 라인 하나에 여러 개가 딸려 와서 훨씬 빨라집니다. 클래스 배열 대신 struct 배열을 쓰거나, 유니티라면 DOTS 같은 방식이 이걸 노린 겁니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>객체가 100배로 늘면요?</q>흩어진 접근이면 캐시 미스가 그만큼 선형으로 늘어서 훨씬 심해집니다. 이럴수록 연속 배치의 이득이 커지고, 여기에 더해 멀리 있는 객체는 덜 자주 갱신하는 식으로 매 프레임 처리하는 일감 자체를 줄이는 걸 같이 봅니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q34" aria-label="34번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">SIT-03</span><span class="qtext">작업을 멀티스레드로 나눴는데, 코어를 늘려도 기대만큼 안 빨라지고 가끔 더 느려집니다. 원인이 뭘까요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>병렬화했는데 안 빨라지는 건, 스레드들이 실제로는 서로 기다리거나 방해하고 있다는 뜻입니다.</strong></p>
+<p>몇 가지를 의심합니다. 먼저 락 경합인데, 여러 스레드가 같은 락을 두고 줄을 서면 결국 한 번에 하나씩 도는 거라 병렬이 무의미해집니다. 다음은 거짓 공유인데, 스레드마다 다른 변수를 쓰는데도 그게 같은 캐시 라인에 있으면 서로 캐시를 튕겨내면서 오히려 느려집니다. 스레드를 너무 잘게 쪼개면 컨텍스트 스위칭 비용이 이득을 잡아먹기도 하고요.</p>
+<p>그래서 락을 잡는 구간을 최대한 줄이고, 각 스레드가 자기 지역 변수에 모았다가 마지막에 합치는 식으로 공유 자체를 줄입니다. 경합하는 데이터는 캐시 라인을 다르게 띄우고요.</p>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q35" aria-label="35번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">SIT-04</span><span class="qtext">로그를 파일에 한 줄씩 수만 번 쓰는데 너무 느립니다. 어떻게 개선하겠습니까?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>한 줄씩 쓸 때마다 시스템 콜이 나가는 게 문제입니다.</strong></p>
+<p>파일 쓰기는 커널이 하는 특권 작업이라, 쓸 때마다 사용자 모드에서 커널 모드로 넘어갔다 옵니다. 이 모드 전환 자체가 비용인데, 한 줄 쓰자고 매번 이걸 하면 그 비용이 폭발합니다.</p>
+<p>그래서 로그를 메모리 버퍼에 모아뒀다가 어느 정도 차면 한 번에 쓰는 식으로 시스템 콜 횟수를 줄입니다. 대부분의 로깅 라이브러리가 이런 버퍼링을 기본으로 합니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>매번 바로 안 쓰면 크래시가 났을 때 로그가 날아가지 않나요?</q>맞습니다. 그게 트레이드오프라, 버퍼에만 있고 아직 디스크에 안 내려간 로그는 크래시 때 잃을 수 있습니다. 그래서 꼭 남겨야 하는 중요한 로그는 주기적으로, 또는 그 시점에 강제로 디스크에 내리는 플러시를 걸어서 성능과 안전성 사이를 조율합니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q36" aria-label="36번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">SIT-05</span><span class="qtext">서버가 동시 접속 수만 개를 받아야 합니다. 연결마다 스레드를 하나씩 두면 왜 안 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>연결마다 스레드를 두면 스레드가 수만 개 생기는데, 이게 감당이 안 됩니다.</strong></p>
+<p>스레드마다 스택 메모리가 잡히고, 운영체제가 그 많은 스레드를 번갈아 실행하느라 컨텍스트 스위칭 비용이 폭발합니다. 대부분은 그냥 I/O를 기다리며 놀고 있는데도요.</p>
+<p>그래서 한 스레드가 여러 연결을 동시에 지켜보다가 준비된 것만 처리하는 I/O 멀티플렉싱을 씁니다. 리눅스라면 epoll인데, 준비된 연결만 골라서 알려주니까 연결이 수만 개여도 효율적입니다. 이게 이벤트 루프 기반 서버의 토대입니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>기존에 스레드로 짠 서버를 어떻게 바꾸나요?</q>보통은 직접 epoll을 다루기보다, 이미 이벤트 루프로 도는 프레임워크나 비동기 런타임 위로 옮깁니다. 이때 핵심 작업은 완료까지 멈추는 블로킹 호출들을, 바로 반환하고 나중에 통지받는 논블로킹·비동기 방식으로 바꾸는 겁니다.</span></li>
+</ul>
 </div>
 </div>
 </details>

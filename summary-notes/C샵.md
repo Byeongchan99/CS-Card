@@ -208,19 +208,62 @@ i3.Items.Add(3);        // i1.Items.Count도 3 — List는 새로 안 만들어�
 
 ## 연산자 오버로딩
 
-`operator +`·`==` 등을 `public static` 메서드로 정의해 사용자 타입에 연산자 문법을 부여 — Vector·복소수·통화처럼 수학적 의미가 뚜렷한 값 타입에 적합. 의미가 자명하지 않은 곳에 붙이면 읽는 쪽이 동작을 추측해야 해 오히려 손해.
+직접 만든 타입에 `+`·`-`·`==`·`<` 같은 연산자가 어떻게 동작할지 정하는 기능. 정의하지 않으면 사용자 타입엔 연산자를 못 씀. 앞의 "`Vector3`가 `==`를 직접 정의해 뒀다"의 그 정의가 이것 — `Vector3`끼리 `+`가 되는 것도 같은 이유.
 
 ```csharp
 struct Vec {
     public float x, y;
-    public static Vec operator +(Vec a, Vec b) => new Vec { x = a.x + b.x, y = a.y + b.y };
+    public Vec(float x, float y) { this.x = x; this.y = y; }
+
+    public static Vec operator +(Vec a, Vec b) => new Vec(a.x + b.x, a.y + b.y);
+    public static Vec operator -(Vec v)         => new Vec(-v.x, -v.y);        // 단항
+    public static Vec operator *(Vec v, float k) => new Vec(v.x * k, v.y * k);
 }
-var v = new Vec { x = 1 } + new Vec { x = 2 };   // v.x = 3
+var c = new Vec(1, 2) + new Vec(3, 4);   // (4, 6)
 ```
 
-짝을 이루는 연산자는 함께 정의하도록 컴파일러가 강제 — `==`/`!=`, `<`/`>`, `<=`/`>=`. `==`를 정의했으면 `Equals`·`GetHashCode`도 같은 기준으로 맞춰야 함. 컬렉션·LINQ는 `==`가 아니라 `Equals`를 쓰므로, 문법만 바꾸고 `Equals`를 참조 비교로 남겨두면 `a == b`는 true인데 `list.Contains(a)`는 false인 상황이 생김.
+형태는 `public static 반환타입 operator 기호(매개변수)`로 고정. 컴파일러가 `a + b`를 이 메서드 호출로 바꿔주는 것뿐이라, 연산자는 메서드를 짧게 부르는 표기.
 
-대입 `=`와 `&&`·`||`·`?:`·`??`는 오버로딩 불가. 단 `&`·`|`와 `true`/`false` 연산자를 정의하면 `&&`·`||`가 그로부터 파생되고, `+`를 정의하면 `+=`는 자동으로 따라옴.
+static인 이유는 연산자가 두 피연산자 중 한쪽 소속이 아니기 때문. 인스턴스 메서드로 만들면 `a + b`가 `a`에 딸린 메서드가 돼 `a`가 주인·`b`가 손님으로 대등하지 않고, 두 가지가 막힘 — `2 * v`는 왼쪽 `float`이 주인이라 내 타입에서 정의할 수 없고, `m == null`은 `m`이 null이면 메서드 호출 자체가 예외. static이면 두 값을 매개변수 2개로 받아 대등하게 다루고 null도 안에서 안전하게 검사. 그래서 `c * 2`와 `2 * c`도 순서만 다른 별개 메서드라 각각 정의해야 함.
+
+```csharp
+public static Vec operator *(float k, Vec v) => v * k;   // 2 * c 를 쓰려면 이걸 추가
+```
+
+짝을 이루는 비교 연산자는 함께 정의하도록 컴파일러가 강제 — `==`/`!=`, `<`/`>`, `<=`/`>=`. `a == b`가 true인데 `a != b`도 true인 모순을 막기 위함.
+
+`==`를 정의하면 `Equals`·`GetHashCode`도 같은 기준으로 맞춤. 내가 직접 쓴 `a == b`는 `operator ==`를 부르지만, `List.Contains`·`Dictionary`·`HashSet` 같은 컬렉션 내부는 `Equals`·`GetHashCode`를 씀. `==`만 고치고 `Equals`를 기본 위치 비교로 두면 `a == b`는 true인데 `list.Contains(a)`는 false인 어긋남이 생김.
+
+```csharp
+class Money {
+    public int amount;   public Money(int a) { amount = a; }
+    public static bool operator ==(Money a, Money b) => a.amount == b.amount;
+    public static bool operator !=(Money a, Money b) => !(a == b);
+    // Equals·GetHashCode를 재정의 안 하면 class 기본인 위치 비교 그대로
+}
+new Money(100) == new Money(100);              // true  — 내 == 가 amount 비교
+new List<Money> { new Money(100) }
+    .Contains(new Money(100));                 // false — Contains는 Equals(위치 비교)를 씀
+```
+
+`+=`·`-=` 등 복합 대입은 따로 정의하지 않음 — `+`가 있으면 `a += b`를 `a = a + b`로 풀어 자동으로 씀. `=`·`&&`·`||`·`?:`·`??`·`.`·`new`는 언어 기본 동작이라 오버로딩 불가.
+
+변환 연산자도 있음 — 한 타입을 다른 타입으로 바꾸는 규칙을 연산자로 정의. 기준은 정보 손실 — 변환해도 잃는 게 없으면 `implicit`(캐스트 없이 자동), 뭔가 잘려 나가면 `explicit`(`(타입)` 캐스트를 적게 강제). 기본 제공 변환도 같은 원리라 `int → double`은 자동, `double → int`는 `(int)` 필수.
+
+```csharp
+struct Celsius {
+    public float temp;   public Celsius(float t) { temp = t; }
+    public static implicit operator Celsius(float t) => new Celsius(t);   // 잃는 것 없음 → 자동
+    public static explicit operator int(Celsius c) => (int)c.temp;        // 소수점 잘림 → 캐스트 필수
+}
+Celsius c = 36.5f;      // implicit — 캐스트 없이
+int r = (int)c;         // explicit — (int) 필수 → 36
+int w = c;              // 컴파일 에러 — explicit인데 캐스트 안 적음
+```
+
+유니티의 `Vector3 → Vector2`가 implicit이라 `Vector2 flat = transform.position;`이 캐스트 없이 되고 z가 버려짐.
+
+의미가 자명하지 않은 곳에 붙이면 읽는 쪽이 동작을 추측해야 해 오히려 손해. `target - position`(벡터 뺄셈)·`price * quantity`(금액×수량)처럼 수학적 의미가 뚜렷한 값 타입에만 쓰고, `player + sword`처럼 장착인지 합산인지 모를 동작은 `player.Equip(sword)`로 이름을 붙임.
 
 ## ref — 참조도 값으로 복사된다
 

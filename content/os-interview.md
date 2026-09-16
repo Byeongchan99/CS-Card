@@ -39,18 +39,17 @@ title: 운영체제 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="q2" aria-label="2번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">MEM-02</span><span class="qtext">지역성이 무엇이고 왜 중요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">MEM-02</span><span class="qtext">지역성이 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
 <p><strong>지역성은 프로그램의 메모리 접근이 아무 데나 흩어지지 않고, 한동안 특정 영역에 쏠리는 경향입니다.</strong></p>
-<p>크게 두 가지인데, 방금 접근한 걸 곧 다시 접근하는 시간 지역성과, 방금 접근한 곳의 근처를 곧 접근하는 공간 지역성이 있습니다.</p>
-<p>중요한 이유는 성능에 바로 직결되기 때문입니다. 위층 캐시는 빠르지만 작아서 데이터를 다 못 담는데, 접근이 쏠려주는 덕분에 그 작은 위층만으로도 대부분의 접근을 받아냅니다. 그래서 평균 접근 속도가 느린 아래층이 아니라 빠른 위층에 가까워집니다. 반대로 접근이 무작위로 흩어지면 캐시가 계속 빗나가서, 같은 알고리즘에 같은 데이터양이라도 접근 패턴만 나빠도 몇 배에서 수십 배까지 느려집니다.</p>
-<p>그래서 캐시뿐 아니라 TLB, 요구 페이징, 워킹셋, 페이지 교체의 LRU가 전부 이 지역성에 기대고 있고, 성능 최적화의 상당 부분이 결국 지역성을 끌어올리는 일입니다.</p>
+<p>크게 두 가지입니다. 방금 접근한 걸 곧 다시 접근하는 시간 지역성이 있고, 방금 접근한 곳의 근처를 곧 접근하는 공간 지역성이 있습니다. 반복문에서 같은 변수를 계속 쓰는 게 시간 지역성이고, 배열을 앞에서부터 순서대로 훑는 게 공간 지역성입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
+<li><span><q>왜 중요한가요?</q>성능에 바로 직결되기 때문입니다. 위층 캐시는 빠르지만 작아서 데이터를 다 못 담는데, 접근이 쏠려주는 덕분에 그 작은 위층만으로도 대부분의 접근을 받아냅니다. 그래서 평균 접근 속도가 느린 아래층이 아니라 빠른 위층에 가까워집니다. 반대로 접근이 무작위로 흩어지면 캐시가 계속 빗나가서, 같은 알고리즘에 같은 데이터양이라도 접근 패턴만 나빠도 몇 배에서 수십 배까지 느려집니다. 그래서 캐시뿐 아니라 TLB, 요구 페이징, 워킹셋, 페이지 교체의 LRU가 전부 이 지역성에 기대고 있습니다.</span></li>
 <li><span><q>지역성을 살리려면 코드를 어떻게 짜나요?</q>데이터를 연속으로 붙여두고 순서대로 훑는 게 기본입니다. 예를 들어 2차원 배열은 저장된 순서대로 접근해야 한 캐시 라인 안에서 처리가 이어져 빠르고, 띄엄띄엄 접근하면 매번 새 라인을 퍼와서 훨씬 느려집니다.</span></li>
 </ul>
 </div>
@@ -60,22 +59,19 @@ title: 운영체제 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="q3" aria-label="3번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">MEM-03</span><span class="qtext">가상 메모리는 왜 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">MEM-03</span><span class="qtext">가상 메모리가 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
 <p><strong>가상 메모리는 프로세스마다 독립된 가상 주소 공간을 주고, 그 주소를 실제 물리 메모리 주소로 변환해서 쓰는 기법입니다.</strong></p>
-<p>변환 단계를 한 겹 두면 두 가지를 얻습니다.</p>
-<ul>
-<li><strong>보호와 격리.</strong> 프로세스마다 변환표가 따로라, 한 프로세스가 다른 프로세스의 메모리를 아예 가리킬 수조차 없습니다.</li>
-<li><strong>램보다 큰 메모리 사용.</strong> 당장 안 쓰는 부분은 디스크로 잠깐 내려두기 때문에, 실제 램보다 큰 공간을 쓸 수 있습니다.</li>
-</ul>
-<p>대신 주소를 매번 변환하는 비용이 있는데, 최근 변환 결과를 캐시해두는 TLB로 대부분 상쇄합니다. 덕분에 프로그램은 자기가 메모리를 통째로 혼자 쓰는 것처럼 단순하게 짤 수 있습니다.</p>
+<p>프로세스는 0번지부터 이어진 자기만의 주소 공간을 보고, 실제로 물리 메모리 어디에 있는지는 신경 쓰지 않습니다. 접근할 때마다 MMU라는 하드웨어가 페이지 테이블을 참조해서 그 가상 주소를 물리 주소로 바꿔줍니다.</p>
+<p>그래서 프로그램은 자기가 메모리를 통째로 혼자 쓰는 것처럼 단순하게 짤 수 있고, 실제 물리 배치나 다른 프로세스와의 분리는 운영체제와 하드웨어가 뒤에서 처리합니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>페이징이 외부 단편화를 없앤다는데, 물리 프레임은 흩어지지 않나요?</q>흩어져도 외부 단편화는 안 생깁니다. 프레임이 전부 같은 크기라 연속된 자리를 요구하지 않고, 흩어진 빈 프레임 아무거나 하나면 되기 때문입니다. 대신 페이지 끝에 남는 자투리, 그러니까 내부 단편화가 대가입니다.</span></li>
+<li><span><q>그럼 왜 필요한가요?</q>변환 계층을 한 겹 두는 덕에 두 가지를 얻기 때문입니다. 하나는 보호와 격리인데, 프로세스마다 변환표가 따로라 한 프로세스가 다른 프로세스의 메모리를 아예 가리킬 수조차 없습니다. 다른 하나는 램보다 큰 메모리 사용인데, 당장 안 쓰는 부분은 디스크로 잠깐 내려두기 때문에 실제 램보다 큰 공간을 쓸 수 있습니다.</span></li>
+<li><span><q>매번 주소를 변환하면 느리지 않나요?</q>느릴 수 있어서, 최근 변환 결과를 TLB라는 작은 캐시에 담아둡니다. 히트하면 페이지 테이블을 보러 가지 않고 바로 변환하니까, 변환 비용이 대부분 상쇄됩니다.</span></li>
 </ul>
 </div>
 </div>
@@ -203,17 +199,17 @@ title: 운영체제 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="q10" aria-label="10번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">MEM-10</span><span class="qtext">스래싱은 무엇이고 어떻게 벗어나나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">MEM-10</span><span class="qtext">스래싱은 왜 생기나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
 <p><strong>스래싱은 페이지 폴트가 너무 자주 나서, CPU가 계산은 못 하고 디스크만 기다리는 상태입니다.</strong></p>
-<p>최근에 실제로 쓰는 페이지들을 워킹셋이라고 하는데, 이 워킹셋의 합이 물리 메모리보다 커지면 무엇을 내보내도 곧 다시 필요해져서 폴트가 폭증합니다.</p>
-<p>벗어나려면 동시에 돌리는 프로세스 수를 줄여서, 일부를 잠깐 디스크로 내려 남은 것들의 워킹셋이 메모리에 들어가게 해야 합니다.</p>
+<p>생기는 원인은 동시에 너무 많은 일을 메모리에 올리려 할 때입니다. 최근에 실제로 쓰는 페이지들을 워킹셋이라고 하는데, 돌리는 프로세스들의 워킹셋 합이 물리 메모리보다 커지면 무엇을 내보내도 곧 다시 필요해져서 폴트가 폭증하고, 그 폴트를 처리하느라 CPU가 디스크만 기다리게 됩니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
+<li><span><q>그럼 어떻게 벗어나나요?</q>동시에 돌리는 프로세스 수를 줄이는 게 핵심입니다. 일부를 잠깐 디스크로 내려서, 남은 것들의 워킹셋이 물리 메모리에 들어가게 하면 폴트가 잦아듭니다. 근본적으로는 메모리를 늘리거나, 워킹셋이 확보될 때만 프로세스를 실행하는 스케줄링을 쓰기도 합니다.</span></li>
 <li><span><q>CPU 사용률이 낮으니 프로세스를 더 띄우면 되지 않나요?</q>그게 함정이자 악순환입니다. 사용률이 낮은 건 할 일이 없어서가 아니라 다들 디스크를 기다려서인데, 여기서 프로세스를 더 띄우면 워킹셋 합이 더 커져서 폴트가 더 늘고 성능이 절벽처럼 떨어집니다.</span></li>
 </ul>
 </div>
@@ -257,17 +253,17 @@ title: 운영체제 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="q13" aria-label="13번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">MEM-13</span><span class="qtext">스택 오버플로는 왜 나고 어떻게 막나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">MEM-13</span><span class="qtext">스택 오버플로는 왜 나나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
 <p><strong>스택 오버플로는 스택이 정해진 한계 크기를 넘어 자라다 넘치는 것입니다.</strong></p>
 <p>스택은 함수를 호출할 때마다 프레임을 쌓는데, 종료 조건이 잘못됐거나 너무 깊은 재귀, 또는 큰 배열을 지역 변수로 스택에 잡으면 이 한계를 넘어섭니다. 스택에는 운영체제가 정한 최대 크기가 있는데 보통 몇 메가바이트라, 운영체제가 그 끝에 접근 금지된 가드 페이지를 둬서 거길 침범하면 폴트를 내고 프로그램이 대개 그 자리에서 죽습니다. 흔히 힙과 스택이 마주 보다 충돌한다고 그리지만, 실제로는 물리적으로 만나기 전에 이 크기 한계에서 먼저 막힙니다.</p>
-<p>막는 방법은 깊은 재귀를 반복문으로 바꾸거나, 큰 데이터는 스택 대신 힙에 두거나, 필요하면 스택 크기 한계 자체를 늘리는 겁니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
+<li><span><q>그럼 어떻게 막나요?</q>깊은 재귀를 반복문으로 바꾸거나, 큰 데이터는 스택 대신 힙에 두는 게 기본입니다. 재귀 깊이 자체가 꼭 필요하면 스택 크기 한계를 늘리기도 하지만, 대개는 알고리즘을 바꿔 프레임이 덜 쌓이게 하는 쪽이 낫습니다.</span></li>
 <li><span><q>재귀가 왜 특히 스택 오버플로를 잘 내나요?</q>재귀는 함수가 자기를 다시 부를 때마다 새 프레임이 계속 쌓이는데, 종료 조건에 도달하기 전까지는 이전 프레임들이 안 걷히고 그대로 남아 있기 때문입니다. 깊이가 수만 단계로 가면 프레임이 그만큼 쌓여서 금방 한계를 넘습니다. 그래서 꼬리 재귀는 반복문으로 바꾸거나, 컴파일러가 꼬리 호출 최적화로 프레임을 재활용하게 하면 완화됩니다.</span></li>
 </ul>
 </div>

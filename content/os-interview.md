@@ -7,7 +7,7 @@ title: 운영체제 면접 대비 문답
 <div class="osiv">
 <p class="note"><strong>답변 프레임.</strong> 정의 한 문장으로 결론 먼저 → 왜 그렇게 동작·설계됐는지 → 트레이드오프(꼬리질문의 90%가 여기를 찌릅니다) → 필요하면 실제 예시 한 줄. 단정("절대 안 됩니다")은 반례 하나로 무너지니 "일반적으로 ~지만 ~한 경우엔 다릅니다"로.</p>
 <div class="bar">
-<span class="prog"><b id="osiv-done">0</b> / <span id="osiv-total">41</span> 자신 있음</span>
+<span class="prog"><b id="osiv-done">0</b> / <span id="osiv-total">43</span> 자신 있음</span>
 <span class="bar-sp"></span>
 <button class="tool" id="osiv-open" type="button">모두 펼치기</button>
 <button class="tool" id="osiv-hide" type="button" aria-pressed="false">체크 숨기기</button>
@@ -272,7 +272,7 @@ title: 운영체제 면접 대비 문답
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>프로세스와 스레드</h3><span class="cnt">5문항</span></div>
+<div class="grp-head"><h3>프로세스와 스레드</h3><span class="cnt">8문항</span></div>
 <p class="grp-note">공유하느냐 격리하느냐가 모든 차이의 뿌리입니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="q14" aria-label="14번 자신 있음"></label>
@@ -362,12 +362,66 @@ title: 운영체제 면접 대비 문답
 </div>
 </details>
 </div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q19" aria-label="19번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">PROC-06</span><span class="qtext">멀티프로세스와 멀티스레드는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>둘 다 작업을 여러 실행 흐름으로 나누는 건데, 흐름을 프로세스로 나누느냐 스레드로 나누느냐가 다릅니다.</strong></p>
+<p>멀티프로세스는 각 흐름이 자기만의 독립된 주소 공간을 가집니다. 그래서 하나가 죽어도 나머지는 격리돼서 안전하지만, 서로 통신하려면 IPC가 필요하고 생성이나 전환 비용도 큽니다. 멀티스레드는 한 프로세스 안에서 코드랑 힙을 공유하는 흐름들이라, 데이터를 그냥 같이 보고 전환도 가볍습니다. 대신 하나가 잘못되면 프로세스 전체가 위험하고, 같은 메모리를 동시에 건드리니 동기화 문제를 떠안습니다.</p>
+<p>그래서 안정성과 격리가 중요하면 멀티프로세스, 잦은 데이터 공유와 가벼운 전환이 중요하면 멀티스레드를 씁니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>실무에선 어느 쪽을 쓰나요?</q>둘을 섞어 씁니다. 예를 들어 크롬은 탭이나 확장 프로그램마다 프로세스를 따로 띄워서 하나가 죽어도 브라우저 전체는 안 죽게 격리하고, 그 프로세스 안에서는 다시 여러 스레드로 렌더링이나 네트워크를 나눠 처리합니다. 크게는 프로세스로 격리하고 그 안에서 스레드로 잘게 나누는 식입니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q20" aria-label="20번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">PROC-07</span><span class="qtext">PCB가 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>PCB는 운영체제가 프로세스 하나를 관리하려고 그 프로세스의 정보를 모아 담아두는 구조체입니다.</strong></p>
+<p>프로세스마다 하나씩 있고 커널이 들고 있는데, 안에는 PID 같은 식별 정보, 지금 준비 상태인지 실행 중인지 같은 상태, 레지스터나 프로그램 카운터 같은 CPU 문맥, 그리고 페이지 테이블 포인터나 열린 파일 목록 같은 자원 정보가 담깁니다.</p>
+<p>그래서 프로세스에 관한 동작은 결국 이 PCB를 두고 돌아갑니다. 상태가 바뀌면 PCB의 상태 필드가 바뀌는 겁니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>컨텍스트 스위칭이랑은 어떤 관계인가요?</q>컨텍스트 스위칭이 바로 이 PCB를 쓰는 대표적인 동작입니다. 실행 중이던 프로세스의 레지스터 같은 CPU 상태를 그 프로세스의 PCB에 저장해두고, 다음에 실행할 프로세스의 PCB에서 저장돼 있던 상태를 불러와 이어서 실행합니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q21" aria-label="21번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">PROC-08</span><span class="qtext">공유 메모리와 메시지 전달 방식의 IPC는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>프로세스는 서로 격리돼 있어서 통신하려면 IPC가 필요한데, 크게 공유 메모리랑 메시지 전달 두 가지입니다.</strong></p>
+<p>공유 메모리는 두 프로세스가 같은 메모리 영역을 같이 보는 방식입니다. 복사가 없어서 빠르지만, 동시에 접근할 때 꼬이지 않게 동기화를 직접 해줘야 하고 잘못 건드리면 오염될 위험이 있습니다. 메시지 전달은 파이프나 소켓으로 커널을 거쳐 데이터를 주고받는 방식입니다. 복사하고 커널을 거치니까 느리지만, 각자 자기 메모리만 만지니까 안전하고 동기화 문제도 적습니다.</p>
+<p>결국 속도를 볼 거냐, 안전하고 단순한 걸 볼 거냐의 선택입니다.</p>
+</div>
+</div>
+</details>
+</div>
 </section>
 <section class="grp">
 <div class="grp-head"><h3>동기화</h3><span class="cnt">6문항</span></div>
 <p class="grp-note">공유 데이터를 동시에 건드릴 때 생기는 문제와 도구들입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q19" aria-label="19번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q22" aria-label="22번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SYNC-01</span><span class="qtext">레이스 컨디션은 왜 생기나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -381,7 +435,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q20" aria-label="20번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q23" aria-label="23번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SYNC-02</span><span class="qtext">뮤텍스와 세마포어는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -395,7 +449,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q21" aria-label="21번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q24" aria-label="24번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SYNC-03</span><span class="qtext">스핀락은 언제 뮤텍스 대신 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -409,7 +463,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q22" aria-label="22번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q25" aria-label="25번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SYNC-04</span><span class="qtext">데드락은 어떤 조건에서 발생하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -429,7 +483,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q23" aria-label="23번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q26" aria-label="26번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SYNC-05</span><span class="qtext">우선순위 역전은 무엇이고 어떻게 해결하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -443,7 +497,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q24" aria-label="24번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q27" aria-label="27번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SYNC-06</span><span class="qtext">volatile만으로 동기화가 충분한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -461,7 +515,7 @@ title: 운영체제 면접 대비 문답
 <div class="grp-head"><h3>스케줄링</h3><span class="cnt">4문항</span></div>
 <p class="grp-note">"다음에 누구를 실행할까"의 규칙과 트레이드오프입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q25" aria-label="25번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q28" aria-label="28번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SCHED-01</span><span class="qtext">CPU 스케줄링 알고리즘에는 무엇이 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -485,7 +539,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q26" aria-label="26번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q29" aria-label="29번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SCHED-02</span><span class="qtext">선점 스케줄링과 비선점 스케줄링은 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -499,7 +553,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q27" aria-label="27번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q30" aria-label="30번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SCHED-03</span><span class="qtext">인터럽트가 폴링보다 항상 좋은가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -513,7 +567,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q28" aria-label="28번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q31" aria-label="31번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SCHED-04</span><span class="qtext">디스크 스케줄링 알고리즘에는 무엇이 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -537,10 +591,10 @@ title: 운영체제 면접 대비 문답
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>I/O · 캐시 · 파일시스템 · 커널</h3><span class="cnt">8문항</span></div>
+<div class="grp-head"><h3>I/O · 캐시 · 파일시스템 · 커널</h3><span class="cnt">7문항</span></div>
 <p class="grp-note">개념이 섞이기 쉬운 축들을 정확히 구분하는지가 관건입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q29" aria-label="29번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q32" aria-label="32번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">IO-01</span><span class="qtext">동기/비동기와 블로킹/논블로킹은 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -560,7 +614,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q30" aria-label="30번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q33" aria-label="33번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">IO-02</span><span class="qtext">I/O 멀티플렉싱에서 epoll이 select·poll보다 나은 이유는?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -574,7 +628,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q31" aria-label="31번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q34" aria-label="34번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">IO-03</span><span class="qtext">캐시 지역성이 게임에서 왜 중요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -594,7 +648,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q32" aria-label="32번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q35" aria-label="35번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">IO-04</span><span class="qtext">거짓 공유(false sharing)는 무엇이고 어떻게 완화하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -608,7 +662,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q33" aria-label="33번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q36" aria-label="36번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">IO-05</span><span class="qtext">파일 시스템에서 inode는 어떤 역할을 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -622,7 +676,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q34" aria-label="34번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q37" aria-label="37번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">IO-06</span><span class="qtext">저널링은 왜 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -636,23 +690,9 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q35" aria-label="35번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q38" aria-label="38번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">IO-07</span><span class="qtext">공유 메모리와 메시지 전달 방식의 IPC는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>프로세스는 서로 격리돼 있어서 통신하려면 IPC가 필요한데, 크게 공유 메모리랑 메시지 전달 두 가지입니다.</strong></p>
-<p>공유 메모리는 두 프로세스가 같은 메모리 영역을 같이 보는 방식입니다. 복사가 없어서 빠르지만, 동시에 접근할 때 꼬이지 않게 동기화를 직접 해줘야 하고 잘못 건드리면 오염될 위험이 있습니다. 메시지 전달은 파이프나 소켓으로 커널을 거쳐 데이터를 주고받는 방식입니다. 복사하고 커널을 거치니까 느리지만, 각자 자기 메모리만 만지니까 안전하고 동기화 문제도 적습니다.</p>
-<p>결국 속도를 볼 거냐, 안전하고 단순한 걸 볼 거냐의 선택입니다.</p>
-</div>
-</div>
-</details>
-</div>
-<div class="q">
-<label class="chk"><input type="checkbox" id="q36" aria-label="36번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">IO-08</span><span class="qtext">사용자 모드와 커널 모드는 왜 나누나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">IO-07</span><span class="qtext">사용자 모드와 커널 모드는 왜 나누나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -674,7 +714,7 @@ title: 운영체제 면접 대비 문답
 <div class="grp-head"><h3>상황형 문제 해결</h3><span class="cnt">5문항</span></div>
 <p class="grp-note">정답보다 접근 순서를 봅니다. 한 상황에 여러 분야가 얽혀 있으니, 측정으로 원인을 좁힌 뒤 CS 개념으로 설명하세요.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q37" aria-label="37번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q39" aria-label="39번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-01</span><span class="qtext">게임을 오래 켜둘수록 점점 느려지고 끊깁니다. 무엇을 의심하겠습니까?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -688,7 +728,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q38" aria-label="38번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q40" aria-label="40번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-02</span><span class="qtext">매 프레임 수천 개 객체를 순회하는데, CPU는 한가한데도 느립니다. 왜일까요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -708,7 +748,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q39" aria-label="39번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q41" aria-label="41번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-03</span><span class="qtext">작업을 멀티스레드로 나눴는데, 코어를 늘려도 기대만큼 안 빨라지고 가끔 더 느려집니다. 원인이 뭘까요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -722,7 +762,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q40" aria-label="40번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q42" aria-label="42번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-04</span><span class="qtext">로그를 파일에 한 줄씩 수만 번 쓰는데 너무 느립니다. 어떻게 개선하겠습니까?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -742,7 +782,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q41" aria-label="41번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q43" aria-label="43번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-05</span><span class="qtext">서버가 동시 접속 수만 개를 받아야 합니다. 연결마다 스레드를 하나씩 두면 왜 안 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">

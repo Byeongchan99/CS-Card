@@ -7,19 +7,59 @@ title: 운영체제 면접 대비 문답
 <div class="osiv">
 <p class="note"><strong>답변 프레임.</strong> 정의 한 문장으로 결론 먼저 → 왜 그렇게 동작·설계됐는지 → 트레이드오프(꼬리질문의 90%가 여기를 찌릅니다) → 필요하면 실제 예시 한 줄. 단정("절대 안 됩니다")은 반례 하나로 무너지니 "일반적으로 ~지만 ~한 경우엔 다릅니다"로.</p>
 <div class="bar">
-<span class="prog"><b id="osiv-done">0</b> / <span id="osiv-total">36</span> 자신 있음</span>
+<span class="prog"><b id="osiv-done">0</b> / <span id="osiv-total">40</span> 자신 있음</span>
 <span class="bar-sp"></span>
 <button class="tool" id="osiv-open" type="button">모두 펼치기</button>
 <button class="tool" id="osiv-hide" type="button" aria-pressed="false">체크 숨기기</button>
 <button class="tool" id="osiv-reset" type="button">초기화</button>
 </div>
 <section class="grp">
-<div class="grp-head"><h3>메모리 관리</h3><span class="cnt">8문항</span></div>
-<p class="grp-note">가상 메모리·페이징이 중심입니다. "왜"를 파고드는 꼬리질문이 많습니다.</p>
+<div class="grp-head"><h3>메모리 관리</h3><span class="cnt">12문항</span></div>
+<p class="grp-note">메모리 계층·지역성부터 가상 메모리·페이징까지, "왜"를 파고드는 꼬리질문이 많습니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="q1" aria-label="1번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">MEM-01</span><span class="qtext">가상 메모리는 왜 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">MEM-01</span><span class="qtext">메모리는 왜 여러 계층으로 나뉘나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>빠른 저장 장치일수록 비싸고 작아서, 데이터를 전부 담을 수 없기 때문입니다.</strong></p>
+<p>그래서 레지스터, 캐시, 램, 디스크 순으로 위로 갈수록 빠르고 작고 비싼 층을 쌓고, 자주 쓰는 것만 위층에 두고 위층이 아래층의 캐시 역할을 하게 만듭니다. CPU는 위층에서 먼저 찾고, 없으면 아래층으로 내려가 가져옵니다.</p>
+<p>그래서 접근이 대부분 위층에서 끝나면 빠르지만, 위층에 없어서 아래층까지 내려가는 미스가 나면 그 층만큼 느려집니다. 이 층별 속도 차이가 뒤에 나올 캐시나 TLB, 페이지 폴트 얘기의 바탕이 됩니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>층마다 못 찾았을 때 비용이 다 같나요?</q>아닙니다, 층에 따라 천차만별입니다. 캐시 미스는 램에 갔다 오는 수십 나노초 정도고, TLB 미스도 램에 있는 페이지 테이블을 한 번 더 읽는 수준이라 비슷하게 빠릅니다. 반면 페이지 폴트는 디스크까지 갔다 와야 해서 수만 배 더 비쌉니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q2" aria-label="2번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">MEM-02</span><span class="qtext">지역성이 무엇이고 왜 중요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>지역성은 프로그램의 메모리 접근이 아무 데나 흩어지지 않고, 한동안 특정 영역에 쏠리는 경향입니다.</strong></p>
+<p>크게 두 가지인데, 방금 접근한 걸 곧 다시 접근하는 시간 지역성과, 방금 접근한 곳의 근처를 곧 접근하는 공간 지역성이 있습니다.</p>
+<p>왜 중요하냐면, 앞서 말한 작은 위층 캐시가 통하는 이유가 바로 이 지역성이기 때문입니다. 접근이 쏠리니까 그 쏠린 부분만 위층에 담아둬도 대부분 맞습니다. 캐시뿐 아니라 TLB, 요구 페이징, 워킹셋, 페이지 교체의 LRU가 전부 이 원리에 기대고 있어서, 지역성이 나쁜 접근 패턴이면 이 캐싱들이 다 헛돌아서 같은 계산도 몇 배 느려집니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>지역성을 살리려면 코드를 어떻게 짜나요?</q>데이터를 연속으로 붙여두고 순서대로 훑는 게 기본입니다. 예를 들어 2차원 배열은 저장된 순서대로 접근해야 한 캐시 라인 안에서 처리가 이어져 빠르고, 띄엄띄엄 접근하면 매번 새 라인을 퍼와서 훨씬 느려집니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q3" aria-label="3번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">MEM-03</span><span class="qtext">가상 메모리는 왜 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -41,64 +81,21 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q2" aria-label="2번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">MEM-02</span><span class="qtext">페이지 폴트가 나면 무슨 일이 일어나나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>페이지 폴트는 접근하려는 페이지가 아직 물리 메모리에 올라와 있지 않을 때 발생하는 예외입니다.</strong></p>
-<p>이게 나면 CPU가 하던 일을 멈추고 운영체제한테 넘깁니다. 운영체제는 디스크에서 그 페이지를 찾아 빈 자리에 올리고, 빈 자리가 없으면 기존 페이지 하나를 내보낸 다음, 페이지 테이블을 갱신하고 멈췄던 명령부터 다시 실행합니다.</p>
-<p>문제는 디스크가 메모리보다 수만 배 느려서, 폴트가 나는 그 순간 프로그램이 눈에 띄게 멈칫한다는 겁니다. 게임 같은 경우엔 이게 프레임 끊김으로 나타나기도 합니다.</p>
-</div>
-<div class="tails">
-<p class="lab">꼬리질문</p>
-<ul>
-<li><span><q>폴트는 무조건 나쁜 건가요?</q>아닙니다. 프로그램을 처음 실행할 때는 필요한 페이지를 미리 다 올리지 않고 실제로 접근하는 순간에 하나씩 올리는데, 이런 폴트는 정상입니다. 진짜 문제는 이미 올려둔 페이지를 내보냈다가 곧바로 다시 불러오는 폴트가 반복될 때입니다.</span></li>
-</ul>
-</div>
-</div>
-</details>
-</div>
-<div class="q">
-<label class="chk"><input type="checkbox" id="q3" aria-label="3번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">MEM-03</span><span class="qtext">스래싱은 무엇이고 어떻게 벗어나나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>스래싱은 페이지 폴트가 너무 자주 나서, CPU가 계산은 못 하고 디스크만 기다리는 상태입니다.</strong></p>
-<p>최근에 실제로 쓰는 페이지들을 워킹셋이라고 하는데, 이 워킹셋의 합이 물리 메모리보다 커지면 무엇을 내보내도 곧 다시 필요해져서 폴트가 폭증합니다.</p>
-<p>벗어나려면 동시에 돌리는 프로세스 수를 줄여서, 일부를 잠깐 디스크로 내려 남은 것들의 워킹셋이 메모리에 들어가게 해야 합니다.</p>
-</div>
-<div class="tails">
-<p class="lab">꼬리질문</p>
-<ul>
-<li><span><q>CPU 사용률이 낮으니 프로세스를 더 띄우면 되지 않나요?</q>그게 함정이자 악순환입니다. 사용률이 낮은 건 할 일이 없어서가 아니라 다들 디스크를 기다려서인데, 여기서 프로세스를 더 띄우면 워킹셋 합이 더 커져서 폴트가 더 늘고 성능이 절벽처럼 떨어집니다.</span></li>
-</ul>
-</div>
-</div>
-</details>
-</div>
-<div class="q">
 <label class="chk"><input type="checkbox" id="q4" aria-label="4번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">MEM-04</span><span class="qtext">페이지 교체 알고리즘에는 어떤 것이 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">MEM-04</span><span class="qtext">내부 단편화와 외부 단편화는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>페이지 교체 알고리즘은 물리 메모리가 꽉 찼을 때 어떤 페이지를 내보낼지 정하는 정책입니다.</strong> 대표적으로 네 가지를 얘기합니다.</p>
-<ul>
-<li><strong>OPT.</strong> 앞으로 가장 늦게 쓸 페이지를 내보내는 이상적인 방식인데, 미래를 알아야 해서 실제로는 못 쓰고 비교 기준으로만 씁니다.</li>
-<li><strong>FIFO.</strong> 먼저 들어온 페이지부터 내보내는 가장 단순한 방식인데, 오래됐다고 안 쓰는 건 아니라서 자주 쓰는 페이지까지 내보내는 게 단점입니다.</li>
-<li><strong>LRU.</strong> 가장 오랫동안 안 쓴 페이지를 내보내는 방식이라 지역성에 잘 맞지만, 언제 마지막에 썼는지 계속 추적해야 해서 비용이 큽니다.</li>
-<li><strong>Clock.</strong> 참조 비트 하나로 LRU를 값싸게 흉내 내는 방식이라, 실제로 가장 많이 씁니다.</li>
-</ul>
+<p><strong>둘 다 메모리 낭비인데, 낭비가 블록 안쪽에서 생기냐 블록 사이에서 생기냐로 나뉩니다.</strong></p>
+<p>내부 단편화는 할당받은 블록이 실제 필요보다 커서 안쪽이 남는 겁니다. 크기를 고정해서 나눠줄 때 생기는데, 페이징에서 페이지 끝에 남는 자투리가 대표적입니다. 외부 단편화는 전체적으로 빈 공간은 충분한데 잘게 쪼개져 있어서, 연속된 큰 덩어리가 없어 할당에 실패하는 겁니다. 크기가 제각각인 걸 연속으로 담는 세그멘테이션이나 힙에서 생깁니다.</p>
+<p>페이징은 크기가 고정이라 외부가 없는 대신 내부가 생기고, 세그멘테이션은 반대입니다. 결국 단편화는 완전히 없앨 수 없고 둘 중 뭘 감수할지 고르는 문제인데, 예측이 안 되는 외부보다 크기가 정해진 내부가 다루기 쉬워서 요즘은 페이징을 씁니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>Belady 이상 현상이 뭔가요?</q>보통은 메모리를 늘리면 폴트가 줄어드는 게 정상인데, FIFO에서는 오히려 폴트가 늘어나는 경우가 있습니다. 들어온 순서라는 기준이 실제 사용 패턴과 상관없어서 생기는 역설이고, LRU나 OPT에서는 일어나지 않습니다.</span></li>
+<li><span><q>외부 단편화는 압축해서 없애면 되지 않나요?</q>이론적으로는 흩어진 걸 한쪽으로 밀어 모으면 없어집니다. 하지만 메모리 내용을 실제로 옮기고 그걸 가리키던 주소를 전부 고쳐야 하는데, 옮기는 동안 프로그램을 멈춰야 해서 비용이 큽니다. 그래서 물리 메모리에서는 상시로는 못 쓰고, 애초에 연속 공간을 요구하지 않는 페이징으로 우회합니다. 다만 참조를 런타임이 다 쥐고 있는 GC 힙은 실제로 압축을 합니다.</span></li>
+<li><span><q>x86은 세그멘테이션과 페이징을 결합했는데 왜 요즘은 페이징만 쓰나요?</q>세그멘테이션이 주던 논리 단위 보호를, 운영체제가 페이징 위에서 소프트웨어로 대신할 수 있기 때문입니다. 그 둘을 합친 건 세그멘테이션이 먼저 있던 시절의 역사적 산물이고, 요즘 64비트 x86은 세그멘테이션을 사실상 꺼두고 페이징만 씁니다.</span></li>
 </ul>
 </div>
 </div>
@@ -107,7 +104,27 @@ title: 운영체제 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="q5" aria-label="5번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">MEM-05</span><span class="qtext">TLB 미스와 페이지 폴트는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">MEM-05</span><span class="qtext">가상 주소를 물리 주소로 어떻게 변환하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>가상 주소를 페이지 번호와 오프셋 두 조각으로 나눠서, 페이지 번호만 프레임 번호로 바꾸고 오프셋은 그대로 붙입니다.</strong></p>
+<p>오프셋을 안 바꾸는 이유는, 페이지랑 프레임 크기가 같아서 페이지 안에서의 위치가 곧 프레임 안에서의 위치이기 때문입니다. 그래서 변환의 핵심은 페이지 번호를 프레임 번호로 바꾸는 매핑 하나고, 이 매핑을 페이지 테이블에서 찾습니다. 실제로는 MMU라는 하드웨어가 이 일을 합니다.</p>
+<p>문제는 페이지 테이블이 램에 있어서, 변환할 때마다 램을 한 번 더 읽어야 한다는 겁니다. 이게 매 접근마다 붙으면 느리니까, 최근 변환 결과를 TLB라는 작은 캐시에 담아두고 히트하면 테이블을 안 보고 바로 변환합니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>페이지가 4KB면 오프셋은 몇 비트인가요?</q>4KB가 2의 12제곱이라 오프셋이 12비트입니다. 그리고 나머지 윗비트 전부가 페이지 번호가 됩니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q6" aria-label="6번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">MEM-06</span><span class="qtext">TLB 미스와 페이지 폴트는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -119,26 +136,6 @@ title: 운영체제 면접 대비 문답
 <p class="lab">꼬리질문</p>
 <ul>
 <li><span><q>그럼 TLB 크기를 키우면 되지 않나요?</q>못 키웁니다. TLB는 메모리에 접근할 때마다 거치는 가장 바쁜 길목에 있고 모든 항목을 한꺼번에 비교하는 구조라, 크게 만들면 조회 자체가 느려져서 전체가 느려집니다. 그래서 대신 TLB를 여러 단계로 두거나, 페이지 크기를 키워서 한 항목이 더 넓은 영역을 담당하게 하는 식으로 우회합니다.</span></li>
-</ul>
-</div>
-</div>
-</details>
-</div>
-<div class="q">
-<label class="chk"><input type="checkbox" id="q6" aria-label="6번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">MEM-06</span><span class="qtext">내부 단편화와 외부 단편화는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>둘 다 메모리 낭비인데, 낭비가 블록 안쪽에서 생기냐 블록 사이에서 생기냐로 나뉩니다.</strong></p>
-<p>내부 단편화는 할당받은 블록이 실제 필요보다 커서 안쪽이 남는 겁니다. 크기를 고정해서 나눠줄 때 생기는데, 페이징에서 페이지 끝에 남는 자투리가 대표적입니다. 외부 단편화는 전체적으로 빈 공간은 충분한데 잘게 쪼개져 있어서, 연속된 큰 덩어리가 없어 할당에 실패하는 겁니다. 크기가 제각각인 걸 연속으로 담는 세그멘테이션이나 힙에서 생깁니다.</p>
-<p>페이징은 크기가 고정이라 외부가 없는 대신 내부가 생기고, 세그멘테이션은 반대입니다. 결국 단편화는 완전히 없앨 수 없고 둘 중 뭘 감수할지 고르는 문제인데, 예측이 안 되는 외부보다 크기가 정해진 내부가 다루기 쉬워서 요즘은 페이징을 씁니다.</p>
-</div>
-<div class="tails">
-<p class="lab">꼬리질문</p>
-<ul>
-<li><span><q>x86은 세그멘테이션과 페이징을 결합했는데 왜 요즘은 페이징만 쓰나요?</q>세그멘테이션이 주던 논리 단위 보호를, 운영체제가 페이징 위에서 소프트웨어로 대신할 수 있기 때문입니다. 그 둘을 합친 건 세그멘테이션이 먼저 있던 시절의 역사적 산물이고, 요즘 64비트 x86은 세그멘테이션을 사실상 꺼두고 페이징만 씁니다.</span></li>
 </ul>
 </div>
 </div>
@@ -161,7 +158,91 @@ title: 운영체제 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="q8" aria-label="8번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">MEM-08</span><span class="qtext">스택과 힙 메모리는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">MEM-08</span><span class="qtext">페이지 폴트가 나면 무슨 일이 일어나나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>페이지 폴트는 접근하려는 페이지가 아직 물리 메모리에 올라와 있지 않을 때 발생하는 예외입니다.</strong></p>
+<p>이게 나면 CPU가 하던 일을 멈추고 운영체제한테 넘깁니다. 운영체제는 디스크에서 그 페이지를 찾아 빈 자리에 올리고, 빈 자리가 없으면 기존 페이지 하나를 내보낸 다음, 페이지 테이블을 갱신하고 멈췄던 명령부터 다시 실행합니다.</p>
+<p>문제는 디스크가 메모리보다 수만 배 느려서, 폴트가 나는 그 순간 프로그램이 눈에 띄게 멈칫한다는 겁니다. 게임 같은 경우엔 이게 프레임 끊김으로 나타나기도 합니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>폴트는 무조건 나쁜 건가요?</q>아닙니다. 프로그램을 처음 실행할 때는 필요한 페이지를 미리 다 올리지 않고 실제로 접근하는 순간에 하나씩 올리는데, 이런 폴트는 정상입니다. 진짜 문제는 이미 올려둔 페이지를 내보냈다가 곧바로 다시 불러오는 폴트가 반복될 때입니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q9" aria-label="9번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">MEM-09</span><span class="qtext">페이지 교체 알고리즘에는 어떤 것이 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>페이지 교체 알고리즘은 물리 메모리가 꽉 찼을 때 어떤 페이지를 내보낼지 정하는 정책입니다.</strong> 대표적으로 네 가지를 얘기합니다.</p>
+<ul>
+<li><strong>OPT.</strong> 앞으로 가장 늦게 쓸 페이지를 내보내는 이상적인 방식인데, 미래를 알아야 해서 실제로는 못 쓰고 비교 기준으로만 씁니다.</li>
+<li><strong>FIFO.</strong> 먼저 들어온 페이지부터 내보내는 가장 단순한 방식인데, 오래됐다고 안 쓰는 건 아니라서 자주 쓰는 페이지까지 내보내는 게 단점입니다.</li>
+<li><strong>LRU.</strong> 가장 오랫동안 안 쓴 페이지를 내보내는 방식이라 지역성에 잘 맞지만, 언제 마지막에 썼는지 계속 추적해야 해서 비용이 큽니다.</li>
+<li><strong>Clock.</strong> 참조 비트 하나로 LRU를 값싸게 흉내 내는 방식이라, 실제로 가장 많이 씁니다.</li>
+</ul>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>Belady 이상 현상이 뭔가요?</q>보통은 프레임을 늘리면 폴트가 줄어드는 게 정상인데, FIFO에서는 오히려 늘어나는 경우가 있습니다. FIFO는 안 쓰인 정도가 아니라 들어온 순서로 내쫓다 보니, 프레임을 늘렸을 때 하필 곧 다시 쓸 페이지를 직전에 내보내는 배치가 나올 수 있어서입니다. LRU나 OPT는 프레임을 늘리면 갖고 있던 페이지가 그대로 남는 게 보장돼서 이 현상이 없습니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q10" aria-label="10번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">MEM-10</span><span class="qtext">스래싱은 무엇이고 어떻게 벗어나나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>스래싱은 페이지 폴트가 너무 자주 나서, CPU가 계산은 못 하고 디스크만 기다리는 상태입니다.</strong></p>
+<p>최근에 실제로 쓰는 페이지들을 워킹셋이라고 하는데, 이 워킹셋의 합이 물리 메모리보다 커지면 무엇을 내보내도 곧 다시 필요해져서 폴트가 폭증합니다.</p>
+<p>벗어나려면 동시에 돌리는 프로세스 수를 줄여서, 일부를 잠깐 디스크로 내려 남은 것들의 워킹셋이 메모리에 들어가게 해야 합니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>CPU 사용률이 낮으니 프로세스를 더 띄우면 되지 않나요?</q>그게 함정이자 악순환입니다. 사용률이 낮은 건 할 일이 없어서가 아니라 다들 디스크를 기다려서인데, 여기서 프로세스를 더 띄우면 워킹셋 합이 더 커져서 폴트가 더 늘고 성능이 절벽처럼 떨어집니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q11" aria-label="11번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">MEM-11</span><span class="qtext">프로그램이 메모리에 올라갈 때 영역이 어떻게 나뉘나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>프로세스 주소 공간은 용도에 따라 코드, 데이터, BSS, 힙, 스택으로 나뉩니다.</strong></p>
+<p>낮은 주소부터 실행할 기계어가 담긴 코드, 초기값이 정해진 전역 변수가 담긴 데이터, 0으로 시작하는 전역 변수 자리인 BSS가 오고, 그 위로 힙이 자랍니다. 그리고 높은 주소에서 스택이 아래로 자라서, 힙과 스택이 가운데 빈 공간을 사이에 두고 마주 봅니다.</p>
+<p>이렇게 나누는 건 영역마다 성격이 다르기 때문입니다. 코드는 읽기 전용이라 실수나 공격으로 못 덮어쓰게 막고, 코드와 데이터와 BSS는 컴파일 때 크기가 정해져 고정인 반면 힙과 스택만 실행 중에 늘고 줍니다. 그래서 힙과 스택이 마주 보며 자라다 부딪히면 스택 오버플로 같은 충돌이 납니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>BSS는 데이터 영역과 왜 따로 두나요?</q>데이터는 초기값이 있어서 그 값을 실행 파일에 그대로 담아야 하지만, BSS는 전부 0이라 값을 담을 필요 없이 이만큼을 0으로 채우라는 크기 정보만 있으면 됩니다. 그래서 따로 두면 실행 파일 크기를 줄일 수 있습니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="q12" aria-label="12번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">MEM-12</span><span class="qtext">스택과 힙 메모리는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -177,7 +258,7 @@ title: 운영체제 면접 대비 문답
 <div class="grp-head"><h3>프로세스와 스레드</h3><span class="cnt">6문항</span></div>
 <p class="grp-note">공유하느냐 격리하느냐가 모든 차이의 뿌리입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q9" aria-label="9번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q13" aria-label="13번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">PROC-01</span><span class="qtext">프로세스와 스레드는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -197,7 +278,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q10" aria-label="10번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q14" aria-label="14번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">PROC-02</span><span class="qtext">컨텍스트 스위칭 비용에는 무엇이 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -211,7 +292,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q11" aria-label="11번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q15" aria-label="15번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">PROC-03</span><span class="qtext">fork에서 copy-on-write를 쓰는 이유는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -231,7 +312,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q12" aria-label="12번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q16" aria-label="16번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">PROC-04</span><span class="qtext">좀비 프로세스와 고아 프로세스는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -251,7 +332,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q13" aria-label="13번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q17" aria-label="17번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">PROC-05</span><span class="qtext">사용자 모드와 커널 모드는 왜 나누나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -271,7 +352,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q14" aria-label="14번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q18" aria-label="18번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">PROC-06</span><span class="qtext">코어가 하나뿐이어도 멀티스레드가 이득인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -289,7 +370,7 @@ title: 운영체제 면접 대비 문답
 <div class="grp-head"><h3>동기화</h3><span class="cnt">6문항</span></div>
 <p class="grp-note">공유 데이터를 동시에 건드릴 때 생기는 문제와 도구들입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q15" aria-label="15번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q19" aria-label="19번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SYNC-01</span><span class="qtext">레이스 컨디션은 왜 생기나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -303,7 +384,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q16" aria-label="16번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q20" aria-label="20번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SYNC-02</span><span class="qtext">뮤텍스와 세마포어는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -317,7 +398,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q17" aria-label="17번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q21" aria-label="21번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SYNC-03</span><span class="qtext">스핀락은 언제 뮤텍스 대신 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -331,7 +412,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q18" aria-label="18번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q22" aria-label="22번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SYNC-04</span><span class="qtext">데드락은 어떤 조건에서 발생하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -351,7 +432,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q19" aria-label="19번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q23" aria-label="23번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SYNC-05</span><span class="qtext">우선순위 역전은 무엇이고 어떻게 해결하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -365,7 +446,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q20" aria-label="20번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q24" aria-label="24번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SYNC-06</span><span class="qtext">volatile만으로 동기화가 충분한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -383,7 +464,7 @@ title: 운영체제 면접 대비 문답
 <div class="grp-head"><h3>스케줄링</h3><span class="cnt">4문항</span></div>
 <p class="grp-note">"다음에 누구를 실행할까"의 규칙과 트레이드오프입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q21" aria-label="21번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q25" aria-label="25번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SCHED-01</span><span class="qtext">CPU 스케줄링 알고리즘에는 무엇이 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -407,7 +488,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q22" aria-label="22번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q26" aria-label="26번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SCHED-02</span><span class="qtext">선점 스케줄링과 비선점 스케줄링은 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -421,7 +502,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q23" aria-label="23번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q27" aria-label="27번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SCHED-03</span><span class="qtext">인터럽트가 폴링보다 항상 좋은가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -435,7 +516,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q24" aria-label="24번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q28" aria-label="28번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SCHED-04</span><span class="qtext">디스크 스케줄링 알고리즘에는 무엇이 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -462,7 +543,7 @@ title: 운영체제 면접 대비 문답
 <div class="grp-head"><h3>I/O · 캐시 · 파일시스템</h3><span class="cnt">7문항</span></div>
 <p class="grp-note">개념이 섞이기 쉬운 축들을 정확히 구분하는지가 관건입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q25" aria-label="25번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q29" aria-label="29번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">IO-01</span><span class="qtext">동기/비동기와 블로킹/논블로킹은 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -482,7 +563,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q26" aria-label="26번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q30" aria-label="30번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">IO-02</span><span class="qtext">I/O 멀티플렉싱에서 epoll이 select·poll보다 나은 이유는?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -496,7 +577,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q27" aria-label="27번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q31" aria-label="31번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">IO-03</span><span class="qtext">캐시 지역성이 게임에서 왜 중요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -516,7 +597,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q28" aria-label="28번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q32" aria-label="32번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">IO-04</span><span class="qtext">거짓 공유(false sharing)는 무엇이고 어떻게 완화하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -530,7 +611,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q29" aria-label="29번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q33" aria-label="33번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">IO-05</span><span class="qtext">파일 시스템에서 inode는 어떤 역할을 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -544,7 +625,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q30" aria-label="30번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q34" aria-label="34번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">IO-06</span><span class="qtext">저널링은 왜 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -558,7 +639,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q31" aria-label="31번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q35" aria-label="35번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">IO-07</span><span class="qtext">공유 메모리와 메시지 전달 방식의 IPC는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -576,7 +657,7 @@ title: 운영체제 면접 대비 문답
 <div class="grp-head"><h3>상황형 문제 해결</h3><span class="cnt">5문항</span></div>
 <p class="grp-note">정답보다 접근 순서를 봅니다. 한 상황에 여러 분야가 얽혀 있으니, 측정으로 원인을 좁힌 뒤 CS 개념으로 설명하세요.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q32" aria-label="32번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q36" aria-label="36번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-01</span><span class="qtext">게임을 오래 켜둘수록 점점 느려지고 끊깁니다. 무엇을 의심하겠습니까?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -590,7 +671,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q33" aria-label="33번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q37" aria-label="37번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-02</span><span class="qtext">매 프레임 수천 개 객체를 순회하는데, CPU는 한가한데도 느립니다. 왜일까요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -610,7 +691,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q34" aria-label="34번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q38" aria-label="38번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-03</span><span class="qtext">작업을 멀티스레드로 나눴는데, 코어를 늘려도 기대만큼 안 빨라지고 가끔 더 느려집니다. 원인이 뭘까요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -624,7 +705,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q35" aria-label="35번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q39" aria-label="39번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-04</span><span class="qtext">로그를 파일에 한 줄씩 수만 번 쓰는데 너무 느립니다. 어떻게 개선하겠습니까?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -644,7 +725,7 @@ title: 운영체제 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="q36" aria-label="36번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="q40" aria-label="40번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-05</span><span class="qtext">서버가 동시 접속 수만 개를 받아야 합니다. 연결마다 스레드를 하나씩 두면 왜 안 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">

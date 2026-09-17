@@ -1,7 +1,8 @@
-// 면접 대비 문답 페이지 공유 로직 (분야별 *-interview.md에서 <script src="./interview.js">로 로드)
+// 면접 대비 문답 페이지 로직 (통합 페이지 content/interview.md 에서 <script src="./interview.js">로 로드)
 // 인라인 <script>/<style>는 Quartz 직렬화에서 이스케이프되므로 CSS도 여기서 주입한다.
-// 페이지 구조: .osiv 안에 .q(체크박스+details)들, 툴바 버튼 id는 osiv-open/hide/reset,
-// 진행률 표시는 #osiv-done / #osiv-total. 진행 상태는 페이지 경로별로 localStorage에 저장된다.
+// 페이지 구조: .osiv > .tabs(분야 탭) + .field[data-field] 여러 개.
+//   각 .field 안에 .note, .bar(진행률 .prog-done/.prog-total + 버튼 .tool-open/.tool-hide/.tool-reset),
+//   section.grp 들, .q(체크박스 + details). 진행 상태는 분야별로 localStorage에 독립 저장된다.
 ;(function () {
   var root = document.querySelector(".osiv")
   if (!root) return
@@ -40,6 +41,27 @@
   --osiv-flag-soft: #2c2418;
   --osiv-ok: #5fc79b;
 }
+
+/* 분야 탭 */
+.osiv .tabs {
+  position: sticky; top: 0; z-index: 6;
+  display: flex; flex-wrap: wrap; gap: 1px;
+  background: var(--osiv-surface);
+  border-bottom: 2px solid var(--osiv-rule);
+  margin: 6px 0 0; padding: 2px 0 0;
+}
+.osiv .tab {
+  font: inherit; font-size: 0.9em; font-weight: 500;
+  color: var(--osiv-muted); background: none;
+  border: none; border-bottom: 2px solid transparent; margin-bottom: -2px;
+  padding: 8px 13px; cursor: pointer; white-space: nowrap; line-height: 1.4;
+}
+.osiv .tab:hover { color: var(--osiv-accent); }
+.osiv .tab[aria-selected="true"] {
+  color: var(--osiv-accent); border-bottom-color: var(--osiv-accent); font-weight: 600;
+}
+.osiv .field[hidden] { display: none; }
+
 .osiv .dek { color: var(--osiv-ink-2); margin: 0 0 6px; }
 .osiv .note {
   margin: 18px 0 4px; padding: 13px 16px; background: var(--osiv-accent-soft);
@@ -61,12 +83,12 @@
 .osiv ol.steps b { font-weight: 600; }
 .osiv ol.steps span { color: var(--osiv-ink-2); }
 
-/* 툴바 */
+/* 툴바 (탭 아래에 스티키) */
 .osiv .bar {
-  position: sticky; top: 0; z-index: 5;
+  position: sticky; top: var(--osiv-tabs-h, 44px); z-index: 5;
   background: var(--osiv-surface);
   border: 1px solid var(--osiv-rule); border-radius: 4px;
-  padding: 9px 13px; margin: 22px 0 8px;
+  padding: 9px 13px; margin: 12px 0 8px;
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
 }
 .osiv .prog {
@@ -101,7 +123,7 @@
 /* 질문 */
 .osiv .q { display: grid; grid-template-columns: 28px 1fr; border-bottom: 1px solid var(--osiv-rule-soft); }
 .osiv .q.done { opacity: 0.5; }
-.osiv.hide-done .q.done { display: none; }
+.osiv .field.hide-done .q.done { display: none; }
 .osiv .chk { display: flex; align-items: start; justify-content: center; padding-top: 18px; }
 .osiv .chk input {
   appearance: none; -webkit-appearance: none; width: 15px; height: 15px;
@@ -154,6 +176,7 @@
 .osiv .close ul { margin: 0; padding-left: 18px; color: var(--osiv-ink-2); display: grid; gap: 6px; }
 @media (max-width: 620px) {
   .osiv .q { grid-template-columns: 24px 1fr; }
+  .osiv .tabs { flex-wrap: nowrap; overflow-x: auto; }
 }
 `
   var styleEl = document.createElement("style")
@@ -162,87 +185,149 @@
   document.head.appendChild(styleEl)
   }
 
-  // ---------- 체크리스트 (페이지 경로별로 저장) ----------
-  var KEY = "interview-prep:" + (location.pathname || "default")
-  var boxes = Array.prototype.slice.call(root.querySelectorAll(".chk input"))
-  var doneEl = document.getElementById("osiv-done")
-  var totalEl = document.getElementById("osiv-total")
-  if (totalEl) totalEl.textContent = boxes.length
+  // ---------- 분야 초기화 (분야별 독립: 체크리스트·툴바) ----------
+  var fields = Array.prototype.slice.call(root.querySelectorAll(".field"))
 
-  function load() {
-    try {
-      var raw = localStorage.getItem(KEY)
-      return raw ? JSON.parse(raw) : []
-    } catch (e) {
-      return []
+  function initField(field) {
+    var slug = field.getAttribute("data-field") || "default"
+    // 옛 개별 페이지(.../<slug>-interview)의 저장 키를 그대로 재현해 기존 진행을 유지한다.
+    var base = (location.pathname || "").replace(/\/$/, "")
+    var oldPath = base.replace(/interview$/, slug + "-interview")
+    if (oldPath === base) oldPath = base + "-" + slug // interview로 끝나지 않으면 충돌 방지
+    var KEY = "interview-prep:" + oldPath
+
+    var boxes = Array.prototype.slice.call(field.querySelectorAll(".chk input"))
+    var doneEl = field.querySelector(".prog-done")
+    var totalEl = field.querySelector(".prog-total")
+    if (totalEl) totalEl.textContent = boxes.length
+
+    function load() {
+      try {
+        var raw = localStorage.getItem(KEY)
+        return raw ? JSON.parse(raw) : []
+      } catch (e) {
+        return []
+      }
+    }
+    function save(ids) {
+      try {
+        localStorage.setItem(KEY, JSON.stringify(ids))
+      } catch (e) {}
+    }
+    function sync() {
+      var n = 0
+      boxes.forEach(function (b) {
+        var row = b.closest(".q")
+        if (b.checked) {
+          n++
+          row.classList.add("done")
+        } else {
+          row.classList.remove("done")
+        }
+      })
+      if (doneEl) doneEl.textContent = n
+      save(
+        boxes
+          .filter(function (b) {
+            return b.checked
+          })
+          .map(function (b) {
+            return b.id
+          }),
+      )
+    }
+
+    var saved = load()
+    boxes.forEach(function (b) {
+      if (saved.indexOf(b.id) !== -1) b.checked = true
+      b.addEventListener("change", sync)
+    })
+    sync()
+
+    var details = Array.prototype.slice.call(field.querySelectorAll(".q details"))
+    var openBtn = field.querySelector(".tool-open")
+    if (openBtn) {
+      openBtn.addEventListener("click", function () {
+        var anyClosed = details.some(function (d) {
+          return !d.open
+        })
+        details.forEach(function (d) {
+          d.open = anyClosed
+        })
+        openBtn.textContent = anyClosed ? "모두 접기" : "모두 펼치기"
+      })
+    }
+
+    var hideBtn = field.querySelector(".tool-hide")
+    if (hideBtn) {
+      hideBtn.addEventListener("click", function () {
+        var on = hideBtn.getAttribute("aria-pressed") === "true"
+        hideBtn.setAttribute("aria-pressed", on ? "false" : "true")
+        field.classList.toggle("hide-done", !on)
+      })
+    }
+
+    var resetBtn = field.querySelector(".tool-reset")
+    if (resetBtn) {
+      resetBtn.addEventListener("click", function () {
+        boxes.forEach(function (b) {
+          b.checked = false
+        })
+        sync()
+      })
     }
   }
-  function save(ids) {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(ids))
-    } catch (e) {}
+
+  fields.forEach(initField)
+
+  // ---------- 분야 탭 ----------
+  var tabs = Array.prototype.slice.call(root.querySelectorAll(".tab"))
+  var tabsEl = root.querySelector(".tabs")
+  var ACTIVE_KEY = "interview-prep:active-field"
+
+  function setTabsH() {
+    if (tabsEl) root.style.setProperty("--osiv-tabs-h", tabsEl.offsetHeight + "px")
   }
-  function sync() {
-    var n = 0
-    boxes.forEach(function (b) {
-      var row = b.closest(".q")
-      if (b.checked) {
-        n++
-        row.classList.add("done")
-      } else {
-        row.classList.remove("done")
+
+  function show(slug) {
+    var matched = false
+    fields.forEach(function (f) {
+      var on = f.getAttribute("data-field") === slug
+      if (on) matched = true
+      f.hidden = !on
+    })
+    if (!matched) return false
+    tabs.forEach(function (t) {
+      t.setAttribute("aria-selected", t.getAttribute("data-field") === slug ? "true" : "false")
+    })
+    setTabsH()
+    return true
+  }
+
+  tabs.forEach(function (t) {
+    t.addEventListener("click", function () {
+      var slug = t.getAttribute("data-field")
+      if (!show(slug)) return
+      try {
+        localStorage.setItem(ACTIVE_KEY, slug)
+      } catch (e) {}
+      // 새 분야를 처음부터 보도록 탭 줄 상단으로 스크롤
+      if (tabsEl && tabsEl.getBoundingClientRect().top < 0) {
+        tabsEl.scrollIntoView({ block: "start" })
       }
     })
-    if (doneEl) doneEl.textContent = n
-    save(
-      boxes
-        .filter(function (b) {
-          return b.checked
-        })
-        .map(function (b) {
-          return b.id
-        }),
-    )
-  }
-
-  var saved = load()
-  boxes.forEach(function (b) {
-    if (saved.indexOf(b.id) !== -1) b.checked = true
-    b.addEventListener("change", sync)
   })
-  sync()
 
-  // ---------- 툴바 ----------
-  var details = Array.prototype.slice.call(root.querySelectorAll(".q details"))
-  var openBtn = document.getElementById("osiv-open")
-  if (openBtn) {
-    openBtn.addEventListener("click", function () {
-      var anyClosed = details.some(function (d) {
-        return !d.open
-      })
-      details.forEach(function (d) {
-        d.open = anyClosed
-      })
-      openBtn.textContent = anyClosed ? "모두 접기" : "모두 펼치기"
-    })
+  // 초기 활성 분야 복원 (없거나 못 맞추면 첫 분야 유지)
+  var initial = null
+  try {
+    initial = localStorage.getItem(ACTIVE_KEY)
+  } catch (e) {}
+  if (!initial || !show(initial)) {
+    var firstSlug = fields[0] && fields[0].getAttribute("data-field")
+    if (firstSlug) show(firstSlug)
   }
 
-  var hideBtn = document.getElementById("osiv-hide")
-  if (hideBtn) {
-    hideBtn.addEventListener("click", function () {
-      var on = hideBtn.getAttribute("aria-pressed") === "true"
-      hideBtn.setAttribute("aria-pressed", on ? "false" : "true")
-      root.classList.toggle("hide-done", !on)
-    })
-  }
-
-  var resetBtn = document.getElementById("osiv-reset")
-  if (resetBtn) {
-    resetBtn.addEventListener("click", function () {
-      boxes.forEach(function (b) {
-        b.checked = false
-      })
-      sync()
-    })
-  }
+  setTabsH()
+  window.addEventListener("resize", setTabsH)
 })()

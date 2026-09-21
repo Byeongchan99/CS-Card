@@ -267,13 +267,39 @@ int w = c;              // 컴파일 에러 — explicit인데 캐스트 안 적
 
 ## ref — 참조도 값으로 복사된다
 
-참조 타입도 파라미터로 넘기면 참조가 값으로 복사됨. 메서드 안에서 `e = new Enemy(...)`로 재할당하면 지역 복사본만 새 객체를 가리키고 원본은 안 바뀜. 내부 필드 수정(`e.hp = ...`)은 전파되지만 재할당은 전파 안 됨. 진짜 바꾸려면 `ref`.
+C#의 인자 전달은 값 타입이든 참조 타입이든 예외 없이 값 전달 — 변수 칸에 든 것을 복사해 넘김. 값 타입은 데이터가, 참조 타입은 위치(주소)가 복사됨. 그래서 참조 타입을 넘기면 매개변수와 원래 변수는 서로 다른 칸이지만 같은 객체를 가리킴. 여기서 두 동작이 갈림:
+
+- `e.hp = 50` — 복사된 위치를 따라가 그 객체를 고침. 원래 변수도 같은 객체를 보므로 반영됨
+- `e = new Enemy()` — 매개변수 칸에 새 위치를 덮어씀. 그 칸은 복사본이라 원래 변수는 옛 위치 그대로
+
+<svg viewBox="0 0 540 176" width="540" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="참조 타입 인자에서 필드 수정은 반영되고 재할당은 원본에 반영되지 않는다"><defs><marker id="rf-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><g font-size="12" fill="currentColor" text-anchor="middle" opacity="0.8"><text x="138" y="18" font-family="monospace">e.hp = 50 · 반영됨</text><text x="405" y="18" font-family="monospace">e = new Enemy() · 원본 그대로</text></g><line x1="270" y1="30" x2="270" y2="150" stroke="currentColor" opacity="0.2"/><g fill="none" stroke="currentColor" stroke-opacity="0.6"><rect x="24" y="50" width="104" height="30" rx="4"/><rect x="24" y="104" width="104" height="30" rx="4"/><rect x="300" y="50" width="96" height="30" rx="4"/><rect x="300" y="104" width="96" height="30" rx="4"/><rect x="430" y="48" width="96" height="30" rx="4"/></g><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="168" y="76" width="86" height="34" rx="4"/><rect x="430" y="106" width="96" height="30" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="76" y="69">enemy</text><text x="76" y="123">e (복사본)</text><text x="211" y="97">Enemy hp:50</text><text x="348" y="69">enemy</text><text x="348" y="123">e (복사본)</text><text x="478" y="67">원래 Enemy</text><text x="478" y="125">새 Enemy</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#rf-a)"><line x1="128" y1="65" x2="166" y2="88"/><line x1="128" y1="119" x2="166" y2="99"/><line x1="396" y1="64" x2="428" y2="63"/><line x1="396" y1="119" x2="428" y2="121"/></g><g font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle"><text x="140" y="162">둘이 같은 객체 → 고치면 반영</text><text x="412" y="162">e 칸만 새 객체 → enemy는 그대로</text></g></svg>
 
 ```csharp
-void Swap(Enemy e)      { e = new Enemy(); }   // 지역 복사본만 교체 → 원본 그대로
-void Heal(Enemy e)      { e.hp = 100; }        // 내부 필드 수정은 전파됨
-void Swap(ref Enemy e)  { e = new Enemy(); }   // ref면 진짜 원본이 교체됨
+void Heal(Enemy e)    { e.hp = 50; }        // 객체를 고침 → 반영됨
+void Replace(Enemy e) { e = new Enemy(); }  // 칸을 덮어씀 → 원본 그대로
+
+var enemy = new Enemy { hp = 100 };
+Heal(enemy);     // enemy.hp = 50 (반영)
+Replace(enemy);  // enemy는 원래 객체 그대로
 ```
+
+`ref`는 값을 복사해 넘기는 대신 원래 변수의 칸 자체(별칭)를 넘김. 그래서 메서드 안의 재할당이 곧 원래 변수에 대한 재할당이 됨. 호출할 때도 `ref`를 붙여 "이 변수 칸을 넘긴다"를 명시. 값 타입에도 쓰며 오히려 값 타입에서 더 자주 씀 — 원래 복사돼 넘어가 못 바꾸던 원본을 직접 고칠 수 있어서.
+
+```csharp
+void Replace(ref Enemy e) { e = new Enemy(); }  // 원본 변수가 진짜 교체됨
+void AddOne(ref int n)    { n++; }              // 값 타입도 원본이 바뀜
+Replace(ref enemy);   AddOne(ref x);            // 호출 때도 ref 명시
+```
+
+형제 키워드 `out`·`in`도 "변수 칸을 넘긴다"는 같은 계열이고 읽기·쓰기 권한만 다름.
+
+| 키워드 | 방향 | 넘기기 전 초기화 | 주 용도 |
+| --- | --- | --- | --- |
+| `ref` | 읽기 + 쓰기 | 필요 | 원본 변수를 고침 |
+| `out` | 쓰기 전용(메서드가 반드시 채움) | 불필요 | 결과를 여러 개 반환 |
+| `in` | 읽기 전용(메서드가 못 바꿈) | 필요 | 큰 struct를 복사 없이 넘김 |
+
+`in`은 성능용 — 큰 struct(예: `Matrix4x4`, 64바이트)를 그냥 넘기면 호출마다 통째로 복사되는데, `in`이면 칸 위치만 넘어가 복사가 없고 안에서 수정은 막힘. `ref`는 실행이 미뤄지는 `async` 메서드·이터레이터(`yield`)의 매개변수로는 못 쓰고 람다도 캡처 못 함 — 그때쯤 원래 변수의 스택 자리가 사라졌을 수 있어서.
 
 ## out 파라미터
 

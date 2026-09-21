@@ -117,14 +117,33 @@ old.Add(new Pos());           // object로 받음 → 박싱, 힙에 복사본
 
 ## 박싱(boxing)
 
-값 타입을 object로 변환할 때 힙에 할당 → GC 부담. `Debug.Log(int)`처럼 값 타입을 object 파라미터로 넘길 때 발생. 문자열(참조 타입)을 넘기면 박싱 없음. 핵심 핫 패스에선 로그·박싱을 피할 것.
+박싱은 값 타입을 `object`나 인터페이스로 담을 때 일어남. `object`는 참조 타입이라 변수 칸에 위치만 담을 수 있으므로, 값 타입을 넣으려면 런타임이 힙에 상자를 만들어 값을 복사해 넣고 그 상자의 위치를 가리키게 함. 다시 값 타입으로 꺼내는 게 언박싱. 즉 값을 참조로 변신시키는 변환.
+
+<svg viewBox="0 0 620 168" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="박싱은 스택의 값 타입을 힙 상자로 복사하고 object가 그것을 가리킨다"><defs><marker id="box-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><g fill="none" stroke="currentColor" stroke-opacity="0.25" stroke-dasharray="4 3"><rect x="16" y="30" width="240" height="116" rx="10"/><rect x="356" y="30" width="248" height="116" rx="10"/></g><g font-size="13" fill="currentColor" text-anchor="middle" opacity="0.8"><text x="136" y="22">스택</text><text x="480" y="22">힙</text></g><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="46" y="52" width="128" height="38" rx="4"/></g><g fill="none" stroke="currentColor" stroke-opacity="0.6"><rect x="46" y="100" width="128" height="32" rx="4"/></g><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="422" y="66" width="120" height="44" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="110" y="76">int n = 42</text><text x="110" y="121">object o</text><text x="482" y="85">상자</text><text x="482" y="101" font-size="11" opacity="0.65">42 (복사본)</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#box-a)"><line x1="174" y1="71" x2="420" y2="83"/><line x1="174" y1="116" x2="420" y2="98"/></g><g font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle"><text x="300" y="66">박싱: 힙 할당 + 복사</text><text x="300" y="140">o는 상자의 위치를 가리킴</text></g></svg>
 
 ```csharp
 int n = 42;
-object o = n;      // 박싱 — 힙에 복사본 할당
-int m = (int)o;    // 언박싱
-Debug.Log(n);      // int가 object 파라미터로 → 박싱 발생
+object o = n;     // 박싱 — 힙에 상자 할당, 42를 복사
+int m = (int)o;   // 언박싱 — 상자에서 값 복사
 ```
+
+박싱은 힙 할당이라 GC 대상이 하나 생김. 한 번은 사소하나 매 프레임·루프에서 반복되면 임시 쓰레기가 쌓여 GC가 잦아지고 그때마다 멈칫함(게임이면 스터터). 문제는 코드에 잘 안 보인다는 것 — 대표적으로 값 타입을 `object` 파라미터로 넘길 때(`Debug.Log(int)`, `string.Format` 인자, 옛 컬렉션 `Add`), 인터페이스로 담을 때(`IComparable c = myStruct`), `enum`을 `object`로 다룰 때.
+
+피하는 법은 전부 한 문장의 변주 — 값 타입을 `object`·인터페이스에 담지 말고, 담아야 할 것 같으면 제네릭으로 컴파일러가 타입을 알게 함.
+
+- 제네릭 컬렉션 — `List<int>`·`Dictionary<int,int>`는 내부 배열이 실제 타입이라 박싱 없음. 옛 `ArrayList`·`Hashtable`만 피함
+- 제네릭 제약 — `where T : IComparable<T>`면 `object` 경유 없이 값에 직접 호출(constrained call). struct에 `IEquatable<T>`·`GetHashCode`를 두면 Dictionary 비교의 박싱도 사라짐
+- `enum` — 옛 `HasFlag`는 내부 박싱, 비트 연산 `(e & flag) != 0`으로 검사하면 박싱 없음
+- 로그·문자열 — 값을 `ToString()`으로 먼저 문자열로 만들어 넘기면 박싱은 없음. 단 결과 문자열은 힙에 할당되므로 "박싱만" 없는 것이지 할당까지 없는 건 아님(진짜 무할당은 미리 만든 문자열 재사용·로그 끄기)
+
+```csharp
+Debug.Log(hp);                 // int → object 파라미터 → 박싱
+Debug.Log(hp.ToString());      // 이미 string → 박싱 없음(문자열 할당은 남음)
+if ((eff & Eff.Fire) != 0) { } // HasFlag 대신 비트 검사 → 박싱 없음
+T Max<T>(T a, T b) where T : IComparable<T> => a.CompareTo(b) >= 0 ? a : b;  // 박싱 없이 호출
+```
+
+`ToString()` 자체가 박싱이 아닌 건 `int`처럼 `ToString()`을 재정의한 타입이라 값에 직접 호출되기 때문. 재정의 안 한 커스텀 struct는 상속받은 `ValueType.ToString()`을 부르며 박싱되므로, struct엔 `ToString()` override를 두면 그 박싱도 사라짐.
 
 ## 배열 기본 초기화 — 값 타입 vs 참조 타입
 

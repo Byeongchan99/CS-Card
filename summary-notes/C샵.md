@@ -147,11 +147,33 @@ T Max<T>(T a, T b) where T : IComparable<T> => a.CompareTo(b) >= 0 ? a : b;  // 
 
 ## 배열 기본 초기화 — 값 타입 vs 참조 타입
 
-값 타입 배열 원소는 모든 필드가 0으로 초기화됨(null 아님). 참조 타입 배열 원소는 null로 초기화됨. 그래서 struct 배열은 바로 접근 가능하지만, class 배열은 그대로 접근하면 `NullReferenceException`.
+`new T[n]`을 하면 런타임이 그 메모리 블록을 통째로 0으로 채움. "0으로 채운다"가 타입에 따라 다른 뜻이 됨 — 값 타입에겐 유효한 기본값이고, 참조 타입에겐 null.
+
+- 값 타입 배열 — 각 원소의 필드가 기본값(`int` 0, `bool` false, 안의 참조는 null). 원소가 이미 유효한 기본값 struct라 바로 접근 가능
+- 참조 타입 배열 — 각 원소는 참조라 0이 곧 null. n개의 null 칸만 있고 객체는 하나도 안 만들어져, `원소.멤버`에 접근하면 `NullReferenceException`
+
+<svg viewBox="0 0 620 204" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="값 타입 배열은 기본값으로, 참조 타입 배열은 null로 초기화된다"><g font-size="12" fill="currentColor"><text x="24" y="36" font-size="13">new Pos[3]</text><text x="150" y="36" opacity="0.6">값 타입 — 기본값으로 채워짐</text></g><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="24" y="50" width="118" height="44" rx="4"/><rect x="154" y="50" width="118" height="44" rx="4"/><rect x="284" y="50" width="118" height="44" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="83" y="77">{ x:0, y:0 }</text><text x="213" y="77">{ x:0, y:0 }</text><text x="343" y="77">{ x:0, y:0 }</text></g><text x="420" y="77" font-size="12" fill="currentColor" opacity="0.7">바로 s[0].x 접근 가능</text><g font-size="12" fill="currentColor"><text x="24" y="134" font-size="13">new Player[3]</text><text x="164" y="134" opacity="0.6">참조 타입 — 전부 null</text></g><g fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-dasharray="4 3"><rect x="24" y="148" width="118" height="44" rx="4"/><rect x="154" y="148" width="118" height="44" rx="4"/><rect x="284" y="148" width="118" height="44" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle" opacity="0.6"><text x="83" y="175">null</text><text x="213" y="175">null</text><text x="343" y="175">null</text></g><text x="420" y="175" font-size="12" fill="#e2574c">c[0].Hp 접근 → 예외</text></svg>
 
 ```csharp
-var s = new SPos[2];   // 원소 { hp:0 } — 바로 접근 가능
-var c = new CPos[2];   // 원소 null — c[0].hp 접근 시 NullReferenceException
+struct Pos { public int x, y; }
+
+var s = new Pos[3];       // 원소: {0,0} 셋 — s[0].x 바로 접근 가능
+var i = new int[3];       // 0, 0, 0
+var c = new Player[3];    // null, null, null — c[0].Hp 접근 시 NullReferenceException
+var str = new string[3];  // null, null, null (string도 참조 타입)
+```
+
+class 배열은 칸만 만들고 내용물은 없으니 쓰기 전에 각 칸에 객체를 넣어야 함.
+
+```csharp
+for (int k = 0; k < c.Length; k++) c[k] = new Player();
+```
+
+이 "0으로 초기화"는 배열만이 아니라 클래스의 필드에도 그대로 적용됨 — `new`로 객체를 만들면 초기화 안 한 필드는 값 타입이면 0, 참조 타입이면 null. `default(T)`도 같은 값을 줌. 단 `new T[n]`은 원소 n개를 기본값으로 채운 상태고 `new List<T>()`는 원소 0개(비어 있음)라, `Length`와 `Count`가 다르게 시작함.
+
+```csharp
+new int[3].Length;      // 3 (0,0,0으로 이미 채워짐)
+new List<int>().Count;  // 0 (비어 있음)
 ```
 
 ## ref — 참조도 값으로 복사된다

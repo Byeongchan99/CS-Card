@@ -520,12 +520,33 @@ checked { int c = int.MaxValue + 1; } // OverflowException (기본은 조용히 
 
 ## as vs 형변환 캐스트
 
-`as`는 실패 시 null을 반환하고 예외가 없으며, 참조 타입·Nullable에만 사용 가능. `(Type)` 캐스트는 실패 시 `InvalidCastException`.
+객체를 다른 타입으로 바꿔 받는 방법이 둘 있고 성공 시 결과는 같음. 차이는 실패했을 때 — `(Type)obj` 캐스트는 실패하면 `InvalidCastException`을 던지고, `obj as Type`은 예외 없이 null을 돌려줌. 반드시 그 타입이어야 하는 자리(실패가 곧 버그)면 캐스트로 바로 터뜨리고, 실패가 정상 범위면 `as`로 받아 null 검사로 분기. 실패의 비용이 다름 — null은 값으로 분기, 예외는 비싸고 예외적 상황용.
 
 ```csharp
-var e = obj as Enemy;   // 실패 시 null (예외 없음)
-var f = (Enemy)obj;     // 실패 시 InvalidCastException
+var e1 = obj as Enemy;      // 실패 시 null
+if (e1 != null) e1.Hit();
+var e2 = (Enemy)obj;        // 실패 시 InvalidCastException
 ```
+
+`as`는 실패 시 null을 돌려줘야 하니 null을 담을 수 있는 타입(참조 타입·nullable 값 타입)에만 됨. 또 참조 변환만 하고 숫자·사용자 정의 변환은 안 거치므로 그런 변환은 캐스트를 씀.
+
+```csharp
+int n = (int)3.9;        // 캐스트 — 숫자 변환 됨(3)
+// int m = obj as int;   // 컴파일 에러 — non-nullable 값 타입엔 as 불가
+int? k = obj as int?;    // nullable이면 OK
+```
+
+"타입 확인하고 맞으면 그 타입으로 쓰기"는 `as`로 받아 null 검사하던 두 단계인데, 요즘은 `is` 패턴이 검사와 변수 바인딩을 한 줄로 합쳐 이걸 대체(다음 패턴 매칭 항목).
+
+```csharp
+if (obj is Enemy e) e.Hit();   // 형 검사 + e 바인딩 동시에
+```
+
+| | `(Type)` 캐스트 | `as` | `is` 패턴 |
+| --- | --- | --- | --- |
+| 실패 시 | 예외 | null | false로 분기 |
+| 대상 타입 | 값·참조 다, 숫자·사용자 변환도 | 참조·nullable만, 참조 변환만 | 값·참조 다 |
+| 쓰는 자리 | 반드시 그 타입일 때 | 실패 허용, null 검사할 때 | 검사하고 바로 쓸 때(요즘 기본) |
 
 ## 패턴 매칭
 

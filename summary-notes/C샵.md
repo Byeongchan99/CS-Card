@@ -454,19 +454,30 @@ decimal price = 0.1m + 0.2m;   // 0.3 정확 — 금액엔 decimal
 
 ## 문자열 불변성과 StringBuilder
 
-문자열은 불변이라 `Replace`·`ToUpper`는 원본을 안 바꾸고 새 문자열을 반환. 반환값을 안 받으면 원본은 그대로라 `s = s.Replace(...)`가 필요. 불변인 이유는 보안, 해시 키 캐싱, 멀티스레드 안전.
-
-`+=`로 반복 연결하면 매번 전체를 복사해 전체 O(n²)이고 객체도 많이 생김. `StringBuilder`는 가변 버퍼라 O(n).
+`string`은 한 번 만들어지면 내용이 절대 안 바뀜. `Replace`·`ToUpper`·`Trim`·`Substring`은 원본을 고치는 게 아니라 바뀐 새 문자열을 반환 — 반환값을 안 받으면 아무 일도 안 일어남.
 
 ```csharp
 string s = "abc";
-s.ToUpper();          // 반환값 안 받으면 s는 그대로 "abc"
-s = s.ToUpper();      // "ABC"
+s.ToUpper();          // 반환값 안 받음 → s는 그대로 "abc"
+s = s.ToUpper();      // "ABC" — 새 문자열로 갈아 끼워야 반영
+```
+
+불변으로 만든 이유는 여러 이점이 겹침 — 값이 안 바뀌니 여러 스레드가 잠금 없이 공유해도 안전하고, 딕셔너리 키의 해시값을 한 번 계산해 캐싱할 수 있고, 같은 리터럴을 하나로 공유(interning)해 메모리를 아끼고, 검사를 통과한 경로·권한 문자열이 뒤에 몰래 바뀌지 않음. `string`이 참조 타입인데도 `==`가 내용을 비교하는 것도, 불변이라 값처럼 다뤄도 안전해 그렇게 재정의해 둔 것(앞 Equals 항목).
+
+불변이라 `s += x`는 기존 문자열을 고치는 게 아니라 지금까지의 전체를 복사한 새 문자열을 매번 만듦. 루프에서 반복하면 매 단계가 길어진 전체를 복사해 전체 비용이 길이의 제곱(n²)이 되고 버려지는 임시 문자열도 잔뜩 생김. `StringBuilder`는 안에 늘어나는 가변 버퍼를 두고 거기에 덧붙이기만 해 복사 없이 선형(n)으로 끝남.
+
+<svg viewBox="0 0 620 214" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="문자열 반복 연결은 매번 전체를 복사하고 StringBuilder는 한 버퍼에 덧붙인다"><text x="24" y="26" font-size="13" fill="currentColor">s += x (반복)</text><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="24" y="36" width="58" height="26" rx="3"/><rect x="24" y="68" width="92" height="26" rx="3"/><rect x="24" y="100" width="126" height="26" rx="3"/><rect x="24" y="132" width="160" height="26" rx="3"/></g><g font-size="11" fill="currentColor" text-anchor="middle"><text x="53" y="53">"a"</text><text x="70" y="85">"ab"</text><text x="87" y="117">"abc"</text><text x="104" y="149">"abcd"</text></g><text x="210" y="85" font-size="11" fill="currentColor" opacity="0.7">매 단계 전체 복사 → 새 문자열</text><text x="210" y="141" font-size="11" fill="#e2574c">앞 3개는 버려짐(임시 쓰레기)</text><text x="24" y="184" font-size="11" fill="currentColor" opacity="0.75">비용: 길이의 제곱 (n²)</text><line x1="350" y1="20" x2="350" y2="196" stroke="currentColor" stroke-opacity="0.2"/><text x="374" y="26" font-size="13" fill="currentColor">StringBuilder</text><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="374" y="64" width="214" height="38" rx="4"/></g><text x="481" y="88" font-size="12" fill="currentColor" text-anchor="middle">a b c d …  (한 버퍼)</text><text x="374" y="132" font-size="11" fill="currentColor" opacity="0.7">같은 버퍼에 제자리로 덧붙임, 복사·임시 없음</text><text x="374" y="184" font-size="11" fill="currentColor" opacity="0.75">비용: 길이에 비례 (n)</text></svg>
+
+```csharp
+string s = "";
+for (int i = 0; i < n; i++) s += i;       // 매번 전체 복사 → 전체 O(n²), 쓰레기 다량
 
 var sb = new StringBuilder();
-for (int i = 0; i < n; i++) sb.Append(i);   // O(n) — += 반복은 O(n²)
-string result = sb.ToString();
+for (int i = 0; i < n; i++) sb.Append(i);  // 버퍼에 덧붙임 → O(n)
+string result = sb.ToString();             // 마지막에 한 번만 문자열로
 ```
+
+고정된 몇 개를 한 줄에서 잇는 `a + b + c`나 보간 `$"{a}{b}"`는 컴파일러가 한 번의 결합으로 최적화하므로 `StringBuilder`가 필요 없음. 문제는 루프에서 반복되는 `+=` — 반복 횟수가 많고 미리 개수를 모르는 연결일 때만 `StringBuilder`를 씀.
 
 ## var vs object vs dynamic
 

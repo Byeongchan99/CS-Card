@@ -631,12 +631,33 @@ int len = maybeNull!.Length;   // "믿어라, null 아니다" → 경고 끔
 
 ## ?? 와 ?. 연산자
 
-`??`(null 병합)는 좌변이 null이면 우변 반환. `?.`(null 조건부)는 좌변이 null이면 평가를 멈추고 null 반환. `a`가 null일 때 `a ?? "default"` → `"default"`, `a?.Length` → null(`int?`로 받음).
+앞 항목의 nullable 값을 장황한 if-null 검사 없이 짧게 다루는 짝꿍 연산자.
+
+`??`(null 병합)는 왼쪽이 null이면 오른쪽을, 아니면 왼쪽을 씀 — "없으면 기본값". `??=`는 대입 버전으로 왼쪽이 null일 때만 오른쪽을 넣음(지연 초기화).
 
 ```csharp
-string a = null;
-a ?? "default";   // "default"
-a?.Length;        // null (int? 로 받음)
+string name = input ?? "손님";   // input이 null이면 "손님"
+_cache ??= LoadCache();          // 아직 없으면 만들어 담고, 있으면 그대로
+```
+
+`?.`(null 조건부)는 왼쪽이 null이면 그 표현식의 계산을 거기서 접고 전체를 null로 만듦 — `.멤버`를 아예 실행 안 해 `NullReferenceException`이 안 남. 여기서 "멈춘다"는 프로그램 흐름(다음 줄)이 서는 게 아니라 그 한 표현식의 계산만 끝나 null이 된다는 뜻. 오히려 `?.` 없이 null을 역참조하면 예외로 흐름이 튕기는데, 그걸 막아 주는 것.
+
+```csharp
+int len1 = text.Length;    // text가 null이면 예외 → 흐름이 튕김
+int? len2 = text?.Length;  // 예외 없이 len2 = null, 다음 줄 계속
+var city = user?.Address?.City;  // 체인 중 null을 만난 지점 오른쪽 전체를 건너뜀 → null
+```
+
+인덱서 버전 `?[]`도 있음(`list?[0]`). 값 타입 멤버에 `?.`를 쓰면 "null일 수도 있음"이 되어 결과가 nullable이 됨 — `text?.Length`는 `int`가 아니라 `int?`. 그래서 보통 `??`와 같이 써서 기본값으로 되받는 `?. ... ?? 기본값`이 관용구.
+
+```csharp
+int len = text?.Length ?? 0;   // null이면 0, 아니면 길이 — if 분기를 한 줄로
+```
+
+이벤트 발생의 정석도 이것 — 구독자가 없으면(null) 예외가 나는데 `?.`로 안전하게 부름.
+
+```csharp
+OnHit?.Invoke(damage);   // 구독자 있으면 호출, 없으면 조용히 넘어감
 ```
 
 ## 연산자 오버로딩

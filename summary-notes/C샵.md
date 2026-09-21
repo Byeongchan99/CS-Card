@@ -392,13 +392,47 @@ i3.Items.Add(3);        // i1.Items.Count도 3 — List는 새로 안 만들어�
 
 ## 튜플과 분해
 
-`(int, string)` 값 튜플(`ValueTuple`)은 이름 붙인 여러 값을 가벼운 값 타입으로 묶어 반환 — 임시 클래스나 여러 개의 out을 대신. `var (id, name) = GetUser()`로 분해해 받고, 필드명을 주면 `.min`·`.max`처럼 접근. 옛 `Tuple`(참조 타입, `.Item1`)과 달리 값 타입이라 할당이 없고, 사용자 타입도 `Deconstruct`를 정의하면 같은 분해 문법을 지원.
+`(int, string)` 값 튜플(`ValueTuple`)은 여러 값을 하나로 묶는 가벼운 값 타입. 임시 클래스나 여러 개의 `out` 대신 메서드가 값을 여러 개 돌려줄 때 씀. 필드명을 주면 이름으로, 안 주면 `.Item1`·`.Item2`로 접근.
 
 ```csharp
 (int min, int max) Range(int[] a) => (a.Min(), a.Max());
-var (lo, hi) = Range(nums);   // 분해해서 받기
-var r = Range(nums); r.min;   // 이름으로 접근
+var r = Range(nums);
+r.min;  r.max;                // 묶음으로 받아 점 찍어 꺼냄
 ```
+
+분해(deconstruction)는 묶음 하나로 받는 대신 여러 변수로 한 번에 풀어 받는 것 — 튜플의 `Item1`을 `lo`에, `Item2`를 `hi`에 각각 복사해 넣어 중간 묶음 변수 없이 바로 낱개 변수가 생김. 안 쓸 값은 버림 `_`으로 받음.
+
+```csharp
+var (lo, hi) = Range(nums);   // lo=min, hi=max 바로 낱개 변수로
+var (lo, _)  = Range(nums);   // 하나만 필요하면 나머지는 버림
+```
+
+분해는 튜플만이 아니라 `Deconstruct` 메서드를 정의한 어떤 타입에도 됨. 이름이 정확히 `Deconstruct`, 반환형 `void`, 내보낼 값마다 `out` 파라미터 하나면 됨(인터페이스가 아니라 관례). `var (x, y) = p`는 컴파일러가 `p.Deconstruct(out var x, out var y)`로 바꿔 부르는 것 — 앞 `out`의 옆문 반환을 그대로 씀. `record`는 위치 매개변수로 선언하면 이 `Deconstruct`를 자동 생성.
+
+```csharp
+class Point {
+    public int X, Y;
+    public void Deconstruct(out int x, out int y) { x = X; y = Y; }
+}
+var (a, b) = point;           // Deconstruct 덕분에 분해됨 (없으면 컴파일 에러)
+```
+
+| | ValueTuple `(a, b)` | 옛 `Tuple<>` |
+| --- | --- | --- |
+| 계열 | 값 타입(struct) | 참조 타입(class) |
+| 할당 | 힙 할당 없음 | 힙 할당 |
+| 필드 | 이름 가능, 가변 | `.Item1`만, 불변 |
+
+지금은 ValueTuple을 씀. 옛 `Tuple`은 힙을 쓰고 이름도 없어 읽기 나쁨.
+
+튜플 필드 이름(`min`/`max`)은 컴파일 타임 설탕 — 컴파일하면 `Item1`/`Item2`로 치환돼 런타임엔 사라짐. 그래서 `(int min, int max)`와 `(int x, int y)`는 다른 타입이 아니라 똑같은 `(int, int)`이고, 동등 비교도 이름이 아니라 위치로 함(리플렉션으로 지역 튜플의 이름은 못 봄). record·클래스의 프로퍼티 이름이 런타임에 실재하는 것과 대비됨.
+
+```csharp
+(1, "a") == (1, "a");                // true — 원소별 비교
+(min: 1, max: 2) == (lo: 1, hi: 2);  // true — 이름 무시, 위치가 같으면 같음
+```
+
+"성공 여부 + 값" 조합은 `out`(Try 패턴)이 관용적이고 그냥 "값 여러 개 반환"은 튜플이 더 읽힘. 공개 API에서 의미가 중요하면 이름 붙인 record가 더 나음.
 
 ## 기본 자료형과 부동소수점
 

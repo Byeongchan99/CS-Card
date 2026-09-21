@@ -85,7 +85,35 @@ Vector3 e = list[0];   e.x = 5f;   list[0] = e;   // List도 같은 방식
 
 ## 값 타입이 힙에 저장되는 경우
 
-"값 타입 = 스택"은 부정확. 박싱됐을 때, 클래스(참조 타입)의 필드일 때(객체 안에 함께 저장), 값 타입 배열의 원소일 때(배열 자체가 힙 객체) 힙에 삶.
+"값 타입은 스택, 참조 타입은 힙"은 앞부분이 부정확. 스택이냐 힙이냐를 정하는 건 타입이 아니라 그 값이 담긴 그릇 — 값 타입은 자기를 담은 그릇을 따라감. 지역 변수면 그릇이 스택 프레임이라 스택, 힙에 있는 무언가 안에 담기면 힙.
+
+<svg viewBox="0 0 620 232" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="같은 값 타입 Pos가 지역 변수면 스택, 클래스 필드나 배열 원소면 힙에 산다"><g fill="none" stroke="currentColor" stroke-opacity="0.25" stroke-dasharray="4 3"><rect x="16" y="40" width="170" height="170" rx="10"/><rect x="210" y="40" width="394" height="170" rx="10"/></g><g font-size="13" fill="currentColor" text-anchor="middle" opacity="0.8"><text x="101" y="32">스택</text><text x="407" y="32">힙</text></g><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="42" y="112" width="118" height="42" rx="4"/><rect x="262" y="98" width="110" height="40" rx="4"/><rect x="452" y="98" width="42" height="40" rx="4"/><rect x="498" y="98" width="42" height="40" rx="4"/><rect x="544" y="98" width="42" height="40" rx="4"/></g><g fill="none" stroke="#4f83e0"><rect x="240" y="66" width="150" height="86" rx="4"/><rect x="432" y="66" width="164" height="86" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="101" y="130">Pos local</text><text x="101" y="175" font-size="11" opacity="0.6">지역 변수</text><text x="315" y="86" fill="#4f83e0" font-size="11">Player 객체</text><text x="317" y="123">Pos p</text><text x="315" y="175" font-size="11" opacity="0.6">클래스 필드</text><text x="514" y="86" fill="#4f83e0" font-size="11">Pos[] 배열 객체</text><text x="473" y="123">[0]</text><text x="519" y="123">[1]</text><text x="565" y="123">[2]</text><text x="514" y="175" font-size="11" opacity="0.6">배열·컬렉션 원소</text></g><text x="407" y="198" font-size="11" fill="currentColor" text-anchor="middle" opacity="0.6">그릇(객체·배열)이 힙에 있으니 안의 Pos도 힙</text></svg>
+
+값 타입이 힙에 사는 세 경우:
+
+- 클래스(참조 타입)의 필드일 때 — 객체가 힙에 통째로 만들어지고 그 안의 값 타입 필드도 함께 힙에
+- 값 타입 배열·컬렉션의 원소일 때 — 배열이 힙 객체라 원소로 깔린 값 타입도 힙에 연속으로
+- 박싱됐을 때 — `object`로 감싸지면 힙에 복사본이 할당됨(다음 항목)
+
+```csharp
+struct Pos { public int x, y; }
+
+Pos local;                   // 스택 — 지역 변수
+class Player { public Pos p; }
+var pl = new Player();       // pl.p는 Player 객체 안 → 힙
+Pos[] arr = new Pos[10];     // 원소들은 배열 객체 안 → 힙
+object o = local;            // 박싱 → 힙에 복사본
+```
+
+배열뿐 아니라 `List`·`Dictionary`·`HashSet`·`Queue`도 내부적으로 힙 배열에 원소를 담으므로 같은 경우(C#의 `List<T>`가 C++ `std::vector` 자리). 단 박싱 여부가 갈림 — 제네릭 컬렉션은 타입 매개변수가 실제 struct라 내부 배열에 값 그대로 인라인 저장(박싱 없음), 옛 비제네릭 `ArrayList`·`Hashtable`은 원소를 `object`로 받아 값 타입을 넣는 순간 하나하나 박싱.
+
+```csharp
+var list = new List<Pos>();   // 내부 Pos[]에 인라인 — 박싱 없음
+var old = new ArrayList();
+old.Add(new Pos());           // object로 받음 → 박싱, 힙에 복사본
+```
+
+그래서 "값 타입이니 무조건 가볍다"가 아니라 어디에 담기느냐를 봐야 함. 클래스 필드·배열 원소로 든 struct는 힙에 있어도 별도 객체로 할당되지 않고 부모 한 덩어리에 얹혀 가 GC 대상 수가 늘지 않지만(배열이면 연속 저장으로 캐시 지역성도 유지), 박싱되면 힙 할당이 생겨 struct의 이점이 깎임.
 
 ## 박싱(boxing)
 

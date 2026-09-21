@@ -342,6 +342,63 @@ flowchart LR
     G1 -->|살아남음| G2["Gen 2"]
 ```
 
+## 접근 제한자
+
+멤버·타입의 노출 범위를 정하는 키워드. 좁게 열수록 캡슐화가 강해져, 바깥이 의존할 표면이 줄고 내부를 자유롭게 바꿀 수 있음.
+
+| 제한자 | 접근 가능 범위 |
+| --- | --- |
+| `private` | 같은 클래스 안에서만 (멤버 기본값) |
+| `protected` | 같은 클래스 + 파생 클래스 |
+| `internal` | 같은 어셈블리(프로젝트) 안에서만 |
+| `protected internal` | 같은 어셈블리 또는 파생 클래스 |
+| `private protected` | 같은 어셈블리이면서 파생 클래스 |
+| `public` | 어디서나 |
+
+`protected`는 상속으로, `internal`은 어셈블리로 나누는 축이라 서로 직교. top-level 클래스는 `internal`이 기본이고 `public`으로 열어야 다른 프로젝트가 씀. 필드는 되도록 `private`로 감추고 프로퍼티로 노출하는 게 캡슐화의 기본형.
+
+```csharp
+class Account {
+    private decimal balance;             // 내부 상태는 숨김
+    public decimal Balance => balance;   // 읽기만 노출
+    protected virtual void OnCharge() {} // 파생 클래스가 확장
+}
+```
+
+## 프로퍼티 (필드 vs 프로퍼티)
+
+필드는 값을 담는 저장 공간이고, 프로퍼티는 겉모습은 필드지만 실제로는 읽기용 `get`과 쓰기용 `set` 메서드 한 쌍. 그래서 값을 꺼내거나 넣는 순간에 검증·계산·알림 같은 코드를 끼워 넣을 수 있음. 필드를 그냥 `public`으로 여는 대신 프로퍼티로 감싸는 이유:
+
+- 검증 — `set`에서 범위를 막거나 예외를 던짐
+- 계산 — 저장 없이 다른 값으로 즉석 계산(계산 프로퍼티)
+- 변경 여지 — 나중에 로직을 넣어도 쓰는 쪽 코드는 그대로
+
+```csharp
+class Player {
+    public int Hp { get; private set; }    // 자동 프로퍼티, 밖에선 읽기만
+    public int MaxHp { get; init; } = 100; // init: 생성 때만 설정, 이후 불변
+    public bool IsDead => Hp <= 0;          // 계산 프로퍼티(저장 안 함)
+    private int _mp;
+    public int Mp {                          // 검증을 넣은 전체 프로퍼티
+        get => _mp;
+        set => _mp = Math.Clamp(value, 0, 100);
+    }
+}
+```
+
+`{ get; set; }` 자동 프로퍼티는 컴파일러가 숨은 백킹 필드를 만들어 줌. `init`은 생성·객체 초기화 때만 설정되고 이후 불변이라 record와 잘 맞음. 유니티의 `[SerializeField]`가 프로퍼티가 아니라 필드에 붙는 것도, 인스펙터 직렬화가 필드를 대상으로 하기 때문.
+
+## 객체지향 4대 특성
+
+| 특성 | 뜻 | C#에서 |
+| --- | --- | --- |
+| 캡슐화 | 상태를 숨기고 공개 표면만 노출 | `private` 필드 + 프로퍼티, 접근 제한자 |
+| 상속 | 공통을 부모에 모으고 물려받음 | `class B : A`, 추상 클래스 |
+| 다형성 | 같은 호출이 실제 타입에 따라 다르게 동작 | `virtual`/`override` 가상 디스패치 |
+| 추상화 | 세부는 감추고 필요한 계약만 드러냄 | 인터페이스, 추상 클래스 |
+
+넷은 따로 노는 게 아니라 맞물림. 캡슐화로 내부를 감추면 추상화된 표면만 남고, 그 표면을 인터페이스·추상 클래스로 약속한 뒤 상속으로 나눠 가지며, 실제 호출은 다형성으로 각 타입에 맞게 갈라짐. 뒤 항목들이 이 넷의 구체적 장치.
+
 ## virtual/override vs new
 
 `override`는 가상 디스패치라 실제 객체 타입 기준으로 호출됨. `new`는 메서드를 숨겨서(hide) 컴파일 타임(선언) 타입 기준으로 호출됨. `Animal a = new Cat()`에서 Cat이 `new`면 Animal의 메서드가 불림.
@@ -352,6 +409,32 @@ class Cat : Animal { public override string V() => "C"; public new string N() =>
 Animal a = new Cat();
 a.V();   // "C" — override는 런타임 타입 기준
 a.N();   // "A" — new는 선언 타입 기준
+```
+
+## 메서드 오버로딩 vs 오버라이딩
+
+이름이 비슷하지만 완전히 다른 것. 오버로딩은 같은 이름 메서드를 매개변수만 다르게 여럿 두는 것이고, 오버라이딩은 부모의 가상 메서드를 자식이 다시 구현하는 것.
+
+| | 오버로딩(overloading) | 오버라이딩(overriding) |
+| --- | --- | --- |
+| 무엇 | 같은 이름 + 다른 매개변수 | 부모 `virtual`을 자식이 재정의 |
+| 관계 | 한 클래스 안(상속 무관) | 부모–자식 상속 |
+| 선택 시점 | 컴파일 타임(인자 타입으로) | 런타임(실제 객체 타입으로) |
+| 키워드 | 없음 | `virtual`/`override` |
+
+핵심은 결정 시점. 오버로딩은 컴파일러가 인자의 정적 타입을 보고 어느 버전을 부를지 그 자리에서 정하고, 오버라이딩은 실행 중 실제 객체가 무엇이냐에 따라 가상 디스패치로 갈라짐.
+
+```csharp
+void Log(int n) {}   void Log(string s) {}   // 오버로딩 — 인자 타입으로 컴파일 때 선택
+class A { public virtual void Hit() {} }
+class B : A { public override void Hit() {} } // 오버라이딩 — 런타임 타입으로 선택
+A a = new B();  a.Hit();   // B.Hit — 실제 객체가 B라서
+```
+
+```mermaid
+flowchart TD
+    OL["오버로딩 호출"] -->|"인자의 정적 타입"| OLC["컴파일 타임에 버전 확정"]
+    OR["오버라이딩 호출"] -->|"실제 객체 타입"| ORD["런타임에 디스패치로 확정"]
 ```
 
 ## 추상 메서드 디스패치
@@ -392,6 +475,25 @@ static은 클래스당 하나라 모든 인스턴스가 공유. 인스턴스 필
 ```csharp
 class E { static int total; public int id = ++total; }
 var a = new E(); var b = new E();   // a.id=1, b.id=2, total=2
+```
+
+## sealed·정적 클래스·정적 생성자
+
+`sealed`는 더 이상의 상속·재정의를 막음. 클래스에 붙이면 상속 불가, `override` 메서드에 붙이면 그 아래에서 더는 재정의 불가. 확장 지점을 닫아 의도를 못 벗어나게 하고, 가상 호출을 직접 호출로 바꿀 여지를 줘 약간의 최적화도 됨.
+
+정적 클래스(`static class`)는 인스턴스를 못 만들고 정적 멤버만 담는 상자. 상태 없는 유틸리티 모음에 씀(예: `Math`). 확장 메서드도 정적 클래스에만 둘 수 있음.
+
+정적 생성자는 그 타입이 처음 쓰이기 직전에 딱 한 번 자동 실행돼 정적 필드를 초기화. 호출 시점을 못 정하고 매개변수도 못 받음.
+
+```csharp
+sealed class FinalBoss : Enemy {}       // 더는 상속 불가
+static class MathUtil {                   // 인스턴스 없음
+    public static float Sq(float x) => x * x;
+}
+class Config {
+    public static readonly string Path;
+    static Config() { Path = Load(); }    // 최초 사용 직전 1회
+}
 ```
 
 ## yield return과 지연 실행
@@ -531,6 +633,45 @@ var e = obj as Enemy;   // 실패 시 null (예외 없음)
 var f = (Enemy)obj;     // 실패 시 InvalidCastException
 ```
 
+## var vs object vs dynamic
+
+셋 다 "타입을 안 적는" 것처럼 보이지만 성격이 다름.
+
+| | 실제 타입 | 결정 시점 | 타입 검사 |
+| --- | --- | --- | --- |
+| `var` | 우변으로 추론된 그 타입 | 컴파일 타임 | 그대로 받음(정적) |
+| `object` | object로 취급, 원래 값은 그 안 | 컴파일 타임 | object 멤버만 |
+| `dynamic` | 런타임까지 미룸 | 런타임 | 컴파일 검사 건너뜀 |
+
+`var`는 타입을 생략하는 문법일 뿐 타입이 사라지는 게 아님 — 우변에서 추론해 확정하므로 `var n = 5;`는 그냥 `int`. `object`는 모든 타입의 부모라 무엇이든 담지만 원래 멤버를 쓰려면 캐스트가 필요하고 값 타입은 박싱됨. `dynamic`은 타입 검사를 런타임으로 미뤄 아무 멤버나 부를 수 있게 하지만, 틀리면 실행 중에 터지고 느림.
+
+```csharp
+var list = new List<int>();   // List<int>로 추론 — 자동완성 그대로
+object o = 5;                 // 박싱, o의 멤버 쓰려면 캐스트
+dynamic d = 5;
+d.Foo();                      // 컴파일은 통과, 실행 때 없으면 예외
+```
+
+## 형 변환 — 캐스트·Parse·TryParse·Convert
+
+바꾸려는 대상에 따라 도구가 다름.
+
+| 상황 | 도구 | 실패 시 |
+| --- | --- | --- |
+| 숫자끼리, 상속 관계 타입 | 캐스트 `(int)`, `as` | 캐스트는 예외, `as`는 null |
+| 문자열에서 숫자로 | `int.Parse` | 예외 |
+| 문자열에서 숫자로(실패 허용) | `int.TryParse` | `false` 반환, 안 던짐 |
+| 폭넓게 이 타입에서 저 타입 | `Convert.ToInt32` | null도 0으로, 관대 |
+
+사용자 입력처럼 실패가 정상 범위면 `TryParse`가 정석 — 예외 대신 성공 여부를 `bool`로 돌려주고 결과는 `out`으로 받음. 반드시 숫자여야 하는 자리면 `Parse`로 바로 터뜨림. 정수 오버플로는 기본으로 조용히 감싸는데, `checked`로 감싸면 오버플로 시 예외를 던지고 `unchecked`는 명시적으로 무시.
+
+```csharp
+int a = (int)3.9;                     // 3 (소수점 버림)
+if (int.TryParse(s, out int n)) { }   // 실패해도 안 던짐 — 입력 검증의 정석
+int b = int.Parse("abc");             // FormatException
+checked { int c = int.MaxValue + 1; } // OverflowException (기본은 조용히 감쌈)
+```
+
 ## 패턴 매칭
 
 `is`·`switch` 식으로 타입·구조·값을 한 번에 검사·분해. `if (obj is Enemy e)`는 형 검사와 변수 바인딩을 동시에, `switch { > 90 => "A", … }`는 값 범위를, `(0, var y)`는 튜플을 분해. if/switch로 타입을 분기하던 코드를 간결·안전하게. 단 다형성(가상 디스패치)으로 풀 수 있으면 그쪽이 우선.
@@ -558,6 +699,57 @@ enum은 이름 붙인 정수 상수 집합이라 매직 넘버 대신 의미를 
 [Flags] enum Eff { None = 0, Fire = 1, Ice = 2, Stun = 4 }
 var e = Eff.Fire | Eff.Ice;          // 조합
 bool onFire = (e & Eff.Fire) != 0;   // 검사
+```
+
+## 비트 연산자와 시프트
+
+정수를 2진수 비트 단위로 다루는 연산자. 플래그 조합·마스킹·저수준 최적화에 씀.
+
+| 연산자 | 의미 |
+| --- | --- |
+| `&` | AND, 둘 다 1인 비트만 1 (마스크 검사) |
+| `\|` | OR, 하나라도 1이면 1 (플래그 합치기) |
+| `^` | XOR, 다르면 1 (토글) |
+| `~` | NOT, 비트 반전 |
+| `<<` `>>` | 왼쪽·오른쪽 시프트 (한 칸이 곱하기 2, 나누기 2) |
+
+`[Flags]` 열거형이 이 연산으로 여러 상태를 한 정수에 조합·검사하는 게 대표 용례. `x << 1`은 곱하기 2, `x >> 1`은 나누기 2와 같아 예전엔 최적화로 썼지만, 지금은 컴파일러가 알아서 하므로 의미가 분명할 때만.
+
+```csharp
+int flags = 0b0000;
+flags |= 0b0010;                  // 비트 켜기 → 0b0010
+bool on = (flags & 0b0010) != 0;  // 켜졌는지 검사 → true
+flags &= ~0b0010;                 // 비트 끄기 → 0b0000
+int doubled = 3 << 1;             // 6
+```
+
+## 단축 평가(short-circuit)
+
+`&&`와 `||`는 왼쪽만으로 결과가 정해지면 오른쪽을 아예 실행 안 함. `&&`는 왼쪽이 false면 전체가 false라 오른쪽을 건너뛰고, `||`는 왼쪽이 true면 오른쪽을 건너뜀. 이 성질로 null 검사와 접근을 한 줄에 안전하게 묶음 — 왼쪽에서 null이 아님을 확인한 뒤에야 오른쪽이 실행되므로 예외가 안 남.
+
+```csharp
+if (obj != null && obj.IsReady) { }          // 왼쪽이 false면 obj.IsReady를 안 봄
+if (list.Count == 0 || list[0] == null) { }  // 왼쪽이 true면 list[0]을 안 봄
+```
+
+비트 연산자 `&`·`|`는 단축이 없어 양쪽을 항상 평가. 오른쪽에 부수효과(함수 호출 등)가 있으면 `&&`/`||`와 결과가 달라질 수 있음. 논리 판단엔 `&&`/`||`를, 비트 조작엔 `&`/`|`를 씀.
+
+## 기본 자료형과 부동소수점
+
+정수는 `int`(4바이트)가 기본, 더 큰 범위는 `long`(8바이트). 실수는 `float`·`double`·`decimal`로 나뉘고 이 셋의 차이가 자주 나옴.
+
+| 타입 | 크기 | 특징 |
+| --- | --- | --- |
+| `float` | 4바이트 | 정밀도 낮음, 접미사 `f`, 유니티 좌표 기본 |
+| `double` | 8바이트 | 실수 기본값, float보다 정밀 |
+| `decimal` | 16바이트 | 10진 기반, 오차 없음, 접미사 `m`, 느림 |
+
+`float`·`double`은 2진 부동소수점이라 `0.1` 같은 10진 소수를 정확히 못 담아 미세한 오차가 생김. 그래서 실수는 `==`로 바로 비교하지 말고 오차 범위(epsilon) 안인지로 비교. 돈처럼 오차가 용납 안 되는 값은 10진 기반이라 정확한 `decimal`을 씀(대신 느림).
+
+```csharp
+0.1 + 0.2 == 0.3;              // false — 2진 부동소수점 오차
+Math.Abs(a - b) < 1e-6;        // 실수 비교는 오차 범위로
+decimal price = 0.1m + 0.2m;   // 0.3 정확 — 금액엔 decimal
 ```
 
 ## 정수 나눗셈
@@ -594,6 +786,24 @@ int wrap = max + 1;       // -2,147,483,648 (int.MinValue)
 string a = null;
 a ?? "default";   // "default"
 a?.Length;        // null (int? 로 받음)
+```
+
+## nullable 값 타입 (int?)
+
+값 타입은 원래 null을 못 담지만, `int?`처럼 물음표를 붙이면 "값이 없음"도 표현 가능. `int?`는 `Nullable<int>`의 축약이고, 값 하나와 값이 있는지 여부를 함께 든 struct.
+
+- `HasValue` — 값이 들어 있는지
+- `Value` — 실제 값(없을 때 꺼내면 예외)
+- `??`·`?.`와 잘 맞음 — 없으면 기본값으로 대체
+
+DB의 빈 칸, "아직 안 정해짐", 실패할 수 있는 계산 결과를 표현할 때 씀. 참조 타입의 nullable(다음 항목)이 컴파일 경고용 표시인 것과 달리, 값 타입의 nullable은 실제로 null 상태를 담는 별도 타입.
+
+```csharp
+int? score = null;
+score.HasValue;          // false
+int shown = score ?? 0;  // 없으면 0
+score = 90;
+int v = score.Value;     // 90 (없을 때 호출하면 예외)
 ```
 
 ## nullable 참조 타입(#nullable)
@@ -653,3 +863,22 @@ GC는 관리 메모리만 회수하고 비관리 리소스(파일 핸들, 소켓
 using (var f = File.OpenRead(path)) { /* ... */ }   // 예외에도 Dispose 보장
 using var g = File.OpenRead(path);                   // C# 8 축약(스코프 끝에 해제)
 ```
+
+## 소멸자(finalizer)
+
+`~ClassName` 형태의 메서드로, GC가 객체를 수거하기 직전에 한 번 불러 비관리 자원을 마지막으로 정리하는 안전망. 호출 시점을 못 정하고(GC에 달림), 있으면 수거가 한 번에 안 끝나고 두 단계로 늦어져 비용이 큼.
+
+그래서 정리는 `IDisposable`의 `Dispose`로 즉시 하는 게 원칙이고, finalizer는 `Dispose`를 깜빡했을 때를 위한 보험으로만 둠. 둘을 함께 쓸 땐 `Dispose`에서 `GC.SuppressFinalize`를 불러 이미 정리했으니 finalizer는 건너뛰라고 알림(dispose 패턴).
+
+```csharp
+class Handle : IDisposable {
+    public void Dispose() {
+        Free();
+        GC.SuppressFinalize(this);   // 정리 끝 → finalizer 생략
+    }
+    ~Handle() { Free(); }            // Dispose 놓쳤을 때의 보험
+    void Free() { /* 비관리 자원 해제 */ }
+}
+```
+
+순수 관리 객체만 담은 클래스엔 finalizer를 두지 않음 — 괜히 두면 수거만 느려짐.

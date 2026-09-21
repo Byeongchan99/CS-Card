@@ -242,15 +242,30 @@ bool TryGetRange(int[] a, out int min, out int max) { }      // out 방식
 
 ## Span과 stackalloc
 
-`Span<T>`는 배열·문자열의 일부를 복사 없이 가리키는 뷰. `Substring` 대신 `Slice`로 부분을 잘라 쓰면 힙 할당·복사를 피함. `stackalloc`으로 스택에 임시 버퍼를 잡으면 GC 대상이 아님. 파싱·버퍼 처리 핫 패스에서 할당을 없애는 데 씀.
+`Span<T>`는 연속된 메모리(배열·문자열·`stackalloc` 버퍼)의 한 구간을 복사 없이 가리키는 뷰. 내부는 "시작 위치 + 길이" 두 값만 든 작은 struct라 슬라이스를 떠도 새 배열·문자열을 안 만듦. 문자열 자르기가 확실한 대비 — `Substring`은 새 `string`을 힙에 할당하지만 `AsSpan().Slice()`(또는 `[a..b]`)는 원본 구간을 가리키기만 해 할당이 0.
 
-<svg viewBox="0 0 340 115" width="340" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Span은 배열의 일부를 복사 없이 가리키는 뷰"><g font-size="14" fill="currentColor" text-anchor="middle"><rect x="20" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="42" y="67">3</text><rect x="66" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="88" y="67">1</text><rect x="112" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="134" y="67">4</text><rect x="158" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="180" y="67">1</text><rect x="204" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="226" y="67">5</text><rect x="250" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="272" y="67">9</text></g><path d="M112 34 L112 28 L248 28 L248 34" fill="none" stroke="#4f83e0" stroke-width="1.6"/><text x="180" y="22" font-size="12" fill="#4f83e0" text-anchor="middle">Span — 복사 없이 참조</text><text x="20" y="104" font-size="12" fill="currentColor" opacity="0.7">AsSpan(2, 3) — 원본 배열의 일부를 그대로 가리킴</text></svg>
+<svg viewBox="0 0 620 176" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Span은 원본 구간을 가리키고 Substring은 새 문자열을 할당한다"><defs><marker id="sp-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><text x="30" y="30" font-size="11" fill="currentColor" opacity="0.7">원본 "2026-09-21" (힙)</text><g font-size="13" fill="currentColor" text-anchor="middle"><rect x="30" y="40" width="36" height="38" rx="3" fill="none" stroke="currentColor" opacity="0.55"/><text x="48" y="64">2</text><rect x="66" y="40" width="36" height="38" rx="3" fill="none" stroke="currentColor" opacity="0.55"/><text x="84" y="64">0</text><rect x="102" y="40" width="36" height="38" rx="3" fill="none" stroke="currentColor" opacity="0.55"/><text x="120" y="64">2</text><rect x="138" y="40" width="36" height="38" rx="3" fill="#3fae7a" fill-opacity="0.14" stroke="#3fae7a"/><text x="156" y="64">6</text><rect x="66" y="40" width="36" height="38" rx="3" fill="#3fae7a" fill-opacity="0.14" stroke="#3fae7a"/><text x="84" y="64">0</text><rect x="102" y="40" width="36" height="38" rx="3" fill="#3fae7a" fill-opacity="0.14" stroke="#3fae7a"/><text x="120" y="64">2</text><rect x="30" y="40" width="36" height="38" rx="3" fill="#3fae7a" fill-opacity="0.14" stroke="#3fae7a"/><text x="48" y="64">2</text><rect x="174" y="40" width="36" height="38" rx="3" fill="none" stroke="currentColor" opacity="0.55"/><text x="192" y="64">-</text><rect x="210" y="40" width="36" height="38" rx="3" fill="none" stroke="currentColor" opacity="0.55"/><text x="228" y="64">0</text></g><rect x="410" y="34" width="180" height="46" rx="4" fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"/><g fill="currentColor" text-anchor="middle"><text x="500" y="54" font-size="13">Span</text><text x="500" y="71" font-size="11" opacity="0.7">시작 0 · 길이 4 (할당 0)</text></g><path d="M30 86 L30 94 L174 94 L174 86" fill="none" stroke="#3fae7a" stroke-width="1.4"/><line x1="408" y1="72" x2="176" y2="96" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#sp-a)"/><text x="100" y="112" font-size="11" fill="currentColor" opacity="0.7">앞 4칸을 가리킴</text><rect x="30" y="122" width="180" height="44" rx="4" fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"/><g fill="currentColor" text-anchor="middle"><text x="120" y="142" font-size="13">Substring "2026"</text><text x="120" y="159" font-size="11" opacity="0.7">힙에 새 문자열 할당</text></g><text x="228" y="149" font-size="11" fill="currentColor" opacity="0.7">복사 발생, GC 대상 하나 생김</text></svg>
 
 ```csharp
-int[] arr = { 3, 1, 4, 1, 5, 9 };
-Span<int> mid = arr.AsSpan(2, 3);      // {4,1,5} — 복사 없는 뷰
-Span<byte> buf = stackalloc byte[64];  // 스택 버퍼, GC 대상 아님
+string s = "2026-09-21";
+string y1 = s.Substring(0, 4);            // 새 string "2026" 할당
+ReadOnlySpan<char> y2 = s.AsSpan(0, 4);   // 할당 없이 "2026" 구간을 가리킴
+int year = int.Parse(y2);                 // Span도 그대로 파싱 가능
 ```
+
+`stackalloc`은 임시 버퍼를 힙이 아니라 스택에 잡음. GC 대상이 아니고 메서드가 끝나면 자동으로 사라짐. 보통 `Span`으로 받아 안전하게 씀.
+
+```csharp
+Span<byte> buf = stackalloc byte[128];   // 스택 버퍼 — GC 무관, 메서드 끝나면 사라짐
+```
+
+`Span<T>`는 `ref struct`라 제약이 따름 — 스택 메모리를 가리킬 수 있어, 그 스택 자리가 사라진 뒤에도 살아 있으면 안 되기 때문. 그래서 오래 사는 자리에 못 둠.
+
+- 클래스 필드에 저장 못 함 — 객체는 힙에서 오래 사는데 Span이 이미 사라진 스택을 가리킬 수 있어서
+- `await`·`yield`를 넘겨 못 씀 — 그 사이 스택 프레임이 바뀜
+- 박싱 못 함, 제네릭 타입 인자로 못 씀
+
+힙에 담아 오래 들고 다녀야 하면 `Memory<T>`(비동기에 걸쳐 쓸 수 있는 사촌), 읽기 전용이면 `ReadOnlySpan<T>`. 쓰는 자리는 파싱·버퍼 처리 핫 패스에서 "잠깐 보고 버리는" 데이터의 할당을 없앨 때 — 큰 문자열을 구분자로 잘라 조각을 `Substring` 없이 파싱하거나, 네트워크·파일 바이트를 `stackalloc` 버퍼로 처리. 일반 로직엔 과하고 매 프레임·대량 반복에서 값어치가 남.
 
 ## struct vs class의 기본 Equals
 

@@ -601,13 +601,33 @@ int v = score.Value;     // 90 (없을 때 호출하면 예외)
 
 ## nullable 참조 타입(#nullable)
 
-참조 타입도 `string?`처럼 null 허용 여부를 타입에 표기해, 컴파일러가 null 가능성을 흐름 분석으로 경고. `string`은 non-null 의도라 null 대입·미초기화에 경고가 뜨고, `string?`은 역참조 전에 null 검사를 요구. 런타임 강제가 아니라 컴파일 타임 경고라 `!`(null 무시 연산자)로 끌 수 있음. NullReferenceException을 설계 단계에서 줄이는 장치.
+참조 타입에 `?`를 붙여 null 허용 여부를 타입에 표시하는 기능(C# 8, `#nullable enable`로 켬). `string`은 "null이 아니어야 한다", `string?`은 "null일 수 있다"는 의도. 컴파일러가 코드 흐름을 분석해 null을 잘못 다룰 것 같은 자리에 경고를 줌.
+
+- `string`(non-null) — null을 대입하거나 초기화를 빠뜨리면 경고
+- `string?`(nullable) — 값을 꺼내 쓰기(역참조) 전에 null 검사를 요구
 
 ```csharp
-string s = null;    // 경고: non-null 타입에 null 대입
-string? t = null;   // OK — 역참조 전 null 검사를 요구
-int len = t!.Length;  // ! 로 경고 무시(책임은 개발자)
+string a = null;                // 경고 — non-null 타입에 null
+string? b = null;               // OK — null 가능 표시
+int len = b.Length;             // 경고 — null일 수 있는데 검사 없이 역참조
+if (b != null) len = b.Length;  // OK — 검사 뒤엔 non-null로 취급
 ```
+
+`int?`(nullable 값 타입)와 갈리는 결정적 지점 — `int?`는 런타임에 `Nullable<int>`라는 실제로 다른 타입이라 진짜 null 상태를 담지만, `string?`과 `string`은 런타임에 똑같은 `string`이고 `?`는 실행 파일에 남는 실체가 아니라 컴파일러가 정적 분석에 쓰는 표시일 뿐. 그래서 런타임 강제가 아니라 컴파일 타임 경고.
+
+| | `int?` (nullable 값 타입) | `string?` (nullable 참조 타입) |
+| --- | --- | --- |
+| 런타임 타입 | `Nullable<int>` — 다른 타입 | 그냥 `string` — 같은 타입 |
+| `?`의 정체 | 진짜 null 상태를 담는 구조 | 컴파일러용 표시(주석) |
+| 강제력 | 런타임에 실재 | 컴파일 타임 경고만 |
+
+컴파일러는 null 상태를 흐름을 따라 추적해 `if (s != null)` 안에서는 non-null로 앎. 개발자가 "여긴 확실히 null 아니다"라고 이길 때는 null 무시 연산자 `!`로 경고를 끔(책임은 개발자에게, 틀리면 런타임 NRE).
+
+```csharp
+int len = maybeNull!.Length;   // "믿어라, null 아니다" → 경고 끔
+```
+
+목적은 `NullReferenceException`을 실행 중이 아니라 작성 단계에서 줄이는 것. 다만 경고라, 애노테이션 안 된 라이브러리·리플렉션·역직렬화처럼 컴파일러가 못 보는 경로에선 여전히 null이 흘러들 수 있어 `!`나 nullable 애트리뷰트로 미세 조정. 다음 항목의 `??`·`?.`가 이 nullable 값을 다루는 짝꿍 연산자.
 
 ## ?? 와 ?. 연산자
 

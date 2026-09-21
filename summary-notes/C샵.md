@@ -83,6 +83,106 @@ Vector3 e = list[0];   e.x = 5f;   list[0] = e;   // List도 같은 방식
 
 프로퍼티가 class 타입을 반환하면 에러가 안 남. 돌려준 게 위치 값의 복사본이라 따라가면 원본 객체이므로 `transform.parent.name = "Root"`는 제대로 반영됨.
 
+## 값 타입이 힙에 저장되는 경우
+
+"값 타입 = 스택"은 부정확. 박싱됐을 때, 클래스(참조 타입)의 필드일 때(객체 안에 함께 저장), 값 타입 배열의 원소일 때(배열 자체가 힙 객체) 힙에 삶.
+
+## 박싱(boxing)
+
+값 타입을 object로 변환할 때 힙에 할당 → GC 부담. `Debug.Log(int)`처럼 값 타입을 object 파라미터로 넘길 때 발생. 문자열(참조 타입)을 넘기면 박싱 없음. 핵심 핫 패스에선 로그·박싱을 피할 것.
+
+```csharp
+int n = 42;
+object o = n;      // 박싱 — 힙에 복사본 할당
+int m = (int)o;    // 언박싱
+Debug.Log(n);      // int가 object 파라미터로 → 박싱 발생
+```
+
+## 배열 기본 초기화 — 값 타입 vs 참조 타입
+
+값 타입 배열 원소는 모든 필드가 0으로 초기화됨(null 아님). 참조 타입 배열 원소는 null로 초기화됨. 그래서 struct 배열은 바로 접근 가능하지만, class 배열은 그대로 접근하면 `NullReferenceException`.
+
+```csharp
+var s = new SPos[2];   // 원소 { hp:0 } — 바로 접근 가능
+var c = new CPos[2];   // 원소 null — c[0].hp 접근 시 NullReferenceException
+```
+
+## ref — 참조도 값으로 복사된다
+
+C#의 인자 전달은 값 타입이든 참조 타입이든 예외 없이 값 전달 — 변수 칸에 든 것을 복사해 넘김. 값 타입은 데이터가, 참조 타입은 위치(주소)가 복사됨. 그래서 참조 타입을 넘기면 매개변수와 원래 변수는 서로 다른 칸이지만 같은 객체를 가리킴. 여기서 두 동작이 갈림:
+
+- `e.hp = 50` — 복사된 위치를 따라가 그 객체를 고침. 원래 변수도 같은 객체를 보므로 반영됨
+- `e = new Enemy()` — 매개변수 칸에 새 위치를 덮어씀. 그 칸은 복사본이라 원래 변수는 옛 위치 그대로
+
+<svg viewBox="0 0 540 176" width="540" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="참조 타입 인자에서 필드 수정은 반영되고 재할당은 원본에 반영되지 않는다"><defs><marker id="rf-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><g font-size="12" fill="currentColor" text-anchor="middle" opacity="0.8"><text x="138" y="18" font-family="monospace">e.hp = 50 · 반영됨</text><text x="405" y="18" font-family="monospace">e = new Enemy() · 원본 그대로</text></g><line x1="270" y1="30" x2="270" y2="150" stroke="currentColor" opacity="0.2"/><g fill="none" stroke="currentColor" stroke-opacity="0.6"><rect x="24" y="50" width="104" height="30" rx="4"/><rect x="24" y="104" width="104" height="30" rx="4"/><rect x="300" y="50" width="96" height="30" rx="4"/><rect x="300" y="104" width="96" height="30" rx="4"/><rect x="430" y="48" width="96" height="30" rx="4"/></g><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="168" y="76" width="86" height="34" rx="4"/><rect x="430" y="106" width="96" height="30" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="76" y="69">enemy</text><text x="76" y="123">e (복사본)</text><text x="211" y="97">Enemy hp:50</text><text x="348" y="69">enemy</text><text x="348" y="123">e (복사본)</text><text x="478" y="67">원래 Enemy</text><text x="478" y="125">새 Enemy</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#rf-a)"><line x1="128" y1="65" x2="166" y2="88"/><line x1="128" y1="119" x2="166" y2="99"/><line x1="396" y1="64" x2="428" y2="63"/><line x1="396" y1="119" x2="428" y2="121"/></g><g font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle"><text x="140" y="162">둘이 같은 객체 → 고치면 반영</text><text x="412" y="162">e 칸만 새 객체 → enemy는 그대로</text></g></svg>
+
+```csharp
+void Heal(Enemy e)    { e.hp = 50; }        // 객체를 고침 → 반영됨
+void Replace(Enemy e) { e = new Enemy(); }  // 칸을 덮어씀 → 원본 그대로
+
+var enemy = new Enemy { hp = 100 };
+Heal(enemy);     // enemy.hp = 50 (반영)
+Replace(enemy);  // enemy는 원래 객체 그대로
+```
+
+`ref`는 값을 복사해 넘기는 대신 원래 변수의 칸 자체(별칭)를 넘김. 그래서 메서드 안의 재할당이 곧 원래 변수에 대한 재할당이 됨. 호출할 때도 `ref`를 붙여 "이 변수 칸을 넘긴다"를 명시. 값 타입에도 쓰며 오히려 값 타입에서 더 자주 씀 — 원래 복사돼 넘어가 못 바꾸던 원본을 직접 고칠 수 있어서.
+
+```csharp
+void Replace(ref Enemy e) { e = new Enemy(); }  // 원본 변수가 진짜 교체됨
+void AddOne(ref int n)    { n++; }              // 값 타입도 원본이 바뀜
+Replace(ref enemy);   AddOne(ref x);            // 호출 때도 ref 명시
+```
+
+형제 키워드 `out`·`in`도 "변수 칸을 넘긴다"는 같은 계열이고 읽기·쓰기 권한만 다름.
+
+| 키워드 | 방향 | 넘기기 전 초기화 | 주 용도 |
+| --- | --- | --- | --- |
+| `ref` | 읽기 + 쓰기 | 필요 | 원본 변수를 고침 |
+| `out` | 쓰기 전용(메서드가 반드시 채움) | 불필요 | 결과를 여러 개 반환 |
+| `in` | 읽기 전용(메서드가 못 바꿈) | 필요 | 큰 struct를 복사 없이 넘김 |
+
+`in`은 성능용 — 큰 struct(예: `Matrix4x4`, 64바이트)를 그냥 넘기면 호출마다 통째로 복사되는데, `in`이면 칸 위치만 넘어가 복사가 없고 안에서 수정은 막힘. `ref`는 실행이 미뤄지는 `async` 메서드·이터레이터(`yield`)의 매개변수로는 못 쓰고 람다도 캡처 못 함 — 그때쯤 원래 변수의 스택 자리가 사라졌을 수 있어서.
+
+## out 파라미터
+
+`out`은 `ref`와 같은 계열 — 값을 복사해 넘기는 게 아니라 호출자 변수의 칸 자체를 넘겨, 메서드가 그 칸에 값을 써 넣으면 호출자 변수에 바로 반영됨. `return`은 값을 하나만 돌려주지만 `out`을 쓰면 결과를 여러 개 내보낼 수 있음 — 정식 반환값 옆문으로 값을 더 미는 셈.
+
+`ref`와 갈리는 건 방향과 규칙. `out`은 "이 칸은 내가 채워서 돌려준다"는 쓰기 전용 약속이라 컴파일러가 둘을 강제함:
+
+- 호출하는 쪽 — 넘기기 전 초기화 불필요(어차피 메서드가 덮어씀)
+- 메서드 쪽 — `return` 전에 반드시 그 `out` 인자에 대입(안 하면 컴파일 에러)
+
+즉 `ref`는 기존 값을 읽고 고치는 양방향, `out`은 기존 값을 무시하고 새로 채워 내보내는 단방향(밖으로).
+
+<svg viewBox="0 0 540 180" width="540" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="out을 쓰는 Try 패턴은 반환값으로 성공 여부를, out으로 변환된 값을 함께 내보낸다"><defs><marker id="out-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><g font-size="12" fill="currentColor" text-anchor="middle"><rect x="16" y="70" width="104" height="40" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="68" y="87">입력 문자열</text><text x="68" y="103" opacity="0.6">"42"</text></g><rect x="170" y="62" width="150" height="52" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><g font-size="12" fill="currentColor" text-anchor="middle"><text x="245" y="84">TryParse</text><text x="245" y="102" font-size="11" opacity="0.65">호출 1번 · 출력 2갈래</text></g><rect x="378" y="26" width="152" height="46" rx="4" fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"/><g font-size="12" fill="currentColor" text-anchor="middle"><text x="454" y="48">return</text><text x="454" y="64" font-size="11" opacity="0.65">bool 성공 여부 → true</text></g><rect x="378" y="106" width="152" height="46" rx="4" fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"/><g font-size="12" fill="currentColor" text-anchor="middle"><text x="454" y="128">out result</text><text x="454" y="144" font-size="11" opacity="0.65">호출자 칸에 42 씀</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#out-a)"><line x1="120" y1="90" x2="168" y2="90"/><line x1="320" y1="80" x2="376" y2="52"/><line x1="320" y1="98" x2="376" y2="128"/></g><g font-size="11" fill="currentColor" opacity="0.6"><text x="330" y="66">정식 반환</text><text x="330" y="120">옆문(out)</text></g></svg>
+
+가장 흔한 자리가 Try 패턴. "성공했나"는 `bool`로 반환하고 "변환된 값"은 `out`으로 돌려줌 — 실패가 정상 범위인 입력 처리에서 예외 대신 성공 여부와 결과를 한 번에 받음. `out int n`처럼 호출 자리에서 변수를 바로 선언할 수 있고(`out var`도 됨), 안 쓸 값은 버림 `_`으로 받음.
+
+```csharp
+if (int.TryParse(input, out int n)) { Use(n); }   // 성공 시 n에 변환값이 채워짐
+if (dict.TryGetValue(key, out var value)) { }      // 있는지 확인 + 값 꺼내기를 조회 1번에
+if (dict.TryGetValue(key, out _)) { }              // 값이 필요 없으면 버림 _
+```
+
+`Dictionary.TryGetValue`도 같은 패턴 — `ContainsKey` 뒤 `[key]`로 다시 꺼내면 조회가 두 번인데 이건 한 번. 결과를 여럿 내보내는 데는 튜플·record도 있고 요즘은 튜플이 더 읽히지만, "성공 여부 + 값" 조합인 Try 패턴만은 `out`이 여전히 관용적.
+
+```csharp
+bool TryGetRange(int[] a, out int min, out int max) { }      // out 방식
+(int min, int max) GetRange(int[] a) => (a.Min(), a.Max());  // 튜플 방식(요즘 선호)
+```
+
+## Span과 stackalloc
+
+`Span<T>`는 배열·문자열의 일부를 복사 없이 가리키는 뷰. `Substring` 대신 `Slice`로 부분을 잘라 쓰면 힙 할당·복사를 피함. `stackalloc`으로 스택에 임시 버퍼를 잡으면 GC 대상이 아님. 파싱·버퍼 처리 핫 패스에서 할당을 없애는 데 씀.
+
+<svg viewBox="0 0 340 115" width="340" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Span은 배열의 일부를 복사 없이 가리키는 뷰"><g font-size="14" fill="currentColor" text-anchor="middle"><rect x="20" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="42" y="67">3</text><rect x="66" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="88" y="67">1</text><rect x="112" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="134" y="67">4</text><rect x="158" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="180" y="67">1</text><rect x="204" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="226" y="67">5</text><rect x="250" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="272" y="67">9</text></g><path d="M112 34 L112 28 L248 28 L248 34" fill="none" stroke="#4f83e0" stroke-width="1.6"/><text x="180" y="22" font-size="12" fill="#4f83e0" text-anchor="middle">Span — 복사 없이 참조</text><text x="20" y="104" font-size="12" fill="currentColor" opacity="0.7">AsSpan(2, 3) — 원본 배열의 일부를 그대로 가리킴</text></svg>
+
+```csharp
+int[] arr = { 3, 1, 4, 1, 5, 9 };
+Span<int> mid = arr.AsSpan(2, 3);      // {4,1,5} — 복사 없는 뷰
+Span<byte> buf = stackalloc byte[64];  // 스택 버퍼, GC 대상 아님
+```
+
 ## struct vs class의 기본 Equals
 
 `Equals`는 두 값이 같은지 답하는 메서드로, 모든 타입이 최상위 부모 `object`에서 물려받아 따로 정의하지 않아도 쓸 수 있음. "같다"엔 두 뜻이 있음 — 같은 객체 하나를 가리키는지(참조 동등), 객체는 달라도 필드 값이 모두 같은지(값 동등).
@@ -206,6 +306,145 @@ i3.Items.Add(3);        // i1.Items.Count도 3 — List는 새로 안 만들어�
 | 상태 | 계속 바뀜 | 만든 뒤 안 바뀜 |
 | 예시 | `Enemy`, 플레이어, 매니저 | 좌표, 아이템 정보, 설정값, 이벤트 메시지, 딕셔너리 키 |
 
+## 튜플과 분해
+
+`(int, string)` 값 튜플(`ValueTuple`)은 이름 붙인 여러 값을 가벼운 값 타입으로 묶어 반환 — 임시 클래스나 여러 개의 out을 대신. `var (id, name) = GetUser()`로 분해해 받고, 필드명을 주면 `.min`·`.max`처럼 접근. 옛 `Tuple`(참조 타입, `.Item1`)과 달리 값 타입이라 할당이 없고, 사용자 타입도 `Deconstruct`를 정의하면 같은 분해 문법을 지원.
+
+```csharp
+(int min, int max) Range(int[] a) => (a.Min(), a.Max());
+var (lo, hi) = Range(nums);   // 분해해서 받기
+var r = Range(nums); r.min;   // 이름으로 접근
+```
+
+## 기본 자료형과 부동소수점
+
+정수는 `int`(4바이트)가 기본, 더 큰 범위는 `long`(8바이트). 실수는 `float`·`double`·`decimal`로 나뉘고 이 셋의 차이가 자주 나옴.
+
+| 타입 | 크기 | 특징 |
+| --- | --- | --- |
+| `float` | 4바이트 | 정밀도 낮음, 접미사 `f`, 유니티 좌표 기본 |
+| `double` | 8바이트 | 실수 기본값, float보다 정밀 |
+| `decimal` | 16바이트 | 10진 기반, 오차 없음, 접미사 `m`, 느림 |
+
+`float`·`double`은 2진 부동소수점이라 `0.1` 같은 10진 소수를 정확히 못 담아 미세한 오차가 생김. 그래서 실수는 `==`로 바로 비교하지 말고 오차 범위(epsilon) 안인지로 비교. 돈처럼 오차가 용납 안 되는 값은 10진 기반이라 정확한 `decimal`을 씀(대신 느림).
+
+```csharp
+0.1 + 0.2 == 0.3;              // false — 2진 부동소수점 오차
+Math.Abs(a - b) < 1e-6;        // 실수 비교는 오차 범위로
+decimal price = 0.1m + 0.2m;   // 0.3 정확 — 금액엔 decimal
+```
+
+## 문자열 불변성과 StringBuilder
+
+문자열은 불변이라 `Replace`·`ToUpper`는 원본을 안 바꾸고 새 문자열을 반환. 반환값을 안 받으면 원본은 그대로라 `s = s.Replace(...)`가 필요. 불변인 이유는 보안, 해시 키 캐싱, 멀티스레드 안전.
+
+`+=`로 반복 연결하면 매번 전체를 복사해 전체 O(n²)이고 객체도 많이 생김. `StringBuilder`는 가변 버퍼라 O(n).
+
+```csharp
+string s = "abc";
+s.ToUpper();          // 반환값 안 받으면 s는 그대로 "abc"
+s = s.ToUpper();      // "ABC"
+
+var sb = new StringBuilder();
+for (int i = 0; i < n; i++) sb.Append(i);   // O(n) — += 반복은 O(n²)
+string result = sb.ToString();
+```
+
+## var vs object vs dynamic
+
+셋 다 "타입을 안 적는" 것처럼 보이지만 성격이 다름.
+
+| | 실제 타입 | 결정 시점 | 타입 검사 |
+| --- | --- | --- | --- |
+| `var` | 우변으로 추론된 그 타입 | 컴파일 타임 | 그대로 받음(정적) |
+| `object` | object로 취급, 원래 값은 그 안 | 컴파일 타임 | object 멤버만 |
+| `dynamic` | 런타임까지 미룸 | 런타임 | 컴파일 검사 건너뜀 |
+
+`var`는 타입을 생략하는 문법일 뿐 타입이 사라지는 게 아님 — 우변에서 추론해 확정하므로 `var n = 5;`는 그냥 `int`. `object`는 모든 타입의 부모라 무엇이든 담지만 원래 멤버를 쓰려면 캐스트가 필요하고 값 타입은 박싱됨. `dynamic`은 타입 검사를 런타임으로 미뤄 아무 멤버나 부를 수 있게 하지만, 틀리면 실행 중에 터지고 느림.
+
+```csharp
+var list = new List<int>();   // List<int>로 추론 — 자동완성 그대로
+object o = 5;                 // 박싱, o의 멤버 쓰려면 캐스트
+dynamic d = 5;
+d.Foo();                      // 컴파일은 통과, 실행 때 없으면 예외
+```
+
+## 형 변환 — 캐스트·Parse·TryParse·Convert
+
+바꾸려는 대상에 따라 도구가 다름.
+
+| 상황 | 도구 | 실패 시 |
+| --- | --- | --- |
+| 숫자끼리, 상속 관계 타입 | 캐스트 `(int)`, `as` | 캐스트는 예외, `as`는 null |
+| 문자열에서 숫자로 | `int.Parse` | 예외 |
+| 문자열에서 숫자로(실패 허용) | `int.TryParse` | `false` 반환, 안 던짐 |
+| 폭넓게 이 타입에서 저 타입 | `Convert.ToInt32` | null도 0으로, 관대 |
+
+사용자 입력처럼 실패가 정상 범위면 `TryParse`가 정석 — 예외 대신 성공 여부를 `bool`로 돌려주고 결과는 `out`으로 받음. 반드시 숫자여야 하는 자리면 `Parse`로 바로 터뜨림. 정수 오버플로는 기본으로 조용히 감싸는데, `checked`로 감싸면 오버플로 시 예외를 던지고 `unchecked`는 명시적으로 무시.
+
+```csharp
+int a = (int)3.9;                     // 3 (소수점 버림)
+if (int.TryParse(s, out int n)) { }   // 실패해도 안 던짐 — 입력 검증의 정석
+int b = int.Parse("abc");             // FormatException
+checked { int c = int.MaxValue + 1; } // OverflowException (기본은 조용히 감쌈)
+```
+
+## as vs 형변환 캐스트
+
+`as`는 실패 시 null을 반환하고 예외가 없으며, 참조 타입·Nullable에만 사용 가능. `(Type)` 캐스트는 실패 시 `InvalidCastException`.
+
+```csharp
+var e = obj as Enemy;   // 실패 시 null (예외 없음)
+var f = (Enemy)obj;     // 실패 시 InvalidCastException
+```
+
+## 패턴 매칭
+
+`is`·`switch` 식으로 타입·구조·값을 한 번에 검사·분해. `if (obj is Enemy e)`는 형 검사와 변수 바인딩을 동시에, `switch { > 90 => "A", … }`는 값 범위를, `(0, var y)`는 튜플을 분해. if/switch로 타입을 분기하던 코드를 간결·안전하게. 단 다형성(가상 디스패치)으로 풀 수 있으면 그쪽이 우선.
+
+```csharp
+if (obj is Enemy e) e.Hit();   // 형 검사 + 변수 바인딩 동시에
+string grade = score switch { > 90 => "A", > 80 => "B", _ => "C" };
+```
+
+## nullable 값 타입 (int?)
+
+값 타입은 원래 null을 못 담지만, `int?`처럼 물음표를 붙이면 "값이 없음"도 표현 가능. `int?`는 `Nullable<int>`의 축약이고, 값 하나와 값이 있는지 여부를 함께 든 struct.
+
+- `HasValue` — 값이 들어 있는지
+- `Value` — 실제 값(없을 때 꺼내면 예외)
+- `??`·`?.`와 잘 맞음 — 없으면 기본값으로 대체
+
+DB의 빈 칸, "아직 안 정해짐", 실패할 수 있는 계산 결과를 표현할 때 씀. 참조 타입의 nullable(다음 항목)이 컴파일 경고용 표시인 것과 달리, 값 타입의 nullable은 실제로 null 상태를 담는 별도 타입.
+
+```csharp
+int? score = null;
+score.HasValue;          // false
+int shown = score ?? 0;  // 없으면 0
+score = 90;
+int v = score.Value;     // 90 (없을 때 호출하면 예외)
+```
+
+## nullable 참조 타입(#nullable)
+
+참조 타입도 `string?`처럼 null 허용 여부를 타입에 표기해, 컴파일러가 null 가능성을 흐름 분석으로 경고. `string`은 non-null 의도라 null 대입·미초기화에 경고가 뜨고, `string?`은 역참조 전에 null 검사를 요구. 런타임 강제가 아니라 컴파일 타임 경고라 `!`(null 무시 연산자)로 끌 수 있음. NullReferenceException을 설계 단계에서 줄이는 장치.
+
+```csharp
+string s = null;    // 경고: non-null 타입에 null 대입
+string? t = null;   // OK — 역참조 전 null 검사를 요구
+int len = t!.Length;  // ! 로 경고 무시(책임은 개발자)
+```
+
+## ?? 와 ?. 연산자
+
+`??`(null 병합)는 좌변이 null이면 우변 반환. `?.`(null 조건부)는 좌변이 null이면 평가를 멈추고 null 반환. `a`가 null일 때 `a ?? "default"` → `"default"`, `a?.Length` → null(`int?`로 받음).
+
+```csharp
+string a = null;
+a ?? "default";   // "default"
+a?.Length;        // null (int? 로 받음)
+```
+
 ## 연산자 오버로딩
 
 직접 만든 타입에 `+`·`-`·`==`·`<` 같은 연산자가 어떻게 동작할지 정하는 기능. 정의하지 않으면 사용자 타입엔 연산자를 못 씀. 앞의 "`Vector3`가 `==`를 직접 정의해 뒀다"의 그 정의가 이것 — `Vector3`끼리 `+`가 되는 것도 같은 이유.
@@ -265,87 +504,6 @@ int w = c;              // 컴파일 에러 — explicit인데 캐스트 안 적
 
 의미가 자명하지 않은 곳에 붙이면 읽는 쪽이 동작을 추측해야 해 오히려 손해. `target - position`(벡터 뺄셈)·`price * quantity`(금액×수량)처럼 수학적 의미가 뚜렷한 값 타입에만 쓰고, `player + sword`처럼 장착인지 합산인지 모를 동작은 `player.Equip(sword)`로 이름을 붙임.
 
-## ref — 참조도 값으로 복사된다
-
-C#의 인자 전달은 값 타입이든 참조 타입이든 예외 없이 값 전달 — 변수 칸에 든 것을 복사해 넘김. 값 타입은 데이터가, 참조 타입은 위치(주소)가 복사됨. 그래서 참조 타입을 넘기면 매개변수와 원래 변수는 서로 다른 칸이지만 같은 객체를 가리킴. 여기서 두 동작이 갈림:
-
-- `e.hp = 50` — 복사된 위치를 따라가 그 객체를 고침. 원래 변수도 같은 객체를 보므로 반영됨
-- `e = new Enemy()` — 매개변수 칸에 새 위치를 덮어씀. 그 칸은 복사본이라 원래 변수는 옛 위치 그대로
-
-<svg viewBox="0 0 540 176" width="540" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="참조 타입 인자에서 필드 수정은 반영되고 재할당은 원본에 반영되지 않는다"><defs><marker id="rf-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><g font-size="12" fill="currentColor" text-anchor="middle" opacity="0.8"><text x="138" y="18" font-family="monospace">e.hp = 50 · 반영됨</text><text x="405" y="18" font-family="monospace">e = new Enemy() · 원본 그대로</text></g><line x1="270" y1="30" x2="270" y2="150" stroke="currentColor" opacity="0.2"/><g fill="none" stroke="currentColor" stroke-opacity="0.6"><rect x="24" y="50" width="104" height="30" rx="4"/><rect x="24" y="104" width="104" height="30" rx="4"/><rect x="300" y="50" width="96" height="30" rx="4"/><rect x="300" y="104" width="96" height="30" rx="4"/><rect x="430" y="48" width="96" height="30" rx="4"/></g><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="168" y="76" width="86" height="34" rx="4"/><rect x="430" y="106" width="96" height="30" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="76" y="69">enemy</text><text x="76" y="123">e (복사본)</text><text x="211" y="97">Enemy hp:50</text><text x="348" y="69">enemy</text><text x="348" y="123">e (복사본)</text><text x="478" y="67">원래 Enemy</text><text x="478" y="125">새 Enemy</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#rf-a)"><line x1="128" y1="65" x2="166" y2="88"/><line x1="128" y1="119" x2="166" y2="99"/><line x1="396" y1="64" x2="428" y2="63"/><line x1="396" y1="119" x2="428" y2="121"/></g><g font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle"><text x="140" y="162">둘이 같은 객체 → 고치면 반영</text><text x="412" y="162">e 칸만 새 객체 → enemy는 그대로</text></g></svg>
-
-```csharp
-void Heal(Enemy e)    { e.hp = 50; }        // 객체를 고침 → 반영됨
-void Replace(Enemy e) { e = new Enemy(); }  // 칸을 덮어씀 → 원본 그대로
-
-var enemy = new Enemy { hp = 100 };
-Heal(enemy);     // enemy.hp = 50 (반영)
-Replace(enemy);  // enemy는 원래 객체 그대로
-```
-
-`ref`는 값을 복사해 넘기는 대신 원래 변수의 칸 자체(별칭)를 넘김. 그래서 메서드 안의 재할당이 곧 원래 변수에 대한 재할당이 됨. 호출할 때도 `ref`를 붙여 "이 변수 칸을 넘긴다"를 명시. 값 타입에도 쓰며 오히려 값 타입에서 더 자주 씀 — 원래 복사돼 넘어가 못 바꾸던 원본을 직접 고칠 수 있어서.
-
-```csharp
-void Replace(ref Enemy e) { e = new Enemy(); }  // 원본 변수가 진짜 교체됨
-void AddOne(ref int n)    { n++; }              // 값 타입도 원본이 바뀜
-Replace(ref enemy);   AddOne(ref x);            // 호출 때도 ref 명시
-```
-
-형제 키워드 `out`·`in`도 "변수 칸을 넘긴다"는 같은 계열이고 읽기·쓰기 권한만 다름.
-
-| 키워드 | 방향 | 넘기기 전 초기화 | 주 용도 |
-| --- | --- | --- | --- |
-| `ref` | 읽기 + 쓰기 | 필요 | 원본 변수를 고침 |
-| `out` | 쓰기 전용(메서드가 반드시 채움) | 불필요 | 결과를 여러 개 반환 |
-| `in` | 읽기 전용(메서드가 못 바꿈) | 필요 | 큰 struct를 복사 없이 넘김 |
-
-`in`은 성능용 — 큰 struct(예: `Matrix4x4`, 64바이트)를 그냥 넘기면 호출마다 통째로 복사되는데, `in`이면 칸 위치만 넘어가 복사가 없고 안에서 수정은 막힘. `ref`는 실행이 미뤄지는 `async` 메서드·이터레이터(`yield`)의 매개변수로는 못 쓰고 람다도 캡처 못 함 — 그때쯤 원래 변수의 스택 자리가 사라졌을 수 있어서.
-
-## out 파라미터
-
-인자의 저장 위치 자체를 넘겨 메서드가 호출자의 변수에 직접 씀(`ref`와 유사). 메서드 안 `result = 42`가 곧 호출자 변수에 기록. `out`은 메서드 안에서 반드시 대입해야 하고, 호출 전 초기화는 불필요(기존 값은 덮어써짐).
-
-```csharp
-bool TryHalf(int n, out int result) { result = n / 2; return n % 2 == 0; }
-if (TryHalf(10, out int half)) { }   // half = 5, 호출 전 초기화 불필요
-```
-
-## 배열 기본 초기화 — 값 타입 vs 참조 타입
-
-값 타입 배열 원소는 모든 필드가 0으로 초기화됨(null 아님). 참조 타입 배열 원소는 null로 초기화됨. 그래서 struct 배열은 바로 접근 가능하지만, class 배열은 그대로 접근하면 `NullReferenceException`.
-
-```csharp
-var s = new SPos[2];   // 원소 { hp:0 } — 바로 접근 가능
-var c = new CPos[2];   // 원소 null — c[0].hp 접근 시 NullReferenceException
-```
-
-## 값 타입이 힙에 저장되는 경우
-
-"값 타입 = 스택"은 부정확. 박싱됐을 때, 클래스(참조 타입)의 필드일 때(객체 안에 함께 저장), 값 타입 배열의 원소일 때(배열 자체가 힙 객체) 힙에 삶.
-
-## 박싱(boxing)
-
-값 타입을 object로 변환할 때 힙에 할당 → GC 부담. `Debug.Log(int)`처럼 값 타입을 object 파라미터로 넘길 때 발생. 문자열(참조 타입)을 넘기면 박싱 없음. 핵심 핫 패스에선 로그·박싱을 피할 것.
-
-```csharp
-int n = 42;
-object o = n;      // 박싱 — 힙에 복사본 할당
-int m = (int)o;    // 언박싱
-Debug.Log(n);      // int가 object 파라미터로 → 박싱 발생
-```
-
-## Span과 stackalloc
-
-`Span<T>`는 배열·문자열의 일부를 복사 없이 가리키는 뷰. `Substring` 대신 `Slice`로 부분을 잘라 쓰면 힙 할당·복사를 피함. `stackalloc`으로 스택에 임시 버퍼를 잡으면 GC 대상이 아님. 파싱·버퍼 처리 핫 패스에서 할당을 없애는 데 씀.
-
-<svg viewBox="0 0 340 115" width="340" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Span은 배열의 일부를 복사 없이 가리키는 뷰"><g font-size="14" fill="currentColor" text-anchor="middle"><rect x="20" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="42" y="67">3</text><rect x="66" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="88" y="67">1</text><rect x="112" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="134" y="67">4</text><rect x="158" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="180" y="67">1</text><rect x="204" y="42" width="44" height="38" rx="4" fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"/><text x="226" y="67">5</text><rect x="250" y="42" width="44" height="38" rx="4" fill="none" stroke="currentColor" opacity="0.6"/><text x="272" y="67">9</text></g><path d="M112 34 L112 28 L248 28 L248 34" fill="none" stroke="#4f83e0" stroke-width="1.6"/><text x="180" y="22" font-size="12" fill="#4f83e0" text-anchor="middle">Span — 복사 없이 참조</text><text x="20" y="104" font-size="12" fill="currentColor" opacity="0.7">AsSpan(2, 3) — 원본 배열의 일부를 그대로 가리킴</text></svg>
-
-```csharp
-int[] arr = { 3, 1, 4, 1, 5, 9 };
-Span<int> mid = arr.AsSpan(2, 3);      // {4,1,5} — 복사 없는 뷰
-Span<byte> buf = stackalloc byte[64];  // 스택 버퍼, GC 대상 아님
-```
-
 ## Index·Range 연산자
 
 `^`(끝 기준 인덱스)와 `..`(범위)로 컬렉션 일부를 간결히 지목. `a[^1]`은 마지막 원소, `a[2..5]`는 인덱스 2부터 4까지. 배열에 `..`를 쓰면 새 배열이 복사되지만, `Span`·`ReadOnlySpan`에 쓰면 복사 없는 슬라이스라 할당이 없음. 파싱·버퍼 처리에서 Span과 함께 쓰면 부분 접근이 깔끔하고 저비용.
@@ -357,16 +515,85 @@ a[2..4];           // {30, 40} — 새 배열 복사
 a.AsSpan()[2..4];  // {30, 40} — 복사 없는 슬라이스
 ```
 
-## 세대별 GC
+## 비트 연산자와 시프트
 
-힙을 Gen0/1/2로 나눔. Gen0이 빠른 이유는 최근 할당된 작은 영역만 스캔하면 되고, 대부분의 객체는 금방 죽어(generational hypothesis) 적은 일로 많이 회수하기 때문. 수집에서 살아남으면 상위 세대로 승격돼 덜 자주 수거됨. 매 프레임 임시 할당이 많으면 Gen0이 자주 차 GC가 잦아짐.
+정수를 2진수 비트 단위로 다루는 연산자. 플래그 조합·마스킹·저수준 최적화에 씀.
 
-```mermaid
-flowchart LR
-    N["새 객체"] --> G0["Gen 0"]
-    G0 -->|살아남음| G1["Gen 1"]
-    G1 -->|살아남음| G2["Gen 2"]
+| 연산자 | 의미 |
+| --- | --- |
+| `&` | AND, 둘 다 1인 비트만 1 (마스크 검사) |
+| `\|` | OR, 하나라도 1이면 1 (플래그 합치기) |
+| `^` | XOR, 다르면 1 (토글) |
+| `~` | NOT, 비트 반전 |
+| `<<` `>>` | 왼쪽·오른쪽 시프트 (한 칸이 곱하기 2, 나누기 2) |
+
+`[Flags]` 열거형이 이 연산으로 여러 상태를 한 정수에 조합·검사하는 게 대표 용례. `x << 1`은 곱하기 2, `x >> 1`은 나누기 2와 같아 예전엔 최적화로 썼지만, 지금은 컴파일러가 알아서 하므로 의미가 분명할 때만.
+
+```csharp
+int flags = 0b0000;
+flags |= 0b0010;                  // 비트 켜기 → 0b0010
+bool on = (flags & 0b0010) != 0;  // 켜졌는지 검사 → true
+flags &= ~0b0010;                 // 비트 끄기 → 0b0000
+int doubled = 3 << 1;             // 6
 ```
+
+## 단축 평가(short-circuit)
+
+`&&`와 `||`는 왼쪽만으로 결과가 정해지면 오른쪽을 아예 실행 안 함. `&&`는 왼쪽이 false면 전체가 false라 오른쪽을 건너뛰고, `||`는 왼쪽이 true면 오른쪽을 건너뜀. 이 성질로 null 검사와 접근을 한 줄에 안전하게 묶음 — 왼쪽에서 null이 아님을 확인한 뒤에야 오른쪽이 실행되므로 예외가 안 남.
+
+```csharp
+if (obj != null && obj.IsReady) { }          // 왼쪽이 false면 obj.IsReady를 안 봄
+if (list.Count == 0 || list[0] == null) { }  // 왼쪽이 true면 list[0]을 안 봄
+```
+
+비트 연산자 `&`·`|`는 단축이 없어 양쪽을 항상 평가. 오른쪽에 부수효과(함수 호출 등)가 있으면 `&&`/`||`와 결과가 달라질 수 있음. 논리 판단엔 `&&`/`||`를, 비트 조작엔 `&`/`|`를 씀.
+
+## 열거형과 [Flags]
+
+enum은 이름 붙인 정수 상수 집합이라 매직 넘버 대신 의미를 드러냄. `[Flags]`를 붙이고 값을 1, 2, 4, 8…로 주면 비트 OR로 여러 상태를 한 변수에 조합(`Fire | Ice`)하고 AND로 검사 — 상태 효과·LayerMask가 이 방식. 기본 밑 타입은 int이나 지정 가능하고, 정의 안 된 정수값도 담길 수 있어 검증이 필요.
+
+```csharp
+[Flags] enum Eff { None = 0, Fire = 1, Ice = 2, Stun = 4 }
+var e = Eff.Fire | Eff.Ice;          // 조합
+bool onFire = (e & Eff.Fire) != 0;   // 검사
+```
+
+## 정수 나눗셈
+
+`25 / 4`는 둘 다 int라 정수 나눗셈으로 6 → float에 대입돼도 6.0. `1 / 3 * 100f`는 `1/3`이 먼저 int 0이 된 뒤 ×100f → 0. 나눗셈이 int끼리 먼저 평가되는 게 함정. 고치려면 `(float)`로 캐스팅.
+
+```csharp
+float a = 25 / 4;               // int끼리 나눠 6 → 6.0
+float b = 1 / 3 * 100f;         // (1/3)=0 먼저 → 0
+float c = (float)1 / 3 * 100f;  // 33.33
+```
+
+## 정수 오버플로
+
+`int`는 부호 1비트 + 값 31비트. `int.MaxValue` = 2³¹−1(2,147,483,647). +1하면 오버플로로 감싸져 `int.MinValue` = −2³¹. 비트로 `0111...111` → `1000...000`.
+
+```csharp
+int max = int.MaxValue;   //  2,147,483,647
+int wrap = max + 1;       // -2,147,483,648 (int.MinValue)
+```
+
+## const vs readonly
+
+| | 확정 시점 | 쓸 수 있는 값 | 함정 |
+| --- | --- | --- | --- |
+| `const` | 컴파일 타임 | 리터럴/불변값 전용 | 사용처에 값이 인라인됨 → 라이브러리 const를 참조하는 쪽이 재컴파일 안 하면 옛값 유지 |
+| `readonly` | 런타임(선언/생성자) | 인스턴스별 값, 참조 타입도 가능 | 참조 타입은 재할당만 막고 객체 내부는 변경 가능 |
+
+## 객체지향 4대 특성
+
+| 특성 | 뜻 | C#에서 |
+| --- | --- | --- |
+| 캡슐화 | 상태를 숨기고 공개 표면만 노출 | `private` 필드 + 프로퍼티, 접근 제한자 |
+| 상속 | 공통을 부모에 모으고 물려받음 | `class B : A`, 추상 클래스 |
+| 다형성 | 같은 호출이 실제 타입에 따라 다르게 동작 | `virtual`/`override` 가상 디스패치 |
+| 추상화 | 세부는 감추고 필요한 계약만 드러냄 | 인터페이스, 추상 클래스 |
+
+넷은 따로 노는 게 아니라 맞물림. 캡슐화로 내부를 감추면 추상화된 표면만 남고, 그 표면을 인터페이스·추상 클래스로 약속한 뒤 상속으로 나눠 가지며, 실제 호출은 다형성으로 각 타입에 맞게 갈라짐. 뒤 항목들이 이 넷의 구체적 장치.
 
 ## 접근 제한자
 
@@ -414,16 +641,52 @@ class Player {
 
 `{ get; set; }` 자동 프로퍼티는 컴파일러가 숨은 백킹 필드를 만들어 줌. `init`은 생성·객체 초기화 때만 설정되고 이후 불변이라 record와 잘 맞음. 유니티의 `[SerializeField]`가 프로퍼티가 아니라 필드에 붙는 것도, 인스펙터 직렬화가 필드를 대상으로 하기 때문.
 
-## 객체지향 4대 특성
+## 생성자 실행 순서
 
-| 특성 | 뜻 | C#에서 |
-| --- | --- | --- |
-| 캡슐화 | 상태를 숨기고 공개 표면만 노출 | `private` 필드 + 프로퍼티, 접근 제한자 |
-| 상속 | 공통을 부모에 모으고 물려받음 | `class B : A`, 추상 클래스 |
-| 다형성 | 같은 호출이 실제 타입에 따라 다르게 동작 | `virtual`/`override` 가상 디스패치 |
-| 추상화 | 세부는 감추고 필요한 계약만 드러냄 | 인터페이스, 추상 클래스 |
+상속 관계에서 자식 생성자는 본문 전에 부모 생성자를 암묵 호출 → 부모 생성자가 먼저 실행되고 자식 생성자가 나중. 부모가 완전히 초기화된 뒤 자식이 동작.
 
-넷은 따로 노는 게 아니라 맞물림. 캡슐화로 내부를 감추면 추상화된 표면만 남고, 그 표면을 인터페이스·추상 클래스로 약속한 뒤 상속으로 나눠 가지며, 실제 호출은 다형성으로 각 타입에 맞게 갈라짐. 뒤 항목들이 이 넷의 구체적 장치.
+```csharp
+class A { public A() => Console.Write("A"); }
+class B : A { public B() => Console.Write("B"); }
+new B();   // "AB" — 부모 먼저
+```
+
+## static 필드
+
+static은 클래스당 하나라 모든 인스턴스가 공유. 인스턴스 필드는 객체별로 따로. `id = ++total`이면 `a.id = 1`, `b.id = 2`, `total = 2`.
+
+```csharp
+class E { static int total; public int id = ++total; }
+var a = new E(); var b = new E();   // a.id=1, b.id=2, total=2
+```
+
+## sealed·정적 클래스·정적 생성자
+
+`sealed`는 더 이상의 상속·재정의를 막음. 클래스에 붙이면 상속 불가, `override` 메서드에 붙이면 그 아래에서 더는 재정의 불가. 확장 지점을 닫아 의도를 못 벗어나게 하고, 가상 호출을 직접 호출로 바꿀 여지를 줘 약간의 최적화도 됨.
+
+정적 클래스(`static class`)는 인스턴스를 못 만들고 정적 멤버만 담는 상자. 상태 없는 유틸리티 모음에 씀(예: `Math`). 확장 메서드도 정적 클래스에만 둘 수 있음.
+
+정적 생성자는 그 타입이 처음 쓰이기 직전에 딱 한 번 자동 실행돼 정적 필드를 초기화. 호출 시점을 못 정하고 매개변수도 못 받음.
+
+```csharp
+sealed class FinalBoss : Enemy {}       // 더는 상속 불가
+static class MathUtil {                   // 인스턴스 없음
+    public static float Sq(float x) => x * x;
+}
+class Config {
+    public static readonly string Path;
+    static Config() { Path = Load(); }    // 최초 사용 직전 1회
+}
+```
+
+## 추상 클래스 vs 인터페이스
+
+| | 상속 | 가질 수 있는 것 | 의미 |
+| --- | --- | --- | --- |
+| 추상 클래스 | 단일 상속 | 필드·생성자·공통 구현 | "종류(is-a)" |
+| 인터페이스 | 다중 구현 | 기능 계약 | "can-do" |
+
+공통 상태·구현을 공유하면 추상 클래스, 무관한 클래스들이 같은 기능을 가지면 인터페이스.
 
 ## virtual/override vs new
 
@@ -475,51 +738,84 @@ Enemy e = new Goblin();
 e.DealDamage();   // Goblin.Attack 실행
 ```
 
-## 추상 클래스 vs 인터페이스
+## 제네릭 where 제약
 
-| | 상속 | 가질 수 있는 것 | 의미 |
-| --- | --- | --- | --- |
-| 추상 클래스 | 단일 상속 | 필드·생성자·공통 구현 | "종류(is-a)" |
-| 인터페이스 | 다중 구현 | 기능 계약 | "can-do" |
-
-공통 상태·구현을 공유하면 추상 클래스, 무관한 클래스들이 같은 기능을 가지면 인터페이스.
-
-## 생성자 실행 순서
-
-상속 관계에서 자식 생성자는 본문 전에 부모 생성자를 암묵 호출 → 부모 생성자가 먼저 실행되고 자식 생성자가 나중. 부모가 완전히 초기화된 뒤 자식이 동작.
+제약이 없으면 컴파일러가 T를 object 수준으로만 취급 → object의 멤버만 보장돼 `CompareTo` 호출 불가. `where T : IComparable<T>`를 걸면 모든 T가 `CompareTo`를 가짐이 보장돼 호출 가능. 제약은 T의 멤버·기능을 컴파일러에게 약속하는 것.
 
 ```csharp
-class A { public A() => Console.Write("A"); }
-class B : A { public B() => Console.Write("B"); }
-new B();   // "AB" — 부모 먼저
+T Max<T>(T a, T b) where T : IComparable<T>
+    => a.CompareTo(b) >= 0 ? a : b;   // 제약이 없으면 CompareTo 호출 불가
 ```
 
-## static 필드
+## 제네릭 공변성·반공변성(in/out)
 
-static은 클래스당 하나라 모든 인스턴스가 공유. 인스턴스 필드는 객체별로 따로. `id = ++total`이면 `a.id = 1`, `b.id = 2`, `total = 2`.
+`IEnumerable<out T>`는 공변 — `IEnumerable<Cat>`을 `IEnumerable<Animal>`에 대입 가능(T를 꺼내기만 해 안전). `Action<in T>`는 반공변 — `Action<Animal>`을 `Action<Cat>`에 대입 가능(T를 받기만 함). `out`은 반환 위치, `in`은 입력 위치에만 T가 쓰일 때 허용. `List<T>` 같은 가변 컬렉션은 넣고 빼기를 다 해 불변(둘 다 불가).
 
 ```csharp
-class E { static int total; public int id = ++total; }
-var a = new E(); var b = new E();   // a.id=1, b.id=2, total=2
+IEnumerable<Animal> a = new List<Cat>();   // 공변(out T): Cat → Animal 대입 OK
+Action<Animal> printAny = x => { };
+Action<Cat> onCat = printAny;              // 반공변(in T): Animal → Cat 대입 OK
 ```
 
-## sealed·정적 클래스·정적 생성자
+## 확장 메서드
 
-`sealed`는 더 이상의 상속·재정의를 막음. 클래스에 붙이면 상속 불가, `override` 메서드에 붙이면 그 아래에서 더는 재정의 불가. 확장 지점을 닫아 의도를 못 벗어나게 하고, 가상 호출을 직접 호출로 바꿀 여지를 줘 약간의 최적화도 됨.
-
-정적 클래스(`static class`)는 인스턴스를 못 만들고 정적 멤버만 담는 상자. 상태 없는 유틸리티 모음에 씀(예: `Math`). 확장 메서드도 정적 클래스에만 둘 수 있음.
-
-정적 생성자는 그 타입이 처음 쓰이기 직전에 딱 한 번 자동 실행돼 정적 필드를 초기화. 호출 시점을 못 정하고 매개변수도 못 받음.
+기존 타입(수정할 수 없는 것 포함)에 인스턴스 메서드처럼 보이는 static 메서드를 덧붙임. static 클래스의 static 메서드 첫 인자에 `this`를 붙이면 그 타입의 메서드처럼 호출 가능. LINQ 전체가 `IEnumerable<T>`의 확장 메서드이고, 유니티에서 Transform·Vector 유틸을 붙일 때 흔히 씀. 실제 타입을 안 건드리므로 private 멤버엔 접근 못 함.
 
 ```csharp
-sealed class FinalBoss : Enemy {}       // 더는 상속 불가
-static class MathUtil {                   // 인스턴스 없음
-    public static float Sq(float x) => x * x;
+static class StringExt {
+    public static bool IsEmpty(this string s) => s.Length == 0;
 }
-class Config {
-    public static readonly string Path;
-    static Config() { Path = Load(); }    // 최초 사용 직전 1회
-}
+"".IsEmpty();   // 인스턴스 메서드처럼 호출
+```
+
+## 리플렉션과 어트리뷰트
+
+리플렉션은 런타임에 타입의 메타데이터(필드·메서드·어트리뷰트)를 읽고 동적으로 호출. 어트리뷰트는 코드에 붙이는 선언적 메타데이터(`[SerializeField]`, `[Obsolete]`)로, 리플렉션으로 읽어 동작을 바꿈 — 유니티 인스펙터·직렬화·테스트 프레임워크가 이 방식. 유연하나 느리고 컴파일 타임 검사를 우회하므로 핫 패스에선 캐싱하거나 소스 제너레이터로 대체.
+
+## delegate vs event
+
+`event`는 외부에서 `+=`/`-=` 구독·해지만 가능하고 호출은 선언한 클래스에서만 가능. public delegate는 외부에서 직접 호출하거나 `=`로 구독 목록을 덮어쓸 수 있어 위험. 그래서 `event`가 안전.
+
+```csharp
+public event Action OnHit;   // 외부에서는 OnHit += / -= 만 가능
+// 외부: OnHit();  → 불가 (호출은 선언 클래스만)
+// 외부: OnHit = null;  → 불가 (구독 목록 덮어쓰기 방지)
+```
+
+## 멀티캐스트 델리게이트 반환값
+
+`f +=` 로 여러 함수를 묶으면 다 실행되지만 반환값은 마지막 것만 남고 앞의 것들은 버려짐. `Func<int>`에 1, 2, 3을 묶어 호출하면 3.
+
+```csharp
+Func<int> f = () => 1;
+f += () => 2;
+f += () => 3;
+int r = f();   // 3 — 마지막 것만, 앞의 1·2는 버려짐
+```
+
+## for 루프 클로저
+
+`for (int i...)`의 람다는 변수 i 자체를 캡처(공유). 루프는 i가 (마지막 사용값 2가 아니라) 3이 되어 끝나므로 람다 실행 시 모두 3 3 3을 출력. 고치려면 루프 안에서 지역 변수에 복사한 뒤 그걸 캡처.
+
+```csharp
+var acts = new List<Action>();
+for (int i = 0; i < 3; i++)
+    acts.Add(() => Console.Write(i));   // i를 공유 캡처
+foreach (var a in acts) a();            // 3 3 3
+
+for (int i = 0; i < 3; i++) {
+    int copy = i;                       // 반복마다 새 지역 변수
+    acts.Add(() => Console.Write(copy));
+}                                       // 0 1 2
+```
+
+## 로컬 함수 vs 람다
+
+메서드 안에 이름 있는 함수를 두는 로컬 함수는, 델리게이트 객체를 만드는 람다와 달리 힙 할당·델리게이트 호출 오버헤드가 없음(캡처가 없으면 특히). 재귀·이터레이터 분리·인자 검증 분리에 적합하고, 캡처한 지역 변수를 `ref`로도 다룰 수 있음. 이벤트 구독처럼 델리게이트 인스턴스 자체가 필요한 자리엔 람다가 맞음.
+
+```csharp
+int Square(int x) => x * x;        // 로컬 함수 — 캡처 없으면 힙 할당 없음
+Func<int, int> sq = x => x * x;    // 람다 — 델리게이트 객체 생성
 ```
 
 ## yield return과 지연 실행
@@ -552,294 +848,6 @@ foreach (var x in list) list.Remove(x);       // InvalidOperationException
 for (int i = list.Count - 1; i >= 0; i--)     // 역순 for는 안전
     if (IsDead(list[i])) list.RemoveAt(i);
 list.RemoveAll(IsDead);                        // 또는 이 한 줄
-```
-
-## 멀티캐스트 델리게이트 반환값
-
-`f +=` 로 여러 함수를 묶으면 다 실행되지만 반환값은 마지막 것만 남고 앞의 것들은 버려짐. `Func<int>`에 1, 2, 3을 묶어 호출하면 3.
-
-```csharp
-Func<int> f = () => 1;
-f += () => 2;
-f += () => 3;
-int r = f();   // 3 — 마지막 것만, 앞의 1·2는 버려짐
-```
-
-## delegate vs event
-
-`event`는 외부에서 `+=`/`-=` 구독·해지만 가능하고 호출은 선언한 클래스에서만 가능. public delegate는 외부에서 직접 호출하거나 `=`로 구독 목록을 덮어쓸 수 있어 위험. 그래서 `event`가 안전.
-
-```csharp
-public event Action OnHit;   // 외부에서는 OnHit += / -= 만 가능
-// 외부: OnHit();  → 불가 (호출은 선언 클래스만)
-// 외부: OnHit = null;  → 불가 (구독 목록 덮어쓰기 방지)
-```
-
-## for 루프 클로저
-
-`for (int i...)`의 람다는 변수 i 자체를 캡처(공유). 루프는 i가 (마지막 사용값 2가 아니라) 3이 되어 끝나므로 람다 실행 시 모두 3 3 3을 출력. 고치려면 루프 안에서 지역 변수에 복사한 뒤 그걸 캡처.
-
-```csharp
-var acts = new List<Action>();
-for (int i = 0; i < 3; i++)
-    acts.Add(() => Console.Write(i));   // i를 공유 캡처
-foreach (var a in acts) a();            // 3 3 3
-
-for (int i = 0; i < 3; i++) {
-    int copy = i;                       // 반복마다 새 지역 변수
-    acts.Add(() => Console.Write(copy));
-}                                       // 0 1 2
-```
-
-## 로컬 함수 vs 람다
-
-메서드 안에 이름 있는 함수를 두는 로컬 함수는, 델리게이트 객체를 만드는 람다와 달리 힙 할당·델리게이트 호출 오버헤드가 없음(캡처가 없으면 특히). 재귀·이터레이터 분리·인자 검증 분리에 적합하고, 캡처한 지역 변수를 `ref`로도 다룰 수 있음. 이벤트 구독처럼 델리게이트 인스턴스 자체가 필요한 자리엔 람다가 맞음.
-
-```csharp
-int Square(int x) => x * x;        // 로컬 함수 — 캡처 없으면 힙 할당 없음
-Func<int, int> sq = x => x * x;    // 람다 — 델리게이트 객체 생성
-```
-
-## 문자열 불변성과 StringBuilder
-
-문자열은 불변이라 `Replace`·`ToUpper`는 원본을 안 바꾸고 새 문자열을 반환. 반환값을 안 받으면 원본은 그대로라 `s = s.Replace(...)`가 필요. 불변인 이유는 보안, 해시 키 캐싱, 멀티스레드 안전.
-
-`+=`로 반복 연결하면 매번 전체를 복사해 전체 O(n²)이고 객체도 많이 생김. `StringBuilder`는 가변 버퍼라 O(n).
-
-```csharp
-string s = "abc";
-s.ToUpper();          // 반환값 안 받으면 s는 그대로 "abc"
-s = s.ToUpper();      // "ABC"
-
-var sb = new StringBuilder();
-for (int i = 0; i < n; i++) sb.Append(i);   // O(n) — += 반복은 O(n²)
-string result = sb.ToString();
-```
-
-## 확장 메서드
-
-기존 타입(수정할 수 없는 것 포함)에 인스턴스 메서드처럼 보이는 static 메서드를 덧붙임. static 클래스의 static 메서드 첫 인자에 `this`를 붙이면 그 타입의 메서드처럼 호출 가능. LINQ 전체가 `IEnumerable<T>`의 확장 메서드이고, 유니티에서 Transform·Vector 유틸을 붙일 때 흔히 씀. 실제 타입을 안 건드리므로 private 멤버엔 접근 못 함.
-
-```csharp
-static class StringExt {
-    public static bool IsEmpty(this string s) => s.Length == 0;
-}
-"".IsEmpty();   // 인스턴스 메서드처럼 호출
-```
-
-## 제네릭 where 제약
-
-제약이 없으면 컴파일러가 T를 object 수준으로만 취급 → object의 멤버만 보장돼 `CompareTo` 호출 불가. `where T : IComparable<T>`를 걸면 모든 T가 `CompareTo`를 가짐이 보장돼 호출 가능. 제약은 T의 멤버·기능을 컴파일러에게 약속하는 것.
-
-```csharp
-T Max<T>(T a, T b) where T : IComparable<T>
-    => a.CompareTo(b) >= 0 ? a : b;   // 제약이 없으면 CompareTo 호출 불가
-```
-
-## 제네릭 공변성·반공변성(in/out)
-
-`IEnumerable<out T>`는 공변 — `IEnumerable<Cat>`을 `IEnumerable<Animal>`에 대입 가능(T를 꺼내기만 해 안전). `Action<in T>`는 반공변 — `Action<Animal>`을 `Action<Cat>`에 대입 가능(T를 받기만 함). `out`은 반환 위치, `in`은 입력 위치에만 T가 쓰일 때 허용. `List<T>` 같은 가변 컬렉션은 넣고 빼기를 다 해 불변(둘 다 불가).
-
-```csharp
-IEnumerable<Animal> a = new List<Cat>();   // 공변(out T): Cat → Animal 대입 OK
-Action<Animal> printAny = x => { };
-Action<Cat> onCat = printAny;              // 반공변(in T): Animal → Cat 대입 OK
-```
-
-## 리플렉션과 어트리뷰트
-
-리플렉션은 런타임에 타입의 메타데이터(필드·메서드·어트리뷰트)를 읽고 동적으로 호출. 어트리뷰트는 코드에 붙이는 선언적 메타데이터(`[SerializeField]`, `[Obsolete]`)로, 리플렉션으로 읽어 동작을 바꿈 — 유니티 인스펙터·직렬화·테스트 프레임워크가 이 방식. 유연하나 느리고 컴파일 타임 검사를 우회하므로 핫 패스에선 캐싱하거나 소스 제너레이터로 대체.
-
-## as vs 형변환 캐스트
-
-`as`는 실패 시 null을 반환하고 예외가 없으며, 참조 타입·Nullable에만 사용 가능. `(Type)` 캐스트는 실패 시 `InvalidCastException`.
-
-```csharp
-var e = obj as Enemy;   // 실패 시 null (예외 없음)
-var f = (Enemy)obj;     // 실패 시 InvalidCastException
-```
-
-## var vs object vs dynamic
-
-셋 다 "타입을 안 적는" 것처럼 보이지만 성격이 다름.
-
-| | 실제 타입 | 결정 시점 | 타입 검사 |
-| --- | --- | --- | --- |
-| `var` | 우변으로 추론된 그 타입 | 컴파일 타임 | 그대로 받음(정적) |
-| `object` | object로 취급, 원래 값은 그 안 | 컴파일 타임 | object 멤버만 |
-| `dynamic` | 런타임까지 미룸 | 런타임 | 컴파일 검사 건너뜀 |
-
-`var`는 타입을 생략하는 문법일 뿐 타입이 사라지는 게 아님 — 우변에서 추론해 확정하므로 `var n = 5;`는 그냥 `int`. `object`는 모든 타입의 부모라 무엇이든 담지만 원래 멤버를 쓰려면 캐스트가 필요하고 값 타입은 박싱됨. `dynamic`은 타입 검사를 런타임으로 미뤄 아무 멤버나 부를 수 있게 하지만, 틀리면 실행 중에 터지고 느림.
-
-```csharp
-var list = new List<int>();   // List<int>로 추론 — 자동완성 그대로
-object o = 5;                 // 박싱, o의 멤버 쓰려면 캐스트
-dynamic d = 5;
-d.Foo();                      // 컴파일은 통과, 실행 때 없으면 예외
-```
-
-## 형 변환 — 캐스트·Parse·TryParse·Convert
-
-바꾸려는 대상에 따라 도구가 다름.
-
-| 상황 | 도구 | 실패 시 |
-| --- | --- | --- |
-| 숫자끼리, 상속 관계 타입 | 캐스트 `(int)`, `as` | 캐스트는 예외, `as`는 null |
-| 문자열에서 숫자로 | `int.Parse` | 예외 |
-| 문자열에서 숫자로(실패 허용) | `int.TryParse` | `false` 반환, 안 던짐 |
-| 폭넓게 이 타입에서 저 타입 | `Convert.ToInt32` | null도 0으로, 관대 |
-
-사용자 입력처럼 실패가 정상 범위면 `TryParse`가 정석 — 예외 대신 성공 여부를 `bool`로 돌려주고 결과는 `out`으로 받음. 반드시 숫자여야 하는 자리면 `Parse`로 바로 터뜨림. 정수 오버플로는 기본으로 조용히 감싸는데, `checked`로 감싸면 오버플로 시 예외를 던지고 `unchecked`는 명시적으로 무시.
-
-```csharp
-int a = (int)3.9;                     // 3 (소수점 버림)
-if (int.TryParse(s, out int n)) { }   // 실패해도 안 던짐 — 입력 검증의 정석
-int b = int.Parse("abc");             // FormatException
-checked { int c = int.MaxValue + 1; } // OverflowException (기본은 조용히 감쌈)
-```
-
-## 패턴 매칭
-
-`is`·`switch` 식으로 타입·구조·값을 한 번에 검사·분해. `if (obj is Enemy e)`는 형 검사와 변수 바인딩을 동시에, `switch { > 90 => "A", … }`는 값 범위를, `(0, var y)`는 튜플을 분해. if/switch로 타입을 분기하던 코드를 간결·안전하게. 단 다형성(가상 디스패치)으로 풀 수 있으면 그쪽이 우선.
-
-```csharp
-if (obj is Enemy e) e.Hit();   // 형 검사 + 변수 바인딩 동시에
-string grade = score switch { > 90 => "A", > 80 => "B", _ => "C" };
-```
-
-## 튜플과 분해
-
-`(int, string)` 값 튜플(`ValueTuple`)은 이름 붙인 여러 값을 가벼운 값 타입으로 묶어 반환 — 임시 클래스나 여러 개의 out을 대신. `var (id, name) = GetUser()`로 분해해 받고, 필드명을 주면 `.min`·`.max`처럼 접근. 옛 `Tuple`(참조 타입, `.Item1`)과 달리 값 타입이라 할당이 없고, 사용자 타입도 `Deconstruct`를 정의하면 같은 분해 문법을 지원.
-
-```csharp
-(int min, int max) Range(int[] a) => (a.Min(), a.Max());
-var (lo, hi) = Range(nums);   // 분해해서 받기
-var r = Range(nums); r.min;   // 이름으로 접근
-```
-
-## 열거형과 [Flags]
-
-enum은 이름 붙인 정수 상수 집합이라 매직 넘버 대신 의미를 드러냄. `[Flags]`를 붙이고 값을 1, 2, 4, 8…로 주면 비트 OR로 여러 상태를 한 변수에 조합(`Fire | Ice`)하고 AND로 검사 — 상태 효과·LayerMask가 이 방식. 기본 밑 타입은 int이나 지정 가능하고, 정의 안 된 정수값도 담길 수 있어 검증이 필요.
-
-```csharp
-[Flags] enum Eff { None = 0, Fire = 1, Ice = 2, Stun = 4 }
-var e = Eff.Fire | Eff.Ice;          // 조합
-bool onFire = (e & Eff.Fire) != 0;   // 검사
-```
-
-## 비트 연산자와 시프트
-
-정수를 2진수 비트 단위로 다루는 연산자. 플래그 조합·마스킹·저수준 최적화에 씀.
-
-| 연산자 | 의미 |
-| --- | --- |
-| `&` | AND, 둘 다 1인 비트만 1 (마스크 검사) |
-| `\|` | OR, 하나라도 1이면 1 (플래그 합치기) |
-| `^` | XOR, 다르면 1 (토글) |
-| `~` | NOT, 비트 반전 |
-| `<<` `>>` | 왼쪽·오른쪽 시프트 (한 칸이 곱하기 2, 나누기 2) |
-
-`[Flags]` 열거형이 이 연산으로 여러 상태를 한 정수에 조합·검사하는 게 대표 용례. `x << 1`은 곱하기 2, `x >> 1`은 나누기 2와 같아 예전엔 최적화로 썼지만, 지금은 컴파일러가 알아서 하므로 의미가 분명할 때만.
-
-```csharp
-int flags = 0b0000;
-flags |= 0b0010;                  // 비트 켜기 → 0b0010
-bool on = (flags & 0b0010) != 0;  // 켜졌는지 검사 → true
-flags &= ~0b0010;                 // 비트 끄기 → 0b0000
-int doubled = 3 << 1;             // 6
-```
-
-## 단축 평가(short-circuit)
-
-`&&`와 `||`는 왼쪽만으로 결과가 정해지면 오른쪽을 아예 실행 안 함. `&&`는 왼쪽이 false면 전체가 false라 오른쪽을 건너뛰고, `||`는 왼쪽이 true면 오른쪽을 건너뜀. 이 성질로 null 검사와 접근을 한 줄에 안전하게 묶음 — 왼쪽에서 null이 아님을 확인한 뒤에야 오른쪽이 실행되므로 예외가 안 남.
-
-```csharp
-if (obj != null && obj.IsReady) { }          // 왼쪽이 false면 obj.IsReady를 안 봄
-if (list.Count == 0 || list[0] == null) { }  // 왼쪽이 true면 list[0]을 안 봄
-```
-
-비트 연산자 `&`·`|`는 단축이 없어 양쪽을 항상 평가. 오른쪽에 부수효과(함수 호출 등)가 있으면 `&&`/`||`와 결과가 달라질 수 있음. 논리 판단엔 `&&`/`||`를, 비트 조작엔 `&`/`|`를 씀.
-
-## 기본 자료형과 부동소수점
-
-정수는 `int`(4바이트)가 기본, 더 큰 범위는 `long`(8바이트). 실수는 `float`·`double`·`decimal`로 나뉘고 이 셋의 차이가 자주 나옴.
-
-| 타입 | 크기 | 특징 |
-| --- | --- | --- |
-| `float` | 4바이트 | 정밀도 낮음, 접미사 `f`, 유니티 좌표 기본 |
-| `double` | 8바이트 | 실수 기본값, float보다 정밀 |
-| `decimal` | 16바이트 | 10진 기반, 오차 없음, 접미사 `m`, 느림 |
-
-`float`·`double`은 2진 부동소수점이라 `0.1` 같은 10진 소수를 정확히 못 담아 미세한 오차가 생김. 그래서 실수는 `==`로 바로 비교하지 말고 오차 범위(epsilon) 안인지로 비교. 돈처럼 오차가 용납 안 되는 값은 10진 기반이라 정확한 `decimal`을 씀(대신 느림).
-
-```csharp
-0.1 + 0.2 == 0.3;              // false — 2진 부동소수점 오차
-Math.Abs(a - b) < 1e-6;        // 실수 비교는 오차 범위로
-decimal price = 0.1m + 0.2m;   // 0.3 정확 — 금액엔 decimal
-```
-
-## 정수 나눗셈
-
-`25 / 4`는 둘 다 int라 정수 나눗셈으로 6 → float에 대입돼도 6.0. `1 / 3 * 100f`는 `1/3`이 먼저 int 0이 된 뒤 ×100f → 0. 나눗셈이 int끼리 먼저 평가되는 게 함정. 고치려면 `(float)`로 캐스팅.
-
-```csharp
-float a = 25 / 4;               // int끼리 나눠 6 → 6.0
-float b = 1 / 3 * 100f;         // (1/3)=0 먼저 → 0
-float c = (float)1 / 3 * 100f;  // 33.33
-```
-
-## 정수 오버플로
-
-`int`는 부호 1비트 + 값 31비트. `int.MaxValue` = 2³¹−1(2,147,483,647). +1하면 오버플로로 감싸져 `int.MinValue` = −2³¹. 비트로 `0111...111` → `1000...000`.
-
-```csharp
-int max = int.MaxValue;   //  2,147,483,647
-int wrap = max + 1;       // -2,147,483,648 (int.MinValue)
-```
-
-## const vs readonly
-
-| | 확정 시점 | 쓸 수 있는 값 | 함정 |
-| --- | --- | --- | --- |
-| `const` | 컴파일 타임 | 리터럴/불변값 전용 | 사용처에 값이 인라인됨 → 라이브러리 const를 참조하는 쪽이 재컴파일 안 하면 옛값 유지 |
-| `readonly` | 런타임(선언/생성자) | 인스턴스별 값, 참조 타입도 가능 | 참조 타입은 재할당만 막고 객체 내부는 변경 가능 |
-
-## ?? 와 ?. 연산자
-
-`??`(null 병합)는 좌변이 null이면 우변 반환. `?.`(null 조건부)는 좌변이 null이면 평가를 멈추고 null 반환. `a`가 null일 때 `a ?? "default"` → `"default"`, `a?.Length` → null(`int?`로 받음).
-
-```csharp
-string a = null;
-a ?? "default";   // "default"
-a?.Length;        // null (int? 로 받음)
-```
-
-## nullable 값 타입 (int?)
-
-값 타입은 원래 null을 못 담지만, `int?`처럼 물음표를 붙이면 "값이 없음"도 표현 가능. `int?`는 `Nullable<int>`의 축약이고, 값 하나와 값이 있는지 여부를 함께 든 struct.
-
-- `HasValue` — 값이 들어 있는지
-- `Value` — 실제 값(없을 때 꺼내면 예외)
-- `??`·`?.`와 잘 맞음 — 없으면 기본값으로 대체
-
-DB의 빈 칸, "아직 안 정해짐", 실패할 수 있는 계산 결과를 표현할 때 씀. 참조 타입의 nullable(다음 항목)이 컴파일 경고용 표시인 것과 달리, 값 타입의 nullable은 실제로 null 상태를 담는 별도 타입.
-
-```csharp
-int? score = null;
-score.HasValue;          // false
-int shown = score ?? 0;  // 없으면 0
-score = 90;
-int v = score.Value;     // 90 (없을 때 호출하면 예외)
-```
-
-## nullable 참조 타입(#nullable)
-
-참조 타입도 `string?`처럼 null 허용 여부를 타입에 표기해, 컴파일러가 null 가능성을 흐름 분석으로 경고. `string`은 non-null 의도라 null 대입·미초기화에 경고가 뜨고, `string?`은 역참조 전에 null 검사를 요구. 런타임 강제가 아니라 컴파일 타임 경고라 `!`(null 무시 연산자)로 끌 수 있음. NullReferenceException을 설계 단계에서 줄이는 장치.
-
-```csharp
-string s = null;    // 경고: non-null 타입에 null 대입
-string? t = null;   // OK — 역참조 전 null 검사를 요구
-int len = t!.Length;  // ! 로 경고 무시(책임은 개발자)
 ```
 
 ## async/await와 Task
@@ -881,6 +889,17 @@ flowchart TD
     F --> E["이후 코드"]
 ```
 
+## 세대별 GC
+
+힙을 Gen0/1/2로 나눔. Gen0이 빠른 이유는 최근 할당된 작은 영역만 스캔하면 되고, 대부분의 객체는 금방 죽어(generational hypothesis) 적은 일로 많이 회수하기 때문. 수집에서 살아남으면 상위 세대로 승격돼 덜 자주 수거됨. 매 프레임 임시 할당이 많으면 Gen0이 자주 차 GC가 잦아짐.
+
+```mermaid
+flowchart LR
+    N["새 객체"] --> G0["Gen 0"]
+    G0 -->|살아남음| G1["Gen 1"]
+    G1 -->|살아남음| G2["Gen 2"]
+```
+
 ## IDisposable과 using
 
 GC는 관리 메모리만 회수하고 비관리 리소스(파일 핸들, 소켓, 네이티브 메모리 등)는 못 챙김. GC 시점도 비결정적. `IDisposable`로 직접 해제하고, `using`으로 예외 상황에서도 `Dispose` 호출을 보장.
@@ -908,3 +927,4 @@ class Handle : IDisposable {
 ```
 
 순수 관리 객체만 담은 클래스엔 finalizer를 두지 않음 — 괜히 두면 수거만 느려짐.
+

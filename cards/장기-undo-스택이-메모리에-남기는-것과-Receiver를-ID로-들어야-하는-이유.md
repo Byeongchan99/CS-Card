@@ -1,7 +1,7 @@
 ---
 title: 장기 undo 스택이 메모리에 남기는 것과 Receiver를 ID로 들어야 하는 이유
 tags: [디자인 패턴, 커맨드패턴, 유니티, 메모리, GC]
-related: ["Destroy를 호출해도 C# 래퍼 객체가 힙에 남아있는 이유"]
+related: ["Destroy를 호출해도 C# 래퍼 객체가 힙에 남아있는 이유", "undo-스택에-쌓인-커맨드가-유니티-객체를-참조할-때-생기는-문제", "Boehm-GC가-객체를-이동시키지-못하는-이유", "Boehm-GC의-blacklisting은-어떻게-오식별-피해를-줄이는가", "Conservative-GC에서-죽은-객체가-잘못-살아남는-현상"]
 parent: undo 스택에 쌓인 커맨드가 유니티 객체를 참조할 때 생기는 문제
 date: 2026-09-15
 result: 맞음

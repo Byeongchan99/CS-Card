@@ -1006,17 +1006,47 @@ C# 8부터 인터페이스도 기본 구현(default method)을 가질 수 있으
 
 설계 원칙으로는 "상속보다 구성(composition)"이 통함. is-a가 확실할 때만 상속(추상 클래스)으로 묶고, 아니면 능력을 인터페이스로 조합하는 쪽이 유연 — 상속은 부모 변경이 자식 전체에 파급되지만 인터페이스 조합은 능력 단위로 갈아 끼울 수 있어서.
 
-## virtual/override vs new
+## 다형성과 가상 디스패치 (virtual/override vs new)
 
-`override`는 가상 디스패치라 실제 객체 타입 기준으로 호출됨. `new`는 메서드를 숨겨서(hide) 컴파일 타임(선언) 타입 기준으로 호출됨. `Animal a = new Cat()`에서 Cat이 `new`면 Animal의 메서드가 불림.
+다형성은 같은 호출이 실제 객체 타입에 따라 다르게 동작하는 것. `Enemy` 참조로 `Attack()`을 불러도 실제가 고블린이면 고블린의 `Attack`이 실행됨. OOP 4대 특성 중 하나이고, 이를 가능하게 하는 엔진이 가상 디스패치.
+
+디스패치는 어느 메서드 구현을 실제로 부를지 정하는 것.
+
+- 정적 디스패치(일반 메서드) — 컴파일 타임에 선언 타입 기준
+- 가상 디스패치(`virtual`/`override`) — 런타임에 실제 객체 타입 기준
+
+`virtual` 메서드를 가진 타입마다 컴파일러가 vtable(메서드 표)을 만듦 — "이 메서드는 실제로 어느 코드다"를 가리키는 포인터 목록. 힙의 모든 객체는 머리에 자기 타입의 vtable을 가리키는 정보를 담. `a.V()` 호출은 a가 가리키는 객체로 가서 그 객체의 vtable에서 V 슬롯을 찾아 그 코드로 점프 — 그래서 같은 호출문이 객체마다 다른 코드로 감.
+
+<svg viewBox="0 0 620 180" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="가상 디스패치가 객체의 vtable을 거쳐 실제 override로 연결된다"><defs><marker id="vt-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><g fill="none" stroke="currentColor" stroke-opacity="0.55"><rect x="16" y="66" width="120" height="46" rx="4"/></g><g fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"><rect x="172" y="60" width="130" height="58" rx="4"/></g><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="338" y="54" width="150" height="72" rx="4"/></g><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="524" y="66" width="92" height="46" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="76" y="86">a.V()</text><text x="76" y="103" font-size="11" opacity="0.7">선언 타입 Animal</text><text x="237" y="84">Cat 객체</text><text x="237" y="102" font-size="11" opacity="0.7">머리 = vtable 위치</text><text x="413" y="78">Cat vtable</text><text x="413" y="98" font-size="11" opacity="0.7">V → Cat.V</text><text x="570" y="86">"C"</text><text x="570" y="103" font-size="11" opacity="0.7">Cat.V</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#vt-a)"><line x1="136" y1="89" x2="170" y2="89"/><line x1="302" y1="89" x2="336" y2="89"/><line x1="488" y1="89" x2="522" y2="89"/></g><text x="310" y="150" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">객체의 vtable에서 슬롯을 찾아 점프 → 실제 타입 Cat의 것</text></svg>
+
+| | `override` | `new` |
+| --- | --- | --- |
+| 기준 | 실제 객체 타입(런타임) | 선언 타입(컴파일 타임) |
+| 방식 | 가상 디스패치(vtable 슬롯 교체) | 메서드 숨김(hide) |
+
+`override`는 부모의 vtable 슬롯을 자식 구현으로 덮어써 다형성이 동작. `new`는 vtable을 안 건드리고 부모와 이름만 같은 별개 메서드를 두는 거라 선언 타입을 따름. `Animal a = new Cat()`에서 자식이 `new`로 숨긴 메서드는 `Animal`의 것이 불림. `new`는 다형성용이 아니라 이름이 우연히 겹쳤을 때 경고를 끄는 용도에 가까움 — 다형성이 필요하면 `override`.
 
 ```csharp
 class Animal { public virtual string V() => "A"; public string N() => "A"; }
 class Cat : Animal { public override string V() => "C"; public new string N() => "C"; }
 Animal a = new Cat();
-a.V();   // "C" — override는 런타임 타입 기준
-a.N();   // "A" — new는 선언 타입 기준
+a.V();   // "C" — override는 런타임 타입(가상 디스패치)
+a.N();   // "A" — new는 선언 타입(숨김)
 ```
+
+추상 메서드도 같은 가상 디스패치를 탐. 부모(추상 클래스)가 자기 추상 메서드를 호출하면 실제 런타임 타입의 오버라이드로 감 — Enemy 참조로 `DealDamage`를 불러도 고블린이면 고블린의 `Attack`이 실행되는 게 다형성의 전형.
+
+```csharp
+abstract class Enemy {
+    public abstract void Attack();
+    public void DealDamage() => Attack();   // 부모가 자기 추상 메서드 호출 → 가상 디스패치
+}
+class Goblin : Enemy { public override void Attack() { /* ... */ } }
+Enemy e = new Goblin();
+e.DealDamage();   // Goblin.Attack 실행
+```
+
+가상 호출은 vtable을 한 번 더 거치는 간접 참조라 직접 호출보다 아주 약간 느림. `sealed`를 붙이면 더 파생 못 함이 확정돼 컴파일러가 직접 호출로 최적화할 여지가 생김(앞 sealed 항목).
 
 ## 메서드 오버로딩 vs 오버라이딩
 
@@ -1042,18 +1072,6 @@ A a = new B();  a.Hit();   // B.Hit — 실제 객체가 B라서
 flowchart TD
     OL["오버로딩 호출"] -->|"인자의 정적 타입"| OLC["컴파일 타임에 버전 확정"]
     OR["오버라이딩 호출"] -->|"실제 객체 타입"| ORD["런타임에 디스패치로 확정"]
-```
-
-## 추상 메서드 디스패치
-
-부모(추상 클래스)의 `DealDamage`가 추상 `Attack()`을 호출하면, 가상 디스패치로 실제 런타임 타입의 오버라이드가 불림. Enemy 참조로 호출해도 고블린이면 고블린의 `Attack`이 실행 → 다형성.
-
-```csharp
-abstract class Enemy { public abstract void Attack();
-    public void DealDamage() => Attack(); }         // 가상 디스패치
-class Goblin : Enemy { public override void Attack() { /* ... */ } }
-Enemy e = new Goblin();
-e.DealDamage();   // Goblin.Attack 실행
 ```
 
 ## 제네릭 where 제약

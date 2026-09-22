@@ -467,18 +467,30 @@ var (a, b) = point;           // Deconstruct 덕분에 분해됨 (없으면 컴�
 
 ## 기본 자료형과 부동소수점
 
-정수는 `int`(4바이트)가 기본, 더 큰 범위는 `long`(8바이트). 실수는 `float`·`double`·`decimal`로 나뉘고 이 셋의 차이가 자주 나옴.
+정수는 `int`(4바이트)가 기본, 더 큰 범위는 `long`(8바이트). 실수는 `float`·`double`·`decimal`로 나뉘는데, 이 셋의 차이를 이해하려면 부동소수점이 무엇인지부터 알아야 함.
 
-| 타입 | 크기 | 특징 |
-| --- | --- | --- |
-| `float` | 4바이트 | 정밀도 낮음, 접미사 `f`, 유니티 좌표 기본 |
-| `double` | 8바이트 | 실수 기본값, float보다 정밀 |
-| `decimal` | 16바이트 | 10진 기반, 오차 없음, 접미사 `m`, 느림 |
+컴퓨터는 실수를 `부호 × 가수 × 2^지수` 꼴로 저장함. 십진수의 과학적 표기(`6.022 × 10²³`)와 같은 아이디어인데 밑이 10이 아니라 2. 지수에 따라 소수점(point) 위치가 떠다녀서(float) 부동소수점. 예로 `0.75`는 `1.1(2진) × 2⁻¹`로 저장됨.
 
-`float`·`double`은 2진 부동소수점이라 `0.1` 같은 10진 소수를 정확히 못 담아 미세한 오차가 생김. 그래서 실수는 `==`로 바로 비교하지 말고 오차 범위(epsilon) 안인지로 비교. 돈처럼 오차가 용납 안 되는 값은 10진 기반이라 정확한 `decimal`을 씀(대신 느림).
+<svg viewBox="0 0 620 210" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="IEEE 754 double의 비트 배치: 부호 1비트, 지수 11비트, 가수 52비트와 값 복원 공식"><text x="24" y="28" font-size="13" fill="currentColor">double — 64비트 (IEEE 754)</text><g fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"><rect x="24" y="42" width="70" height="46" rx="4"/></g><g fill="#e2a13c" fill-opacity="0.14" stroke="#e2a13c"><rect x="98" y="42" width="170" height="46" rx="4"/></g><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="272" y="42" width="324" height="46" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="59" y="63">부호</text><text x="59" y="79" font-size="11" opacity="0.7">1비트</text><text x="183" y="63">지수</text><text x="183" y="79" font-size="11" opacity="0.7">11비트 · 소수점 위치</text><text x="434" y="63">가수 (mantissa)</text><text x="434" y="79" font-size="11" opacity="0.7">52비트 · 유효숫자 → 정밀도</text></g><g font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle"><text x="59" y="108">양수/음수</text><text x="183" y="108">2의 몇 승</text><text x="434" y="108">1.xxxx의 소수부</text></g><rect x="24" y="132" width="572" height="52" rx="8" fill="none" stroke="currentColor" stroke-opacity="0.3" stroke-dasharray="4 3"/><text x="310" y="154" font-size="11" fill="currentColor" opacity="0.7" text-anchor="middle">값 복원</text><text x="310" y="174" font-size="13" fill="currentColor" text-anchor="middle">(−1)^부호 × 1.가수(2진) × 2^(지수 − 바이어스)</text></svg>
+
+오차가 생기는 이유가 핵심. 10진수 `0.1`을 2진 소수로 적으면 `0.000110011…`으로 무한 반복함. `1/3`을 10진수로 적으면 `0.333…`으로 안 떨어지는 것과 같은 이유로, 밑이 바뀌면 딱 떨어지던 분수가 안 떨어짐(2진에서 딱 떨어지는 건 분모가 2의 거듭제곱인 `0.5`·`0.25`뿐). 가수는 52비트로 유한하니 무한 소수를 잘라 근사값으로 저장 — `0.1`은 정확한 0.1이 아님. 그래서 `0.1 + 0.2`가 `0.3`이 아니라 `0.30000000000000004`.
+
+정밀도(유효숫자 자릿수)는 가수 비트 수가 정함.
+
+| 타입 | 크기 | 가수 | 유효숫자 | 특징 |
+| --- | --- | --- | --- | --- |
+| `float` | 4바이트 | 23비트 | 약 7자리 | 접미사 `f`, 유니티 좌표 기본 |
+| `double` | 8바이트 | 52비트 | 약 15~16자리 | 실수 기본값 |
+| `decimal` | 16바이트 | 10진 기반 | 약 28자리 | 2진이 아니라 10진(정수+10의 지수)이라 오차 없음, 접미사 `m`, 느림 |
+
+`double`이 `float`보다 정밀한 건 가수 비트가 많아서. `decimal`은 아예 2진 부동소수점이 아니라 10진 기반이라 `0.1` 같은 10진 소수를 오차 없이 담음(대신 느리고 표현 범위가 좁음). 크기 차가 큰 두 수를 더하면 작은 쪽이 가수 범위 밖으로 밀려 아예 반영이 안 되기도 하고(누적 오차의 원인), 그래서 실무에선 이렇게 다룸.
+
+- 실수 비교에 `==` 금지 — 둘 다 근사값이라 정확히 안 맞음. `|a - b| < epsilon`으로 "충분히 가까운가"를 봄
+- 돈·정확한 10진 계산은 `decimal` — 정밀도보다 정확성이 중요할 때
+- 유니티 좌표가 `float`인 건 정밀도보다 메모리·속도가 중요하고 게임엔 7자리면 충분해서
 
 ```csharp
-0.1 + 0.2 == 0.3;              // false — 2진 부동소수점 오차
+0.1 + 0.2 == 0.3;              // false — 2진 근사값끼리 더해 오차가 드러남
 Math.Abs(a - b) < 1e-6;        // 실수 비교는 오차 범위로
 decimal price = 0.1m + 0.2m;   // 0.3 정확 — 금액엔 decimal
 ```

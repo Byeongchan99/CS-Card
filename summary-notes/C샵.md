@@ -111,7 +111,9 @@ Pos[] arr = new Pos[10];     // 원소들은 배열 객체 안 → 힙
 object o = local;            // 박싱 → 힙에 복사본
 ```
 
-배열뿐 아니라 `List`·`Dictionary`·`HashSet`·`Queue`도 내부적으로 힙 배열에 원소를 담으므로 같은 경우(C#의 `List<T>`가 C++ `std::vector` 자리). 단 박싱 여부가 갈림 — 제네릭 컬렉션은 타입 매개변수가 실제 struct라 내부 배열에 값 그대로 인라인 저장(박싱 없음), 옛 비제네릭 `ArrayList`·`Hashtable`은 원소를 `object`로 받아 값 타입을 넣는 순간 하나하나 박싱.
+배열뿐 아니라 `List`·`Dictionary`·`HashSet`·`Queue`도 내부적으로 힙 배열에 원소를 담으므로 같은 경우(C#의 `List<T>`가 C++ `std::vector` 자리).
+
+단 박싱 여부가 갈림 — 제네릭 컬렉션은 타입 매개변수가 실제 struct라 내부 배열에 값 그대로 인라인 저장(박싱 없음), 옛 비제네릭 `ArrayList`·`Hashtable`은 원소를 `object`로 받아 값 타입을 넣는 순간 하나하나 박싱.
 
 ```csharp
 var list = new List<Pos>();   // 내부 Pos[]에 인라인 — 박싱 없음
@@ -760,7 +762,12 @@ new List<Money> { new Money(100) }
 
 `+=`·`-=` 등 복합 대입은 따로 정의하지 않음 — `+`가 있으면 `a += b`를 `a = a + b`로 풀어 자동으로 씀. `=`·`&&`·`||`·`?:`·`??`·`.`·`new`는 언어 기본 동작이라 오버로딩 불가.
 
-변환 연산자도 있음 — 한 타입을 다른 타입으로 바꾸는 규칙을 연산자로 정의. 기준은 정보 손실 — 변환해도 잃는 게 없으면 `implicit`(캐스트 없이 자동), 뭔가 잘려 나가면 `explicit`(`(타입)` 캐스트를 적게 강제). 기본 제공 변환도 같은 원리라 `int → double`은 자동, `double → int`는 `(int)` 필수.
+변환 연산자도 있음 — 한 타입을 다른 타입으로 바꾸는 규칙을 연산자로 정의. 기준은 정보 손실이다.
+
+- `implicit` — 변환해도 잃는 게 없을 때. 캐스트 없이 자동
+- `explicit` — 뭔가 잘려 나갈 때. `(타입)` 캐스트를 적게 강제
+
+기본 제공 변환도 같은 원리라 `int → double`은 자동, `double → int`는 `(int)` 필수.
 
 ```csharp
 struct Celsius {

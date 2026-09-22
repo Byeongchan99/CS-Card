@@ -865,13 +865,25 @@ float b = 1 / 3 * 100f;         // (1/3)=0 먼저 → 0
 float c = (float)1 / 3 * 100f;  // 33.33
 ```
 
-## 정수 오버플로
+## 정수 오버플로와 2의 보수
 
-`int`는 부호 1비트 + 값 31비트. `int.MaxValue` = 2³¹−1(2,147,483,647). +1하면 오버플로로 감싸져 `int.MinValue` = −2³¹. 비트로 `0111...111` → `1000...000`.
+정수는 고정된 비트 수(int는 32비트)에 담김. 음수를 어떻게 표현하느냐가 오버플로 동작을 정하는데, C#(과 대부분 CPU)은 2의 보수(two's complement)를 씀. 음수 `-x`는 "`x`의 비트를 전부 뒤집고 1을 더한" 값으로 저장하고, 최상위 비트가 부호 역할(1이면 음수)을 겸함.
+
+왜 이렇게 하냐가 핵심 — 이러면 뺄셈 회로를 따로 안 만들고 덧셈 하나로 뺄셈까지 처리됨(`a - b = a + (-b)`). 4비트로 보면 `3`=`0011`, `-3`=`1100+1`=`1101`, `3 + (-3)` = `0011 + 1101 = 10000` → 넘친 자리를 버리면 `0000`=0. 부호가 있어도 덧셈 회로 하나로 다 되고 0의 표현도 하나뿐(`+0`/`-0`이 안 갈림).
+
+비트 수가 고정이라 표현 범위도 고정(int는 `−2³¹ ~ 2³¹−1`). 최댓값에서 +1하면 자리올림이 부호 비트를 넘어가, 비트 패턴이 최솟값으로 감싸짐(wrap around). `0111…111`에 1을 더하면 `1000…000`이 되는데 2의 보수에선 이 패턴이 곧 최솟값 — 숫자 원판을 한 바퀴 돌아 반대편으로 넘어간 셈.
+
+<svg viewBox="0 0 620 200" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="int 최댓값에 1을 더하면 2의 보수 비트가 최솟값으로 감싸진다"><defs><marker id="of-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="30" y="76" width="210" height="66" rx="4"/></g><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="380" y="76" width="210" height="66" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="135" y="98">int.MaxValue</text><text x="135" y="116" font-size="11" opacity="0.7">2³¹−1 = 2,147,483,647</text><text x="135" y="133" font-size="11" font-family="monospace" opacity="0.7">0111…111</text><text x="485" y="98">int.MinValue</text><text x="485" y="116" font-size="11" opacity="0.7">−2³¹ = −2,147,483,648</text><text x="485" y="133" font-size="11" font-family="monospace" opacity="0.7">1000…000</text></g><path d="M240 92 C310 58, 310 58, 378 92" fill="none" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#of-a)"/><text x="310" y="52" font-size="11" fill="currentColor" opacity="0.7" text-anchor="middle">+1 (자리올림이 부호 비트를 넘김)</text><path d="M378 130 C310 166, 310 166, 242 130" fill="none" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#of-a)"/><text x="310" y="186" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">범위를 원판처럼 한 바퀴 돌아 반대편으로</text></svg>
 
 ```csharp
-int max = int.MaxValue;   //  2,147,483,647
-int wrap = max + 1;       // -2,147,483,648 (int.MinValue)
+int max = int.MaxValue;   //  2,147,483,647  (0111…111)
+int wrap = max + 1;       // -2,147,483,648  (1000…000) — 최솟값으로 감쌈
+```
+
+C#은 성능을 위해 기본으로 오버플로를 검사하지 않고 조용히 감쌈. 그래서 큰 수 계산에서 값이 엉뚱해지는 버그가 숨을 수 있음. `checked`로 감싸면 오버플로 시 예외를 던짐(앞 형 변환의 "조용한 감쌈 vs 예외로 드러냄"과 연결). 더 큰 범위가 필요하면 `long`(64비트), 아주 크면 `BigInteger`.
+
+```csharp
+checked { int c = int.MaxValue + 1; }   // OverflowException — 조용히 안 넘어감
 ```
 
 ## const vs readonly

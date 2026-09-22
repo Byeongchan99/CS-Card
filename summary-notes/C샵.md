@@ -981,12 +981,30 @@ class Config {
 
 ## 추상 클래스 vs 인터페이스
 
-| | 상속 | 가질 수 있는 것 | 의미 |
-| --- | --- | --- | --- |
-| 추상 클래스 | 단일 상속 | 필드·생성자·공통 구현 | "종류(is-a)" |
-| 인터페이스 | 다중 구현 | 기능 계약 | "can-do" |
+둘 다 직접 인스턴스를 못 만들고 파생·구현 쪽이 내용을 채우는 틀이지만, 표현하는 관계가 다름.
 
-공통 상태·구현을 공유하면 추상 클래스, 무관한 클래스들이 같은 기능을 가지면 인터페이스.
+- 추상 클래스 = 종류(is-a) — 공통 상태·구현을 가진 한 계통의 부모. `Enemy`를 상속한 `Goblin`은 "Enemy의 일종"
+- 인터페이스 = 능력(can-do) — 서로 무관한 타입들이 "같은 기능을 갖추겠다"는 계약. `IDamageable`을 구현했다면 적이든 상자든 문이든 "피해를 입을 수 있는 것"
+
+같은 대상도 관점이 다름 — 고블린은 is-a로 보면 `Enemy`(추상 클래스)이고, can-do로 보면 `IDamageable`·`IMovable`(인터페이스)을 갖춘 것.
+
+<svg viewBox="0 0 620 200" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="추상 클래스는 한 계통의 is-a, 인터페이스는 무관한 타입에 걸친 can-do"><defs><marker id="ai-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><text x="20" y="22" font-size="12" fill="currentColor" opacity="0.7">추상 클래스 — is-a (한 계통)</text><g fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"><rect x="70" y="34" width="120" height="32" rx="4"/></g><g fill="none" stroke="currentColor" stroke-opacity="0.55"><rect x="20" y="96" width="104" height="30" rx="4"/><rect x="136" y="96" width="104" height="30" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="130" y="54">Enemy (추상)</text><text x="72" y="115">Goblin</text><text x="188" y="115">Dragon</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#ai-a)"><line x1="72" y1="96" x2="112" y2="68"/><line x1="188" y1="96" x2="148" y2="68"/></g><text x="130" y="146" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">공통 상태·구현 상속(단일)</text><line x1="310" y1="14" x2="310" y2="170" stroke="currentColor" stroke-opacity="0.2"/><text x="336" y="22" font-size="12" fill="currentColor" opacity="0.7">인터페이스 — can-do (능력)</text><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="420" y="34" width="150" height="32" rx="4"/></g><g fill="none" stroke="currentColor" stroke-opacity="0.55"><rect x="336" y="96" width="80" height="30" rx="4"/><rect x="428" y="96" width="80" height="30" rx="4"/><rect x="520" y="96" width="80" height="30" rx="4"/></g><g font-size="11" fill="currentColor" text-anchor="middle"><text x="495" y="54" font-size="12">IDamageable</text><text x="376" y="115">Goblin</text><text x="468" y="115">나무 상자</text><text x="560" y="115">문</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#ai-a)"><line x1="376" y1="96" x2="460" y2="68"/><line x1="468" y1="96" x2="490" y2="68"/><line x1="560" y1="96" x2="520" y2="68"/></g><text x="470" y="146" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">무관한 타입이 같은 능력만 구현(여러 개 동시에)</text></svg>
+
+| | 추상 클래스 | 인터페이스 |
+| --- | --- | --- |
+| 상속·구현 | 하나만 상속 | 여러 개 구현 |
+| 담는 것 | 필드·생성자·공통 구현(상태 있음) | 기능 계약(상태 없음) |
+| 관계 | is-a(종류) | can-do(능력) |
+
+C# 8부터 인터페이스도 기본 구현(default method)을 가질 수 있으나 필드(상태)는 여전히 없음. 인터페이스만 여럿 구현되는 이유가 여기 — 클래스 상속을 하나로 제한하는 건 상태·구현이 겹치면 어느 부모 걸 쓸지 충돌하기 때문(다이아몬드 문제). 인터페이스는 상태가 없고 계약만 있어 여럿 붙여도 충돌이 없어 능력 조합에 씀.
+
+언제 무엇을 쓰나.
+
+- 공통 상태·구현을 나눠 가지는 한 계통 → 추상 클래스 (모든 적이 체력·피격 처리를 공유)
+- 서로 무관한 타입들이 같은 기능만 갖춤 → 인터페이스 (적·상자·문이 다 상호작용 가능)
+- 섞기도 — 추상 클래스로 공통 뼈대를 주고 부가 능력은 인터페이스로 붙임
+
+설계 원칙으로는 "상속보다 구성(composition)"이 통함. is-a가 확실할 때만 상속(추상 클래스)으로 묶고, 아니면 능력을 인터페이스로 조합하는 쪽이 유연 — 상속은 부모 변경이 자식 전체에 파급되지만 인터페이스 조합은 능력 단위로 갈아 끼울 수 있어서.
 
 ## virtual/override vs new
 

@@ -529,26 +529,48 @@ string result = sb.ToString();             // 마지막에 한 번만 문자열�
 
 고정된 몇 개를 한 줄에서 잇는 `a + b + c`나 보간 `$"{a}{b}"`는 컴파일러가 한 번의 결합으로 최적화하므로 `StringBuilder`가 필요 없음. 문제는 루프에서 반복되는 `+=` — 반복 횟수가 많고 미리 개수를 모르는 연결일 때만 `StringBuilder`를 씀.
 
-## var vs object vs dynamic
+## 정적 타이핑 vs 동적 타이핑 (var·object·dynamic)
 
-셋 다 "타입을 안 적는" 것처럼 보이지만 성격이 다름.
+언어는 "이 변수에 이 연산이 말이 되나"를 언제 확인하느냐로 갈림.
 
-| | 실제 타입 | 결정 시점 | 타입 검사 |
-| --- | --- | --- | --- |
-| `var` | 우변으로 추론된 그 타입 | 컴파일 타임 | 그대로 받음(정적) |
-| `object` | object로 취급, 원래 값은 그 안 | 컴파일 타임 | object 멤버만 |
-| `dynamic` | 런타임까지 미룸 | 런타임 | 컴파일 검사 건너뜀 |
+- 정적 타이핑 — 컴파일 타임에 타입을 확정하고 검사. 말 안 되는 연산은 컴파일 에러로 실행 전에 잡힘
+- 동적 타이핑 — 런타임에 실제 값의 타입을 보고 검사. 틀리면 실행 중에 터짐
 
-- `var` — 타입을 생략하는 문법일 뿐 타입이 사라지는 게 아님. 우변에서 추론해 확정하므로 `var n = 5;`는 그냥 `int`
-- `object` — 모든 타입의 부모라 무엇이든 담지만 원래 멤버를 쓰려면 캐스트가 필요하고 값 타입은 박싱됨
-- `dynamic` — 타입 검사를 런타임으로 미뤄 아무 멤버나 부를 수 있게 하지만, 틀리면 실행 중에 터지고 느림
+C#은 기본이 정적 타이핑 언어(모든 변수 타입이 컴파일 타임에 확정). Python·JS는 동적. 정적의 이점은 오류를 일찍 잡고, 자동완성·리팩터링이 정확하고, 타입이 확정돼 최적화가 쉬운 것. 동적은 유연하고 짧지만 타입 오류가 런타임까지 숨고 느림. `var`·`object`·`dynamic`은 이 축 위 서로 다른 위치에 있음.
+
+<svg viewBox="0 0 620 178" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="var·object는 컴파일 타임에, dynamic만 런타임에 타입이 검사된다"><defs><marker id="ty-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><line x1="24" y1="40" x2="596" y2="40" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#ty-a)"/><text x="24" y="28" font-size="11" fill="currentColor" opacity="0.7">작성</text><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="120" y="24" width="150" height="32" rx="4"/></g><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="400" y="24" width="150" height="32" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="195" y="45">컴파일 타임</text><text x="475" y="45">런타임(실행)</text></g><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="96" y="84" width="198" height="74" rx="4"/></g><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="376" y="84" width="198" height="74" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="195" y="106">var · object</text><text x="195" y="126" font-size="11" opacity="0.7">여기서 타입 검사</text><text x="195" y="144" font-size="11" opacity="0.7">틀리면 컴파일 에러 · 안전망 O</text><text x="475" y="106">dynamic</text><text x="475" y="126" font-size="11" opacity="0.7">검사를 여기까지 미룸</text><text x="475" y="144" font-size="11" opacity="0.7">틀리면 런타임 예외 · 안전망 X</text></g><g stroke="currentColor" stroke-opacity="0.3" stroke-dasharray="3 3"><line x1="195" y1="56" x2="195" y2="82"/><line x1="475" y1="56" x2="475" y2="82"/></g></svg>
+
+`var`는 동적 타이핑이 아님. 타입을 안 적을 뿐 컴파일러가 우변에서 타입을 추론해 확정(타입 추론)하므로 `var n = 5`는 `int n = 5`와 완전히 같음. 우변에 타입이 뻔히 보일 때 중복을 줄이는 문법 편의일 뿐 타이핑 방식을 바꾸는 게 아님.
 
 ```csharp
-var list = new List<int>();   // List<int>로 추론 — 자동완성 그대로
-object o = 5;                 // 박싱, o의 멤버 쓰려면 캐스트
-dynamic d = 5;
-d.Foo();                      // 컴파일은 통과, 실행 때 없으면 예외
+var n = 5;      // int로 추론 — int n = 5와 동일
+n = "hi";       // 컴파일 에러 — 여전히 정적 타입 int
 ```
+
+`object`는 모든 타입의 부모라 무엇이든 담지만 여전히 정적 타이핑. 변수의 컴파일 타임 타입이 `object`라 컴파일러는 `object`의 멤버만 허용하고, 원래 타입의 멤버를 쓰려면 캐스트로 타입을 되찾아야 하며 값 타입은 담을 때 박싱됨(앞 박싱 항목).
+
+```csharp
+object o = 5;
+o.ToString();   // OK — object의 멤버
+o + 1;          // 컴파일 에러 — object엔 + 가 없음
+((int)o) + 1;   // 캐스트로 int를 되찾아야
+```
+
+`dynamic`은 그 변수에 한해 타입 검사를 런타임으로 미룸. 컴파일러가 아무 멤버 호출이나 통과시키고 실제로 있는지는 실행할 때 확인(DLR이 처리). 그 대가로 컴파일 타임 안전망(오타·타입 오류 검출, 자동완성)을 포기하고 느려짐. COM·리플렉션·JSON처럼 컴파일 타임에 타입을 알 수 없는 상호작용에서만 제한적으로 씀.
+
+```csharp
+dynamic d = 5;
+d.Foo();        // 컴파일 통과 — 실행 시 int에 Foo 없어 RuntimeBinderException
+d = "hi";       // OK — 타입 자체가 유동적
+```
+
+| | 타입 검사 시점 | 틀리면 | 안전망 |
+| --- | --- | --- | --- |
+| `var` | 컴파일 타임(추론) | 컴파일 에러 | 있음 |
+| `object` | 컴파일 타임(object로) | 컴파일 에러 | 있음(멤버 제한) |
+| `dynamic` | 런타임 | 런타임 예외 | 없음 |
+
+면접 각도 — "`var`는 동적 타이핑?" 아니다, 정적 타이핑 + 타입 추론. "C#은 정적/동적?" 정적 타이핑 언어이고 `dynamic`으로 부분적 동적을 엶. 정적 타이핑의 장점은 오류를 일찍 잡음·툴 지원·성능.
 
 ## 형 변환 — 캐스트·Parse·TryParse·Convert
 

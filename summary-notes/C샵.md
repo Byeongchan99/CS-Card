@@ -10,7 +10,10 @@ date: 2026-07-30
 
 변수는 메모리의 한 칸이고, 그 칸에 무엇이 들어가느냐로 갈림. 값 타입(struct)은 칸 안에 데이터가 직접 들어가고, 참조 타입(class)은 데이터(객체)가 힙에 따로 만들어지고 칸에는 그 객체의 위치(참조)만 들어감.
 
-`=` 대입은 양쪽 모두 "오른쪽 칸의 내용을 왼쪽 칸에 복사"하는 같은 동작. 결과가 갈리는 건 복사되는 내용이 달라서 — struct는 데이터가 복사돼 두 벌이 되고, class는 위치가 복사돼 같은 객체 하나를 둘이 가리킴. 그래서 복사 후 한쪽을 고치면 struct는 원본이 그대로고, class는 둘이 보는 객체 하나가 바뀌어 원본 쪽에서 읽어도 바뀐 값이 나옴.
+`=` 대입은 양쪽 모두 "오른쪽 칸의 내용을 왼쪽 칸에 복사"하는 같은 동작. 결과가 갈리는 건 복사되는 내용이 달라서다.
+
+- struct — 데이터가 복사돼 두 벌이 됨. 복사 후 한쪽을 고쳐도 원본은 그대로
+- class — 위치가 복사돼 같은 객체 하나를 둘이 가리킴. 한쪽에서 고치면 원본 쪽에서 읽어도 바뀐 값
 
 <svg viewBox="0 0 560 372" width="560" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="같은 세 줄 코드를 struct와 class로 실행했을 때 줄마다 메모리 상태"><defs><marker id="vr-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><g font-size="13" fill="currentColor" text-anchor="middle" opacity="0.8"><text x="140" y="20">struct — 값 타입</text><text x="420" y="20">class — 참조 타입</text></g><line x1="280" y1="32" x2="280" y2="345" stroke="currentColor" opacity="0.2"/><g font-size="11" font-family="monospace" fill="currentColor" opacity="0.75"><text x="16" y="54">var a = new SPos { hp = 10 };</text><text x="296" y="54">var x = new CPos { hp = 10 };</text><text x="16" y="158">var b = a;</text><text x="296" y="158">var y = x;</text><text x="16" y="262">b.hp = 5;</text><text x="296" y="262">y.hp = 5;</text></g><g fill="none" stroke="currentColor" stroke-opacity="0.6"><rect x="20" y="64" width="112" height="36" rx="4"/><rect x="300" y="76" width="36" height="30" rx="4"/><rect x="420" y="73" width="110" height="36" rx="4"/><rect x="20" y="168" width="112" height="36" rx="4"/><rect x="300" y="166" width="36" height="26" rx="4"/><rect x="420" y="177" width="110" height="36" rx="4"/><rect x="20" y="272" width="112" height="36" rx="4"/><rect x="300" y="270" width="36" height="26" rx="4"/><rect x="300" y="302" width="36" height="26" rx="4"/></g><g fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"><rect x="150" y="168" width="112" height="36" rx="4"/><rect x="300" y="198" width="36" height="26" rx="4"/><rect x="176" y="353" width="10" height="10" rx="2"/></g><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="150" y="272" width="112" height="36" rx="4"/><rect x="420" y="281" width="110" height="36" rx="4"/><rect x="316" y="353" width="10" height="10" rx="2"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="76" y="87">a { hp: 10 }</text><text x="318" y="96">x</text><text x="475" y="96">{ hp: 10 }</text><text x="76" y="191">a { hp: 10 }</text><text x="206" y="191">b { hp: 10 }</text><text x="318" y="184">x</text><text x="318" y="216">y</text><text x="475" y="200">{ hp: 10 }</text><text x="76" y="295">a { hp: 10 }</text><text x="206" y="295">b { hp: 5 }</text><text x="318" y="288">x</text><text x="318" y="320">y</text><text x="475" y="304">{ hp: 5 }</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#vr-a)"><line x1="336" y1="91" x2="414" y2="91"/><line x1="336" y1="179" x2="414" y2="190"/><line x1="336" y1="211" x2="414" y2="200"/><line x1="336" y1="283" x2="414" y2="294"/><line x1="336" y1="315" x2="414" y2="304"/></g><g font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle"><text x="140" y="120">칸 안에 직접 저장</text><text x="475" y="134">힙에 객체 생성</text><text x="140" y="224">hp: 10이 두 벌</text><text x="475" y="238">객체는 여전히 1개</text><text x="140" y="328">a는 그대로 10</text><text x="475" y="342">x로 읽어도 5</text></g><g font-size="11" fill="currentColor" opacity="0.7"><text x="192" y="362">= 로 복사된 칸</text><text x="332" y="362">값이 바뀐 곳</text></g></svg>
 
@@ -39,7 +42,10 @@ struct도 `new`를 쓰지만 필드를 채우는 초기화 문법일 뿐 힙 할
 
 배열은 원소 타입과 무관하게 항상 참조 타입. `int[] b = a;` 후 `b[0]`을 바꾸면 `a[0]`도 바뀜.
 
-고르는 기준은 복사했을 때 따로 노는 게 자연스러운가. 좌표·색상처럼 복사한 쪽을 고쳐도 원본은 지켜져야 하는 작은 데이터는 struct(힙 할당이 없어 GC 부담이 없는 대신 클수록 복사 비용이 커짐). 적 캐릭터처럼 여러 스크립트가 같은 대상 하나를 봐야 하는 건 class — AI가 체력을 깎으면 UI도 깎인 체력을 봐야 하므로.
+고르는 기준은 복사했을 때 따로 노는 게 자연스러운가다.
+
+- struct — 좌표·색상처럼 복사한 쪽을 고쳐도 원본이 지켜져야 하는 작은 데이터. 힙 할당이 없어 GC 부담도 없음(대신 클수록 복사 비용이 커짐)
+- class — 적 캐릭터처럼 여러 스크립트가 같은 대상 하나를 봐야 하는 것. AI가 체력을 깎으면 UI도 깎인 체력을 봐야 하므로
 
 ```csharp
 var enemy = new Enemy();   var ui = enemy;
@@ -127,9 +133,15 @@ object o = n;     // 박싱 — 힙에 상자 할당, 42를 복사
 int m = (int)o;   // 언박싱 — 상자에서 값 복사
 ```
 
-박싱은 힙 할당이라 GC 대상이 하나 생김. 한 번은 사소하나 매 프레임·루프에서 반복되면 임시 쓰레기가 쌓여 GC가 잦아지고 그때마다 멈칫함(게임이면 스터터). 문제는 코드에 잘 안 보인다는 것 — 대표적으로 값 타입을 `object` 파라미터로 넘길 때(`Debug.Log(int)`, `string.Format` 인자, 옛 컬렉션 `Add`), 인터페이스로 담을 때(`IComparable c = myStruct`), `enum`을 `object`로 다룰 때.
+박싱은 힙 할당이라 GC 대상이 하나 생김. 한 번은 사소하나 매 프레임·루프에서 반복되면 임시 쓰레기가 쌓여 GC가 잦아지고 그때마다 멈칫함(게임이면 스터터).
 
-피하는 법은 전부 한 문장의 변주 — 값 타입을 `object`·인터페이스에 담지 말고, 담아야 할 것 같으면 제네릭으로 컴파일러가 타입을 알게 함.
+문제는 코드에 잘 안 보인다는 것. 대표적으로 박싱되는 자리:
+
+- 값 타입을 `object` 파라미터로 넘길 때 — `Debug.Log(int)`, `string.Format` 인자, 옛 컬렉션 `Add`
+- 값 타입을 인터페이스로 담을 때 — `IComparable c = myStruct`
+- `enum`을 `object`로 다룰 때
+
+피하는 법은 전부 한 문장의 변주다. 값 타입을 `object`·인터페이스에 담지 말고, 담아야 할 것 같으면 제네릭으로 컴파일러가 타입을 알게 함.
 
 - 제네릭 컬렉션 — `List<int>`·`Dictionary<int,int>`는 내부 배열이 실제 타입이라 박싱 없음. 옛 `ArrayList`·`Hashtable`만 피함
 - 제네릭 제약 — `where T : IComparable<T>`면 `object` 경유 없이 값에 직접 호출(constrained call). struct에 `IEquatable<T>`·`GetHashCode`를 두면 Dictionary 비교의 박싱도 사라짐

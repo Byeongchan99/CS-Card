@@ -572,27 +572,34 @@ d = "hi";       // OK — 타입 자체가 유동적
 
 면접 각도 — "`var`는 동적 타이핑?" 아니다, 정적 타이핑 + 타입 추론. "C#은 정적/동적?" 정적 타이핑 언어이고 `dynamic`으로 부분적 동적을 엶. 정적 타이핑의 장점은 오류를 일찍 잡음·툴 지원·성능.
 
-## 형 변환 — 캐스트·Parse·TryParse·Convert
+## 형 변환과 오류 처리 (예외 vs 반환값)
 
-바꾸려는 대상에 따라 도구가 다름.
+변환은 실패할 수 있음(`"abc"`를 숫자로). 실패를 호출자에게 알리는 방식이 크게 둘이고, 형 변환 도구들이 이 축으로 갈림.
 
-| 상황 | 도구 | 실패 시 |
+- 예외 던지기 — 실패 지점에서 `throw`하면 정상 흐름을 벗어나 스택을 타고 올라가 맞는 `catch`로 점프. "일어나면 안 되는 예외적 상황"에
+- 반환값으로 알리기 — 성공/실패를 `bool`이나 특별한 값(`null`)으로 돌려주면 호출자가 제자리에서 분기. "실패가 흔하고 예상된 정상 범위"에
+
+핵심 판단은 실패가 예외적(=버그에 가까움)이냐 예상된 정상 범위냐. 비용도 걸림 — 예외는 스택 언와인딩이 있어 비싸서, 자주 실패하는 자리에서 흐름 제어로 쓰면 안 됨.
+
+<svg viewBox="0 0 620 190" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="예외는 스택을 타고 올라가 catch로 점프하고, 반환값은 제자리에서 분기한다"><defs><marker id="cv-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><text x="24" y="26" font-size="13" fill="currentColor">예외 던지기</text><text x="24" y="42" font-size="11" fill="currentColor" opacity="0.6">실패 = 예외적 상황</text><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="30" y="86" width="120" height="38" rx="4"/></g><g fill="none" stroke="currentColor" stroke-opacity="0.5"><rect x="30" y="142" width="120" height="32" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="90" y="109">Parse 실패</text><text x="90" y="162" font-size="11">catch</text></g><path d="M90 86 L90 70 L240 70" fill="none" stroke="#e2574c" stroke-width="1.4"/><path d="M240 70 L240 158 L152 158" fill="none" stroke="#e2574c" stroke-width="1.4" marker-end="url(#cv-a)"/><text x="246" y="66" font-size="11" fill="currentColor" opacity="0.7">흐름이 스택을 타고 튕겨 올라가 점프</text><line x1="330" y1="18" x2="330" y2="176" stroke="currentColor" stroke-opacity="0.2"/><text x="356" y="26" font-size="13" fill="currentColor">반환값(Try)</text><text x="356" y="42" font-size="11" fill="currentColor" opacity="0.6">실패 = 예상된 정상 범위</text><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="362" y="86" width="150" height="38" rx="4"/></g><g fill="none" stroke="currentColor" stroke-opacity="0.5"><rect x="362" y="142" width="150" height="32" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="437" y="109">TryParse → false</text><text x="437" y="162" font-size="11">if/else 제자리 분기</text></g><line x1="437" y1="124" x2="437" y2="140" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#cv-a)"/><text x="530" y="109" font-size="11" fill="currentColor" opacity="0.7">비용 없이 값으로</text></svg>
+
+| 도구 | 실패 시 | 언제 |
 | --- | --- | --- |
-| 숫자끼리, 상속 관계 타입 | 캐스트 `(int)`, `as` | 캐스트는 예외, `as`는 null |
-| 문자열에서 숫자로 | `int.Parse` | 예외 |
-| 문자열에서 숫자로(실패 허용) | `int.TryParse` | `false` 반환, 안 던짐 |
-| 폭넓게 이 타입에서 저 타입 | `Convert.ToInt32` | null도 0으로, 관대 |
+| `(Type)` 캐스트 · `int.Parse` | 예외 | 반드시 그 타입·형식이어야 함(실패=버그) |
+| `as` | null | 실패가 있을 수 있고 참조 타입 |
+| `int.TryParse` | `false` 반환(안 던짐) | 실패가 정상 범위(사용자 입력) |
+| `Convert.ToInt32` | 관대(null→0 등) | 느슨하게 폭넓게 변환 |
 
-사용자 입력처럼 실패가 정상 범위면 `TryParse`가 정석 — 예외 대신 성공 여부를 `bool`로 돌려주고 결과는 `out`으로 받음. 반드시 숫자여야 하는 자리면 `Parse`로 바로 터뜨림.
-
-정수 오버플로는 기본으로 조용히 감싸는데, `checked`로 감싸면 오버플로 시 예외를 던지고 `unchecked`는 명시적으로 무시.
+사용자 입력처럼 "숫자가 아닐 수 있음"이 정상이면 `TryParse`가 정석 — 예외 비용 없이 성공 여부를 `bool`로 받고 결과는 `out`으로. 반드시 숫자여야 하는 내부 데이터면 `Parse`로 바로 터뜨려 버그를 드러냄.
 
 ```csharp
-int a = (int)3.9;                     // 3 (소수점 버림)
-if (int.TryParse(s, out int n)) { }   // 실패해도 안 던짐 — 입력 검증의 정석
-int b = int.Parse("abc");             // FormatException
-checked { int c = int.MaxValue + 1; } // OverflowException (기본은 조용히 감쌈)
+if (int.TryParse(userInput, out int n)) Use(n); else ShowError();  // 실패가 정상 → 반환값
+int id = int.Parse(configValue);   // 실패=버그 → 예외로 즉시 터뜨림
 ```
+
+이 "예외 vs 반환값"은 형 변환만이 아니라 API 설계 전반의 원리. Dictionary도 `dict[key]`(없으면 예외) vs `TryGetValue`(없으면 false)로 갈리고(앞 out 항목), 파일·네트워크도 예외 기반과 Try 기반 API가 공존. Try 패턴은 "실패가 흔한 조회·파싱"에서 예외를 피하는 C#의 관용구.
+
+면접 각도 — "예외는 언제 쓰나?" 예외적·복구 어려운 상황에, 예상된 정상 실패엔 반환값(Try). "예외의 비용?" `throw` 시 스택 언와인딩 + 흐름 점프라 비싸서 루프·핫 패스에서 흐름 제어로 쓰지 말 것.
 
 ## as vs 형변환 캐스트
 

@@ -1095,13 +1095,27 @@ T Max<T>(T a, T b) where T : IComparable<T>
 
 ## 제네릭 공변성·반공변성(in/out)
 
-`IEnumerable<out T>`는 공변 — `IEnumerable<Cat>`을 `IEnumerable<Animal>`에 대입 가능(T를 꺼내기만 해 안전). `Action<in T>`는 반공변 — `Action<Animal>`을 `Action<Cat>`에 대입 가능(T를 받기만 함). `out`은 반환 위치, `in`은 입력 위치에만 T가 쓰일 때 허용. `List<T>` 같은 가변 컬렉션은 넣고 빼기를 다 해 불변(둘 다 불가).
+제네릭 타입끼리 상속 관계를 이어받게 할지의 규칙. `Cat`이 `Animal`의 자식이어도 제네릭은 기본적으로 이 관계를 안 이어받음(불변, invariant) — `List<Cat>`은 `List<Animal>`이 아님. 공변성·반공변성은 특정 조건에서 이걸 허용.
+
+- 공변(out) — 자식을 부모로. `IEnumerable<Cat>` → `IEnumerable<Animal>`
+- 반공변(in) — 부모를 자식으로. `Action<Animal>` → `Action<Cat>`
+
+<svg viewBox="0 0 620 190" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="꺼내기만 하면 공변, 받기만 하면 반공변"><defs><marker id="va-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><text x="20" y="26" font-size="12" fill="currentColor" opacity="0.7">공변 (out) — 꺼내기만</text><g fill="none" stroke="currentColor" stroke-opacity="0.55"><rect x="20" y="38" width="190" height="32" rx="4"/><rect x="410" y="38" width="190" height="32" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="115" y="59">IEnumerable&lt;Cat&gt;</text><text x="505" y="59">IEnumerable&lt;Animal&gt;</text></g><line x1="212" y1="54" x2="408" y2="54" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#va-a)"/><text x="310" y="47" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">자식 → 부모 (꺼낸 걸 동물로 보면 안전)</text><text x="20" y="108" font-size="12" fill="currentColor" opacity="0.7">반공변 (in) — 받기만</text><g fill="none" stroke="currentColor" stroke-opacity="0.55"><rect x="20" y="120" width="190" height="32" rx="4"/><rect x="410" y="120" width="190" height="32" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="115" y="141">Action&lt;Animal&gt;</text><text x="505" y="141">Action&lt;Cat&gt;</text></g><line x1="212" y1="136" x2="408" y2="136" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#va-a)"/><text x="310" y="172" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">부모 → 자식 (고양이를 동물로 받아 처리)</text></svg>
+
+방향이 갈리는 건 `T`를 꺼내기만 하냐 받기만 하냐.
+
+- 공변(out) — `T`를 꺼내기만 하는 타입. `IEnumerable`은 `T`를 내보내기만 함. 고양이 목록에서 꺼낸 걸 "동물"로 보는 건 늘 안전(고양이는 동물)이라, Cat 목록을 Animal 목록으로 써도 됨
+- 반공변(in) — `T`를 받기만 하는 타입. `Action<Animal>`은 동물을 받아 처리하는 함수. `Action<Cat>` 자리에 넣으면 고양이가 오는데 동물로 받아 처리하니 안전(고양이는 동물이라 동물 처리가 통함)
+
+`List`가 불변인 이유가 이걸 뒤집어 보여줌 — `List<T>`는 넣기와 꺼내기를 다 함. `List<Cat>`을 `List<Animal>`로 허용하면 그 "동물 목록"에 강아지를 `Add`할 수 있게 되는데 실제론 고양이 목록이라 깨짐. 넣고 빼기를 다 하면 어느 방향도 안전하지 않아 불변.
 
 ```csharp
-IEnumerable<Animal> a = new List<Cat>();   // 공변(out T): Cat → Animal 대입 OK
+IEnumerable<Animal> a = new List<Cat>();   // 공변: Cat 목록을 Animal 목록으로
 Action<Animal> printAny = x => { };
-Action<Cat> onCat = printAny;              // 반공변(in T): Animal → Cat 대입 OK
+Action<Cat> onCat = printAny;              // 반공변: Animal 처리기를 Cat 처리기로
 ```
+
+한 문장 — 꺼내기만 하면 자식→부모(공변), 받기만 하면 부모→자식(반공변), 둘 다 하면 어느 쪽도 안전하지 않아 불변.
 
 ## 확장 메서드
 

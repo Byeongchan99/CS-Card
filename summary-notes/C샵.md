@@ -1294,13 +1294,36 @@ foreach (var n in it) { }   // 여기서 "start" 찍고 1, 2를 하나씩
 
 ## LINQ 지연 실행(deferred execution)
 
-`Where`·`Select` 같은 LINQ 쿼리는 정의 시점엔 안 돌고, `foreach`·`ToList`·`Count` 등으로 열거할 때 비로소 실행됨(yield 기반). 그래서 쿼리를 만든 뒤 원본 컬렉션이 바뀌면 결과도 바뀌고, 같은 쿼리를 두 번 열거하면 두 번 계산됨. 결과를 고정하거나 반복 사용하려면 `ToList()`로 즉시 실체화.
+`Where`·`Select` 같은 LINQ 쿼리는 yield 기반이라 정의 시점엔 안 돌고, 열거할 때(`foreach`·`ToList`·`Count`) 비로소 실행됨. 즉 쿼리 변수는 결과가 아니라 "이렇게 걸러 내놓겠다"는 계획(recipe).
+
+계획이라서 함정 둘.
+
+- 원본에 연동 — 쿼리를 만든 뒤 원본이 바뀌면, 열거 시점의 원본을 봐 결과가 바뀜
+- 매번 재계산 — 결과를 저장 안 해, 열거할 때마다 계획을 처음부터 다시 실행
 
 ```csharp
-var q = list.Where(x => x > 0);   // 아직 실행 안 됨
-list.Add(5);
-q.Count();               // 이 시점에 평가 → 추가된 5도 반영
-var snapshot = q.ToList();  // 즉시 실체화로 결과 고정
+var nums = new List<int> { 1, 2, 3 };
+var q = nums.Where(x => x > 1);   // 계획만 세움 (실행 X)
+nums.Add(10);                     // 원본에 추가
+foreach (var x in q) { }          // 지금 실행 → 2, 3, 10 (나중 추가분도 걸림)
+q.Count();  q.ToList();           // 열거할 때마다 필터를 다시 실행
+```
+
+결과를 고정·재사용하려면 `ToList()`·`ToArray()`로 즉시 실체화 — 그 자리에서 전부 훑어 실제 리스트로 박제함. 이후엔 원본과 무관하고 몇 번을 써도 재계산 없음.
+
+| | 지연 쿼리 | `ToList()` 후 |
+| --- | --- | --- |
+| 정체 | 계획(recipe) | 실제 리스트(값) |
+| 원본 바뀌면 | 결과도 바뀜 | 무관(박제) |
+| 두 번 열거 | 두 번 계산 | 재계산 없음 |
+
+반대로 지연은 장점이기도 함 — 필요한 만큼만 계산하고 중간 리스트를 안 만듦. 한 원소가 파이프라인 전체를 통과하는 식이라, `Take(3)`이 3개를 채우면 원본을 다 안 훑고 즉시 멈춤.
+
+<svg viewBox="0 0 620 108" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="한 원소가 Where Select Take 파이프라인을 통과하며 Take(3)이 채워지면 원본을 다 안 훑고 중단"><defs><marker id="lq-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><g fill="none" stroke="currentColor" stroke-opacity="0.55"><rect x="16" y="28" width="96" height="38" rx="4"/><rect x="152" y="28" width="108" height="38" rx="4"/><rect x="300" y="28" width="108" height="38" rx="4"/></g><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="448" y="28" width="96" height="38" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="64" y="51">원본 100만</text><text x="206" y="51">Where x&gt;0</text><text x="354" y="51">Select ×2</text><text x="496" y="51">Take(3) 중단</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#lq-a)"><line x1="112" y1="47" x2="150" y2="47"/><line x1="260" y1="47" x2="298" y2="47"/><line x1="408" y1="47" x2="446" y2="47"/></g><text x="16" y="90" font-size="11" fill="currentColor" opacity="0.65">한 원소씩 통과 → 3개 채우면 즉시 멈춤 (원본 100만을 다 훑지 않음)</text></svg>
+
+```csharp
+var first3 = huge.Where(x => x > 0).Select(x => x * 2).Take(3).ToList();
+// Where·Select가 100만을 다 돌지 않음 — Take(3)이 3개 채우면 중단
 ```
 
 ## 순회 중 컬렉션 수정

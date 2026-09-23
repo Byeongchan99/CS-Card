@@ -1251,13 +1251,17 @@ Func<int,int> sq = x => x * x;     // 람다 — 델리게이트 자리에 짧�
 
 ## yield return과 지연 실행
 
-`GetNumbers()` 호출 시점엔 본문이 전혀 안 돎(이터레이터 객체만 생성). foreach가 `MoveNext()`를 부를 때마다 다음 `yield`까지 한 조각씩 실행됨. 컴파일러가 메서드를 state 변수 기반 switch문(상태 기계)으로 변환하기 때문. foreach가 없으면 본문은 영영 실행 안 됨(호출 ≠ 실행).
+`yield return`이 든 메서드는 호출해도 본문이 한 줄도 안 돎 — 컴파일러가 메서드를 상태 기계(state machine) 객체로 바꿔, 호출 시점엔 그 객체만 만들어지고 본문은 잠들어 있음. 값을 요청할 때 비로소 다음 `yield`까지 한 조각씩 실행되고 그 자리에서 멈춰 위치를 기억함(다음 요청 때 이어감). 즉 호출 ≠ 실행, 소비가 방아쇠.
 
 ```csharp
 IEnumerable<int> Nums() { Console.Write("start"); yield return 1; yield return 2; }
 var it = Nums();            // 아무것도 안 찍힘 (본문 미실행)
 foreach (var n in it) { }   // 여기서 "start" 찍고 1, 2를 하나씩
 ```
+
+방아쇠는 `foreach`만이 아님 — `MoveNext()`를 눌러 값을 요청하는 건 다 실행을 일으킴. `ToList()`·`Count()`는 전부 요청해 끝까지, `First()`·`Take(2)`는 필요한 만큼만 돌리고 멈춤. 아무도 소비 안 하면 본문은 영영 안 돎. 이 때문에 본문 안 인자 검증 예외도 소비 시점까지 미뤄져 엉뚱한 곳에서 터지는 함정이 있음(검증은 즉시 실행되는 래퍼로 분리).
+
+지연이라 다 안 만들고 요청한 만큼만 만드므로 무한 수열도 앞 몇 개만 뽑아 쓸 수 있음(`while(true) yield return n++`를 `Take(5)`로). 유니티 코루틴도 이 이터레이터 그대로임 — 차이는 둘뿐. `MoveNext()`를 누르는 주체가 `foreach`가 아니라 유니티 엔진(프레임 루프)이고, `yield`가 내놓는 값이 꺼낼 데이터가 아니라 언제 재개할지 지시(`WaitForSeconds` 등).
 
 ## LINQ 지연 실행(deferred execution)
 

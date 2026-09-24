@@ -1371,12 +1371,23 @@ async Task LoadAsync() {
 
 ## lock과 스레드 안전 컬렉션
 
-`lock(obj)`은 한 번에 한 스레드만 임계 구역에 들이는 문법 설탕(Monitor.Enter/Exit) — 공유 상태 갱신을 감쌈. 잠글 객체는 외부에 노출 안 된 전용 인스턴스를 쓰고, `this`·타입 객체 잠금은 피함. 잦은 동시 접근엔 락 대신 `ConcurrentDictionary`·`ConcurrentQueue` 같은 스레드 안전 컬렉션이나 `Interlocked`가 경합을 줄여 유리.
+`balance += amount`는 한 줄 같지만 실제론 읽고→더하고→쓰는 세 단계. 두 스레드가 이걸 겹치면 둘 다 갱신 전 값(100)을 읽어 각자 110을 쓰고, 한쪽이 다른 쪽을 덮어써 갱신이 유실됨(경쟁 상태, race condition). 중간 상태를 서로 못 봐서 생기는 문제.
+
+`lock`은 임계 구역을 한 번에 한 스레드만 지나게 막음 — 한 스레드가 들어가면 잠그고, 나올 때까지 나머지는 대기. 그러면 A의 읽고-쓰기가 끝난 뒤 B가 시작해 A가 쓴 값을 제대로 봄.
 
 ```csharp
 private readonly object gate = new();
-lock (gate) { balance += amount; }   // 전용 객체로 잠금 — this·타입 잠금은 피함
+lock (gate) { balance += amount; }   // 이 안은 한 번에 한 스레드만
 ```
+
+잠글 객체는 외부에 안 보이는 전용 `object`를 씀. `this`나 타입 객체(`typeof(Foo)`)는 바깥에서도 같은 걸로 잠글 수 있어 예기치 못한 충돌·교착을 부름.
+
+`lock`은 문 앞 대기가 생겨, 잦은 동시 접근엔 병목. 목적이 좁으면 더 가벼운 도구가 유리.
+
+- 공유 컬렉션 — `ConcurrentDictionary`·`ConcurrentQueue`. 내부에서 잘게 쪼갠 락·무락 기법으로 직접 `lock`보다 경합이 적음
+- 단순 숫자 증감·교체 — `Interlocked.Increment` 등. 락 없이 CPU 명령 하나로 원자 처리해 훨씬 빠름
+
+무거운 순: `lock`(복합 갱신 범용) > `Concurrent___`(컬렉션 전용) > `Interlocked`(단순 연산 전용). 아래로 갈수록 가볍고 빠르나 적용 범위가 좁음.
 
 ## 예외 처리 — try/catch/finally
 

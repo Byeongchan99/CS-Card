@@ -2830,7 +2830,7 @@ title: 면접 대비 문답
 <div class="field" data-field="csharp" hidden>
 <p class="note"><strong>답변 프레임.</strong> 정의 한 문장으로 결론 먼저 → 왜 그렇게 동작·설계됐는지 → 트레이드오프(꼬리질문의 90%가 여기를 찌릅니다) → 필요하면 실제 예시 한 줄. 단정("절대 안 됩니다")은 반례 하나로 무너지니 "일반적으로 ~지만 ~한 경우엔 다릅니다"로.</p>
 <div class="bar">
-<span class="prog"><b class="prog-done">0</b> / <span class="prog-total">32</span> 자신 있음</span>
+<span class="prog"><b class="prog-done">0</b> / <span class="prog-total">34</span> 자신 있음</span>
 <span class="bar-sp"></span>
 <button class="tool tool-open" type="button">모두 펼치기</button>
 <button class="tool tool-hide" type="button" aria-pressed="false">체크 숨기기</button>
@@ -2919,7 +2919,7 @@ title: 면접 대비 문답
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>메모리와 박싱</h3><span class="cnt">3문항</span></div>
+<div class="grp-head"><h3>메모리와 할당</h3><span class="cnt">4문항</span></div>
 <p class="grp-note">할당이 어디서 일어나는지 보는 눈이 성능 질문의 바탕입니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q5" aria-label="5번 자신 있음"></label>
@@ -2978,12 +2978,32 @@ title: 면접 대비 문답
 </div>
 </details>
 </div>
-</section>
-<section class="grp">
-<div class="grp-head"><h3>GC와 리소스 관리</h3><span class="cnt">4문항</span></div>
-<p class="grp-note">가비지 컬렉터가 무엇을 챙기고 무엇을 못 챙기는지가 핵심입니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q8" aria-label="8번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">MEM-04</span><span class="qtext">문자열이 불변이라 생기는 문제와 StringBuilder는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>문자열은 고칠 수 없어서 이어붙일 때마다 새 문자열을 통째로 만드는데, 반복되면 StringBuilder로 바꿔야 합니다.</strong></p>
+<p>문자열은 불변이라 <code>Replace</code>나 <code>ToUpper</code>가 원본을 바꾸지 않고 새 문자열을 돌려줍니다. 그래서 반환값을 받지 않으면 아무 일도 안 일어난 것처럼 보입니다.</p>
+<p>반복문에서 더하기로 문자열을 계속 이어붙이면, 매번 지금까지의 전체를 복사한 새 문자열을 만듭니다. 길이에 제곱으로 느려지고 쓰레기 객체도 많이 생깁니다. <code>StringBuilder</code>는 안에 늘어나는 버퍼를 두고 거기에 덧붙이기만 해서, 길이에 비례하는 선형 비용으로 끝납니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>문자열을 굳이 불변으로 만든 이유는 뭔가요?</q>여러 이점이 겹칩니다. 값이 안 바뀌니 여러 스레드가 잠금 없이 공유해도 안전하고, 딕셔너리 키로 쓸 때 해시값을 한 번 계산해 캐싱할 수 있습니다. 같은 문자열을 하나로 공유해 메모리를 아끼는 것도 불변이라 가능합니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section class="grp">
+<div class="grp-head"><h3>GC와 자원 해제</h3><span class="cnt">3문항</span></div>
+<p class="grp-note">가비지 컬렉터가 무엇을 챙기고 무엇을 못 챙기는지가 핵심입니다.</p>
+<div class="q">
+<label class="chk"><input type="checkbox" id="csharp-q9" aria-label="9번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">GC-01</span><span class="qtext">세대별 GC는 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3005,7 +3025,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q9" aria-label="9번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q10" aria-label="10번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">GC-02</span><span class="qtext">가비지 컬렉터가 있는데 왜 IDisposable과 using이 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3026,29 +3046,9 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q10" aria-label="10번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">GC-03</span><span class="qtext">문자열이 불변이라 생기는 문제와 StringBuilder는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>문자열은 고칠 수 없어서 이어붙일 때마다 새 문자열을 통째로 만드는데, 반복되면 StringBuilder로 바꿔야 합니다.</strong></p>
-<p>문자열은 불변이라 <code>Replace</code>나 <code>ToUpper</code>가 원본을 바꾸지 않고 새 문자열을 돌려줍니다. 그래서 반환값을 받지 않으면 아무 일도 안 일어난 것처럼 보입니다.</p>
-<p>반복문에서 더하기로 문자열을 계속 이어붙이면, 매번 지금까지의 전체를 복사한 새 문자열을 만듭니다. 길이에 제곱으로 느려지고 쓰레기 객체도 많이 생깁니다. <code>StringBuilder</code>는 안에 늘어나는 버퍼를 두고 거기에 덧붙이기만 해서, 길이에 비례하는 선형 비용으로 끝납니다.</p>
-</div>
-<div class="tails">
-<p class="lab">꼬리질문</p>
-<ul>
-<li><span><q>문자열을 굳이 불변으로 만든 이유는 뭔가요?</q>여러 이점이 겹칩니다. 값이 안 바뀌니 여러 스레드가 잠금 없이 공유해도 안전하고, 딕셔너리 키로 쓸 때 해시값을 한 번 계산해 캐싱할 수 있습니다. 같은 문자열을 하나로 공유해 메모리를 아끼는 것도 불변이라 가능합니다.</span></li>
-</ul>
-</div>
-</div>
-</details>
-</div>
-<div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q11" aria-label="11번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">GC-04</span><span class="qtext">소멸자는 언제 불리고, 왜 함부로 쓰면 안 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">GC-03</span><span class="qtext">소멸자는 언제 불리고, 왜 함부로 쓰면 안 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3132,10 +3132,75 @@ title: 면접 대비 문답
 </div>
 </section>
 <section class="grp">
+<div class="grp-head"><h3>제네릭과 타입 도구</h3><span class="cnt">3문항</span></div>
+<p class="grp-note">타입을 컴파일 타임에 어떻게 약속하고, 런타임에 어떻게 들여다보는지를 다룹니다.</p>
+<div class="q">
+<label class="chk"><input type="checkbox" id="csharp-q15" aria-label="15번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">GEN-01</span><span class="qtext">제네릭 where 제약은 왜 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>제약이 없으면 컴파일러가 타입 매개변수를 object 수준으로만 알아서, object에 있는 기능밖에 못 쓰기 때문입니다.</strong></p>
+<p>예를 들어 두 값을 비교해 큰 걸 돌려주는 제네릭 메서드에서, 아무 제약이 없으면 <code>CompareTo</code>를 부를 수 없습니다. 컴파일러가 그 타입이 비교 가능한지 모르니까요. <code>where</code>로 <code>IComparable</code>을 구현한 타입만 받게 제약하면, 모든 타입 매개변수가 <code>CompareTo</code>를 가진다고 보장되어 호출할 수 있습니다.</p>
+<p>그래서 제약은 이 타입이 이런 기능을 갖췄다고 컴파일러에게 약속하는 장치입니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>제약으로 뭘 걸 수 있나요?</q>특정 인터페이스나 부모 클래스를 구현할 것, 참조 타입일 것이나 값 타입일 것, 매개변수 없는 생성자가 있을 것 같은 조건을 겁니다. 생성자 제약을 걸면 메서드 안에서 그 타입의 객체를 새로 만들 수 있습니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="csharp-q16" aria-label="16번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">GEN-02</span><span class="qtext">공변성과 반공변성은 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>제네릭 타입끼리 상속 관계를 이어받게 할지를 정하는 규칙으로, 꺼내기만 하면 공변, 받기만 하면 반공변입니다.</strong></p>
+<p><code>IEnumerable</code>은 out으로 선언된 공변이라, 고양이 목록을 동물 목록 자리에 넣을 수 있습니다. 안에서 꺼내기만 하니 고양이를 동물로 보는 게 안전하기 때문입니다. 반대로 <code>Action</code>은 in으로 선언된 반공변이라, 동물을 받는 함수를 고양이를 받는 함수 자리에 넣을 수 있습니다. 고양이가 오면 동물로 받아 처리하니 문제가 없습니다.</p>
+<p>넣기와 꺼내기를 다 하는 <code>List</code> 같은 가변 컬렉션은 어느 쪽도 안전하지 않아서 상속 관계를 이어받지 못합니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>왜 꺼내기만 할 때만 공변이 안전한가요?</q>꺼낼 때는 더 구체적인 걸 더 일반적인 것으로 보는 거라 늘 성립합니다. 하지만 넣는 걸 허용하면, 동물 목록인 척하는 고양이 목록에 강아지를 넣는 상황이 생겨 깨집니다. 그래서 방향을 한쪽으로 제한할 때만 허용합니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="csharp-q17" aria-label="17번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">GEN-03</span><span class="qtext">리플렉션은 무엇이고 어디에 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>실행 중에 타입의 구조를 물어보고, 멤버 이름을 코드에 직접 박는 대신 멤버를 대표하는 객체를 통해 간접적으로 접근하는 기능입니다.</strong></p>
+<p>보통 코드는 멤버 이름을 그대로 적어서 컴파일 타임에 확정합니다. 리플렉션은 그러지 않고 타입에게 어떤 필드와 메서드가 있는지 물어본 다음, 돌려받은 <code>Type</code>이나 <code>FieldInfo</code>, <code>MethodInfo</code> 같은 객체로 값을 읽거나 메서드를 부릅니다. 이름을 문자열로 찾거나 전체를 순회할 수도 있습니다.</p>
+<p>그래서 쓰임새는 컴파일 타임에 타입을 모르는데 그 구조를 다뤄야 할 때로 모입니다. 어떤 객체든 필드를 훑어 저장하는 직렬화, 스크립트 필드를 훑어 편집 화면을 만들어 주는 유니티 인스펙터, 특정 어트리뷰트가 붙은 메서드만 찾아 실행하는 테스트나 의존성 주입 프레임워크가 대표적입니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>어트리뷰트와는 어떤 관계인가요?</q>짝입니다. 어트리뷰트는 클래스나 필드에 붙이는 선언적인 표시일 뿐이고 그 자체로는 아무 동작도 하지 않습니다. 리플렉션이 그 표시를 읽어서 동작을 바꾸는 겁니다. <code>SerializeField</code>를 붙이면 유니티가 리플렉션으로 그걸 읽어 인스펙터에 노출하는 식이라, 표시하는 쪽과 읽는 쪽이 나뉘어 있다고 보면 됩니다.</span></li>
+<li><span><q>단점은 없나요?</q>두 가지가 있습니다. 먼저 실행 중에 조회하는 방식이라 직접 호출보다 느립니다. 그다음 이름을 문자열로 접근하니 오타가 나거나 나중에 이름을 바꿔도 컴파일 에러가 안 나고 실행할 때 터집니다. 컴파일 타임 검사를 우회하는 셈입니다. 그래서 자주 도는 구간에서는 조회 결과를 캐싱하거나, 컴파일 타임에 코드를 대신 만들어 주는 소스 제너레이터로 대체합니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section class="grp">
 <div class="grp-head"><h3>델리게이트와 지연 실행</h3><span class="cnt">4문항</span></div>
 <p class="grp-note">호출과 실행이 분리되는 지점, 그리고 무엇을 캡처하는지가 자주 나옵니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q15" aria-label="15번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q18" aria-label="18번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">DEL-01</span><span class="qtext">yield return과 지연 실행은 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3161,7 +3226,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q16" aria-label="16번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q19" aria-label="19번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">DEL-02</span><span class="qtext">LINQ 쿼리는 언제 실행되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3182,7 +3247,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q17" aria-label="17번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q20" aria-label="20번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">DEL-03</span><span class="qtext">delegate와 event는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3202,7 +3267,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q18" aria-label="18번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q21" aria-label="21번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">DEL-04</span><span class="qtext">for 루프 안에서 만든 람다가 왜 예상과 다른 값을 출력하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3229,52 +3294,33 @@ title: 면접 대비 문답
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>제네릭과 타입 도구</h3><span class="cnt">4문항</span></div>
-<p class="grp-note">컴파일러에게 무엇을 약속하고 무엇을 얻는지를 설명할 수 있어야 합니다.</p>
+<div class="grp-head"><h3>오류 처리와 null</h3><span class="cnt">3문항</span></div>
+<p class="grp-note">실패를 어떻게 알리느냐의 축입니다. 예외로 던질지, null로 돌려줄지, 컴파일러 경고로 미리 막을지를 구분해 설명하세요.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q19" aria-label="19번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q22" aria-label="22번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">GEN-01</span><span class="qtext">제네릭 where 제약은 왜 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">ERR-01</span><span class="qtext">try, catch, finally는 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>제약이 없으면 컴파일러가 타입 매개변수를 object 수준으로만 알아서, object에 있는 기능밖에 못 쓰기 때문입니다.</strong></p>
-<p>예를 들어 두 값을 비교해 큰 걸 돌려주는 제네릭 메서드에서, 아무 제약이 없으면 <code>CompareTo</code>를 부를 수 없습니다. 컴파일러가 그 타입이 비교 가능한지 모르니까요. <code>where</code>로 <code>IComparable</code>을 구현한 타입만 받게 제약하면, 모든 타입 매개변수가 <code>CompareTo</code>를 가진다고 보장되어 호출할 수 있습니다.</p>
-<p>그래서 제약은 이 타입이 이런 기능을 갖췄다고 컴파일러에게 약속하는 장치입니다.</p>
+<p><strong>try에서 예외가 나면 남은 코드를 건너뛰고 맞는 catch로 가며, finally는 예외가 나든 안 나든 항상 실행됩니다.</strong></p>
+<p><code>try</code> 도중에 예외가 터지면 그 지점부터 아래는 실행되지 않고, 타입이 맞는 <code>catch</code>로 점프합니다. 그 <code>catch</code>가 현재 메서드에 없으면 호출 스택을 거슬러 올라가면서 잡아 줄 곳을 찾고, 지나치는 메서드들의 남은 코드는 전부 건너뜁니다. 끝까지 아무도 안 잡으면 프로그램이 종료됩니다. 반환값으로 오류를 알리면 매 단계에서 직접 검사하고 전달해야 하는데, 예외는 중간을 건너뛰고 처리할 수 있는 곳까지 한 번에 간다는 게 차이입니다.</p>
+<p><code>finally</code>는 정상 흐름이든 예외 흐름이든, 심지어 아무도 안 잡아서 위로 전파되는 중이든 반드시 실행됩니다. 어느 경로로 빠져나가도 지나가기 때문에 파일이나 잠금 같은 자원을 놓는 자리로 씁니다. 정상 경로에만 해제 코드를 두면 예외가 났을 때 그 줄에 도달하지 못해 자원이 샙니다. <code>using</code>이 사실 이 <code>try</code>와 <code>finally</code>의 축약입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>제약으로 뭘 걸 수 있나요?</q>특정 인터페이스나 부모 클래스를 구현할 것, 참조 타입일 것이나 값 타입일 것, 매개변수 없는 생성자가 있을 것 같은 조건을 겁니다. 생성자 제약을 걸면 메서드 안에서 그 타입의 객체를 새로 만들 수 있습니다.</span></li>
+<li><span><q>catch를 쓸 때 주의할 점은요?</q>구체적인 예외 타입부터 잡아야 합니다. <code>catch</code>는 위에서부터 처음 맞는 것이 잡는데, 넓은 <code>Exception</code>을 위에 두면 아래의 구체적인 타입은 영영 도달하지 못합니다. 그리고 빈 catch로 예외를 삼켜서 조용히 넘기면, 문제가 숨어 나중에 더 찾기 어려워집니다. 처리하든 로그를 남기든 다시 던지든 해야 합니다.</span></li>
+<li><span><q>그럼 오류는 항상 예외로 알리는 게 좋은가요?</q>아닙니다. 예외는 스택을 거슬러 올라가는 비용이 있어서, 실패가 흔하고 예상된 범위면 반환값으로 알리는 게 맞습니다. 사용자 입력이 숫자가 아닌 건 정상 범위라 <code>TryParse</code>처럼 성공 여부를 <code>bool</code>로 받고, 반드시 숫자여야 하는 내부 설정값이면 <code>Parse</code>로 바로 터뜨려서 버그를 드러냅니다. 판단 기준은 이 실패가 예외적인 상황인지 예상된 정상 범위인지입니다.</span></li>
 </ul>
 </div>
 </div>
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q20" aria-label="20번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q23" aria-label="23번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">GEN-02</span><span class="qtext">공변성과 반공변성은 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>제네릭 타입끼리 상속 관계를 이어받게 할지를 정하는 규칙으로, 꺼내기만 하면 공변, 받기만 하면 반공변입니다.</strong></p>
-<p><code>IEnumerable</code>은 out으로 선언된 공변이라, 고양이 목록을 동물 목록 자리에 넣을 수 있습니다. 안에서 꺼내기만 하니 고양이를 동물로 보는 게 안전하기 때문입니다. 반대로 <code>Action</code>은 in으로 선언된 반공변이라, 동물을 받는 함수를 고양이를 받는 함수 자리에 넣을 수 있습니다. 고양이가 오면 동물로 받아 처리하니 문제가 없습니다.</p>
-<p>넣기와 꺼내기를 다 하는 <code>List</code> 같은 가변 컬렉션은 어느 쪽도 안전하지 않아서 상속 관계를 이어받지 못합니다.</p>
-</div>
-<div class="tails">
-<p class="lab">꼬리질문</p>
-<ul>
-<li><span><q>왜 꺼내기만 할 때만 공변이 안전한가요?</q>꺼낼 때는 더 구체적인 걸 더 일반적인 것으로 보는 거라 늘 성립합니다. 하지만 넣는 걸 허용하면, 동물 목록인 척하는 고양이 목록에 강아지를 넣는 상황이 생겨 깨집니다. 그래서 방향을 한쪽으로 제한할 때만 허용합니다.</span></li>
-</ul>
-</div>
-</div>
-</details>
-</div>
-<div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q21" aria-label="21번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">GEN-03</span><span class="qtext">as와 괄호 캐스트는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">ERR-02</span><span class="qtext">as와 괄호 캐스트는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3292,21 +3338,20 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q22" aria-label="22번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q24" aria-label="24번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">GEN-04</span><span class="qtext">리플렉션은 무엇이고 어디에 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">ERR-03</span><span class="qtext">nullable 참조 타입 기능은 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>실행 중에 타입의 구조를 물어보고, 멤버 이름을 코드에 직접 박는 대신 멤버를 대표하는 객체를 통해 간접적으로 접근하는 기능입니다.</strong></p>
-<p>보통 코드는 멤버 이름을 그대로 적어서 컴파일 타임에 확정합니다. 리플렉션은 그러지 않고 타입에게 어떤 필드와 메서드가 있는지 물어본 다음, 돌려받은 <code>Type</code>이나 <code>FieldInfo</code>, <code>MethodInfo</code> 같은 객체로 값을 읽거나 메서드를 부릅니다. 이름을 문자열로 찾거나 전체를 순회할 수도 있습니다.</p>
-<p>그래서 쓰임새는 컴파일 타임에 타입을 모르는데 그 구조를 다뤄야 할 때로 모입니다. 어떤 객체든 필드를 훑어 저장하는 직렬화, 스크립트 필드를 훑어 편집 화면을 만들어 주는 유니티 인스펙터, 특정 어트리뷰트가 붙은 메서드만 찾아 실행하는 테스트나 의존성 주입 프레임워크가 대표적입니다.</p>
+<p><strong>참조 타입에도 null을 허용할지 여부를 타입에 표시해, 컴파일러가 null 위험을 미리 경고하게 하는 기능입니다.</strong></p>
+<p>물음표 없는 참조 타입은 null이 아니어야 한다는 의도로 보고, null을 넣거나 초기화를 빠뜨리면 경고합니다. 물음표를 붙인 타입은 null일 수 있다고 보고, 값을 꺼내 쓰기 전에 null 검사를 요구합니다. NullReferenceException을 실행 중이 아니라 작성 단계에서 줄이려는 장치입니다.</p>
+<p>다만 런타임에 강제되는 게 아니라 컴파일 타임 경고라, 개발자가 책임지겠다고 하면 느낌표로 경고를 끌 수 있습니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>어트리뷰트와는 어떤 관계인가요?</q>짝입니다. 어트리뷰트는 클래스나 필드에 붙이는 선언적인 표시일 뿐이고 그 자체로는 아무 동작도 하지 않습니다. 리플렉션이 그 표시를 읽어서 동작을 바꾸는 겁니다. <code>SerializeField</code>를 붙이면 유니티가 리플렉션으로 그걸 읽어 인스펙터에 노출하는 식이라, 표시하는 쪽과 읽는 쪽이 나뉘어 있다고 보면 됩니다.</span></li>
-<li><span><q>단점은 없나요?</q>두 가지가 있습니다. 먼저 실행 중에 조회하는 방식이라 직접 호출보다 느립니다. 그다음 이름을 문자열로 접근하니 오타가 나거나 나중에 이름을 바꿔도 컴파일 에러가 안 나고 실행할 때 터집니다. 컴파일 타임 검사를 우회하는 셈입니다. 그래서 자주 도는 구간에서는 조회 결과를 캐싱하거나, 컴파일 타임에 코드를 대신 만들어 주는 소스 제너레이터로 대체합니다.</span></li>
+<li><span><q>널 병합과 널 조건부 연산자는 뭔가요?</q>둘 다 null을 짧게 다루는 연산자입니다. 널 병합은 왼쪽이 null이면 오른쪽 기본값을 주고, 널 조건부는 왼쪽이 null이면 더 파고들지 않고 그냥 null을 돌려줍니다. 긴 null 검사를 한 줄로 줄여 줍니다.</span></li>
 </ul>
 </div>
 </div>
@@ -3314,10 +3359,10 @@ title: 면접 대비 문답
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>값의 함정과 null</h3><span class="cnt">3문항</span></div>
+<div class="grp-head"><h3>값의 함정</h3><span class="cnt">3문항</span></div>
 <p class="grp-note">사소해 보이지만 실수가 잦아 코드 리뷰에서 자주 걸리는 지점입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q23" aria-label="23번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q25" aria-label="25번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">TRAP-01</span><span class="qtext">정수끼리 나눗셈에서 자주 하는 실수는 뭔가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3335,9 +3380,34 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q24" aria-label="24번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q26" aria-label="26번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">TRAP-02</span><span class="qtext">const와 readonly는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">TRAP-02</span><span class="qtext">실수 비교에 등호를 쓰면 왜 안 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>부동소수점은 값을 근사해서 저장하기 때문에, 수학적으로 같은 두 값이 비트로는 다를 수 있습니다.</strong></p>
+<p>컴퓨터는 실수를 부호와 가수와 지수로 나눠서 2진수로 저장합니다. 지수에 따라 소수점 위치가 떠다녀서 부동소수점이라고 부릅니다. 문제는 10진수 0.1을 2진 소수로 적으면 무한히 반복된다는 점입니다. 3분의 1을 10진수로 적으면 0.333으로 안 떨어지는 것과 같은 이유인데, 2진법에서는 분모가 2의 거듭제곱인 0.5나 0.25 정도만 딱 떨어집니다.</p>
+<p>가수 비트 수는 유한하니 그 무한소수를 잘라서 근사값으로 저장합니다. 그래서 0.1 더하기 0.2가 0.3이 아니라 0.30000000000000004처럼 나옵니다. 근사값끼리 더하면서 오차가 드러난 겁니다. 비교할 때는 두 값의 차이의 절댓값이 아주 작은 허용 오차보다 작은지를 보는 식으로 합니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>float과 double은 어떻게 다른가요?</q>가수에 쓰는 비트 수가 다릅니다. <code>float</code>은 4바이트에 가수가 23비트라 유효숫자가 약 7자리고, <code>double</code>은 8바이트에 가수가 52비트라 약 15에서 16자리입니다. <code>double</code>이 더 정밀한 건 가수 비트가 많아서입니다. 유니티 좌표가 <code>float</code>인 건 정밀도보다 메모리와 속도가 중요하고 게임에는 7자리면 충분하기 때문입니다.</span></li>
+<li><span><q>돈 계산에도 double을 쓰면 되나요?</q>쓰면 안 됩니다. 금액은 10진수로 정확해야 하는데 <code>double</code>은 2진 근사라 0.1 같은 값을 정확히 못 담습니다. 그럴 때는 <code>decimal</code>을 씁니다. <code>decimal</code>은 2진 부동소수점이 아니라 10진수 기반이라 10진 소수를 오차 없이 담습니다. 대신 16바이트로 크고 느리며 표현 범위가 좁습니다. 정밀도보다 정확성이 중요할 때 쓰는 타입입니다.</span></li>
+</ul>
+</div>
+<div class="trap">
+<p class="lab">함정</p>
+<p>크기 차가 아주 큰 두 수를 더하면 작은 쪽이 가수 범위 밖으로 밀려서 아예 반영되지 않기도 합니다. 반복해서 더하는 누적 계산에서 오차가 쌓이는 원인이 이겁니다.</p>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="csharp-q27" aria-label="27번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">TRAP-03</span><span class="qtext">const와 readonly는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3358,32 +3428,12 @@ title: 면접 대비 문답
 </div>
 </details>
 </div>
-<div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q25" aria-label="25번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">TRAP-03</span><span class="qtext">nullable 참조 타입 기능은 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>참조 타입에도 null을 허용할지 여부를 타입에 표시해, 컴파일러가 null 위험을 미리 경고하게 하는 기능입니다.</strong></p>
-<p>물음표 없는 참조 타입은 null이 아니어야 한다는 의도로 보고, null을 넣거나 초기화를 빠뜨리면 경고합니다. 물음표를 붙인 타입은 null일 수 있다고 보고, 값을 꺼내 쓰기 전에 null 검사를 요구합니다. NullReferenceException을 실행 중이 아니라 작성 단계에서 줄이려는 장치입니다.</p>
-<p>다만 런타임에 강제되는 게 아니라 컴파일 타임 경고라, 개발자가 책임지겠다고 하면 느낌표로 경고를 끌 수 있습니다.</p>
-</div>
-<div class="tails">
-<p class="lab">꼬리질문</p>
-<ul>
-<li><span><q>널 병합과 널 조건부 연산자는 뭔가요?</q>둘 다 null을 짧게 다루는 연산자입니다. 널 병합은 왼쪽이 null이면 오른쪽 기본값을 주고, 널 조건부는 왼쪽이 null이면 더 파고들지 않고 그냥 null을 돌려줍니다. 긴 null 검사를 한 줄로 줄여 줍니다.</span></li>
-</ul>
-</div>
-</div>
-</details>
-</div>
 </section>
 <section class="grp">
 <div class="grp-head"><h3>비동기와 동시성</h3><span class="cnt">3문항</span></div>
 <p class="grp-note">비동기와 병렬을 구분하고, 공유 상태를 어떻게 지키는지가 핵심입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q26" aria-label="26번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q28" aria-label="28번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">ASYNC-01</span><span class="qtext">async와 await는 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3403,7 +3453,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q27" aria-label="27번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q29" aria-label="29번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">ASYNC-02</span><span class="qtext">lock은 무엇이고 무엇을 잠가야 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3424,21 +3474,21 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q28" aria-label="28번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q30" aria-label="30번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">ASYNC-03</span><span class="qtext">try, catch, finally는 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">ASYNC-03</span><span class="qtext">async void는 왜 피해야 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>try에서 예외가 나면 남은 코드를 건너뛰고 맞는 catch로 가며, finally는 예외가 나든 안 나든 항상 실행됩니다.</strong></p>
-<p><code>try</code> 도중에 예외가 터지면 그 지점부터 아래는 실행되지 않고, 타입이 맞는 <code>catch</code>로 점프합니다. 그 <code>catch</code>가 현재 메서드에 없으면 호출 스택을 거슬러 올라가면서 잡아 줄 곳을 찾고, 지나치는 메서드들의 남은 코드는 전부 건너뜁니다. 끝까지 아무도 안 잡으면 프로그램이 종료됩니다. 반환값으로 오류를 알리면 매 단계에서 직접 검사하고 전달해야 하는데, 예외는 중간을 건너뛰고 처리할 수 있는 곳까지 한 번에 간다는 게 차이입니다.</p>
-<p><code>finally</code>는 정상 흐름이든 예외 흐름이든, 심지어 아무도 안 잡아서 위로 전파되는 중이든 반드시 실행됩니다. 어느 경로로 빠져나가도 지나가기 때문에 파일이나 잠금 같은 자원을 놓는 자리로 씁니다. 정상 경로에만 해제 코드를 두면 예외가 났을 때 그 줄에 도달하지 못해 자원이 샙니다. <code>using</code>이 사실 이 <code>try</code>와 <code>finally</code>의 축약입니다.</p>
+<p><strong>돌려주는 Task가 없어서 예외를 담을 곳도, 완료를 기다릴 방법도 없기 때문입니다.</strong></p>
+<p><code>async Task</code>로 선언하면 작업 도중 난 예외가 그 <code>Task</code>에 담깁니다. 그래서 호출한 쪽이 <code>await</code>할 때 예외가 다시 올라와 잡을 수 있습니다. 반면 <code>async void</code>는 돌려주는 <code>Task</code>가 없으니 예외를 실어 보낼 데가 없고, 그대로 밖으로 터져 나가 잡히지 않고 프로세스가 죽을 수 있습니다.</p>
+<p>완료 시점도 알 수 없습니다. 반환값이 없으니 호출한 쪽이 <code>await</code>로 기다릴 수 없고, 끝났는지 모른 채 다음으로 넘어갑니다. 그래서 기본은 <code>async Task</code>로 두고, 예외적으로 버튼 클릭 같은 이벤트 핸들러에서만 <code>async void</code>를 씁니다. 이벤트 핸들러는 시그니처가 <code>void</code>로 정해져 있어 어쩔 수 없는 경우입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>catch를 쓸 때 주의할 점은요?</q>구체적인 예외 타입부터 잡아야 합니다. <code>catch</code>는 위에서부터 처음 맞는 것이 잡는데, 넓은 <code>Exception</code>을 위에 두면 아래의 구체적인 타입은 영영 도달하지 못합니다. 그리고 빈 catch로 예외를 삼켜서 조용히 넘기면, 문제가 숨어 나중에 더 찾기 어려워집니다. 처리하든 로그를 남기든 다시 던지든 해야 합니다.</span></li>
-<li><span><q>그럼 오류는 항상 예외로 알리는 게 좋은가요?</q>아닙니다. 예외는 스택을 거슬러 올라가는 비용이 있어서, 실패가 흔하고 예상된 범위면 반환값으로 알리는 게 맞습니다. 사용자 입력이 숫자가 아닌 건 정상 범위라 <code>TryParse</code>처럼 성공 여부를 <code>bool</code>로 받고, 반드시 숫자여야 하는 내부 설정값이면 <code>Parse</code>로 바로 터뜨려서 버그를 드러냅니다. 판단 기준은 이 실패가 예외적인 상황인지 예상된 정상 범위인지입니다.</span></li>
+<li><span><q>그럼 이벤트 핸들러에서는 예외를 어떻게 다루나요?</q>핸들러 안에서 직접 잡아야 합니다. 본문 전체를 <code>try</code>와 <code>catch</code>로 감싸서 예외가 밖으로 새어 나가지 않게 하고, 실제 작업은 <code>async Task</code> 메서드로 빼서 핸들러는 그걸 <code>await</code>하고 예외만 처리하는 얇은 껍데기로 두는 방식이 흔합니다.</span></li>
+<li><span><q>반환값이 없는 비동기 메서드는 어떻게 선언하나요?</q>결과가 없어도 <code>async Task</code>로 선언합니다. <code>Task</code>는 결과를 담는 그릇이기도 하지만 완료 여부와 예외를 실어 나르는 핸들이기도 해서, 돌려줄 값이 없어도 <code>Task</code>를 반환해야 호출한 쪽이 기다리고 예외를 받을 수 있습니다. 값이 있으면 <code>Task&lt;T&gt;</code>를 씁니다.</span></li>
 </ul>
 </div>
 </div>
@@ -3449,7 +3499,7 @@ title: 면접 대비 문답
 <div class="grp-head"><h3>상황형 문제 해결</h3><span class="cnt">4문항</span></div>
 <p class="grp-note">정답보다 접근 순서를 봅니다. 한 증상에 여러 개념이 얽혀 있으니, 측정으로 원인을 좁힌 뒤 설명하세요.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q29" aria-label="29번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q31" aria-label="31번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-01</span><span class="qtext">게임을 오래 켜 두면 점점 느려지고, 가끔 프레임이 툭툭 멈칫합니다. 어디부터 보나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3474,7 +3524,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q30" aria-label="30번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q32" aria-label="32번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-02</span><span class="qtext">리스트를 foreach로 돌면서 죽은 적을 Remove했더니 예외가 납니다. 왜 그런가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3501,7 +3551,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q31" aria-label="31번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q33" aria-label="33번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-03</span><span class="qtext">이벤트에 등록해 둔 오브젝트를 파괴했는데, 이벤트가 발생하니 파괴된 오브젝트가 불려서 에러가 납니다.</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3521,7 +3571,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q32" aria-label="32번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q34" aria-label="34번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-04</span><span class="qtext">리스트에 담아 둔 struct를 꺼내 고쳤는데 반영이 안 됩니다. 왜 그런가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">

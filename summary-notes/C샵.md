@@ -1458,9 +1458,18 @@ using var g = File.OpenRead(path);   // C# 8 축약 — 스코프 끝에 해제
 
 ## 소멸자(finalizer)
 
-`~ClassName` 형태의 메서드로, GC가 객체를 수거하기 직전에 한 번 불러 비관리 자원을 마지막으로 정리하는 안전망. 호출 시점을 못 정하고(GC에 달림), 있으면 수거가 한 번에 안 끝나고 두 단계로 늦어져 비용이 큼.
+`~ClassName` 형태의 메서드로, GC가 객체를 수거하기 직전에 한 번 불러 비관리 자원을 마지막으로 정리하는 안전망.
 
-그래서 정리는 `IDisposable`의 `Dispose`로 즉시 하는 게 원칙이고, finalizer는 `Dispose`를 깜빡했을 때를 위한 보험으로만 둠. 둘을 함께 쓸 땐 `Dispose`에서 `GC.SuppressFinalize`를 불러 이미 정리했으니 finalizer는 건너뛰라고 알림(dispose 패턴).
+이름 때문에 C++ 소멸자와 헷갈리지만 성격이 다름 — C++ 소멸자는 스코프를 벗어나면 즉시 불려 자원을 객체 수명에 묶는 RAII가 성립하지만, C# finalizer는 GC가 언제 돌지 모르니 시점이 비결정적이라 그렇게 못 씀. C#에서 RAII에 해당하는 건 finalizer가 아니라 `using` + `IDisposable`.
+
+| | C++ 소멸자 | C# finalizer |
+| --- | --- | --- |
+| 시점 | 스코프 끝·`delete` 시 즉시 | GC 수거 직전 — 언제인지 모름 |
+| 결정성 | 결정적 | 비결정적 |
+
+비용이 큰 이유는 한 번의 GC로 안 끝나기 때문. 1차 GC에서 "죽었지만 finalizer가 있다"고 판단해 회수 대신 finalizer 큐에 넣고, 전용 스레드가 실행한 뒤 2차 GC에서야 실제로 회수됨. 최소 두 주기를 살아남으므로 상위 세대로 승격되고, 승격된 세대는 드물게 수집되니 더 오래 남음(앞 세대별 GC 항목).
+
+그래서 정리는 `IDisposable`의 `Dispose`로 즉시 하는 게 원칙이고, finalizer는 `Dispose`를 깜빡했을 때를 위한 보험으로만 둠. 둘을 함께 쓸 땐 `Dispose`에서 `GC.SuppressFinalize`를 불러 이미 정리했으니 finalizer 큐에 넣지 말라고 알림 — 정상 경로에선 GC 1회로 회수되고, 깜빡했을 때만 2회 비용을 치르며 자원은 안 샘(dispose 패턴).
 
 ```csharp
 class Handle : IDisposable {

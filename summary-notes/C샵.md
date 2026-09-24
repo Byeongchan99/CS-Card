@@ -1328,14 +1328,24 @@ var first3 = huge.Where(x => x > 0).Select(x => x * 2).Take(3).ToList();
 
 ## 순회 중 컬렉션 수정
 
-`foreach`로 순회하는 도중 `Add`/`Remove`로 컬렉션 크기를 바꾸면 `InvalidOperationException`. 열거자가 "보던 게 바뀜"을 감지해 예외를 던짐 → 이후 코드 미실행. 해법은 for 역순 루프, 복사본 순회, 또는 `RemoveAll(조건)`.
+`foreach` 순회 도중 그 컬렉션을 `Add`/`Remove`하면 `InvalidOperationException`. 컬렉션엔 내부 버전 번호가 있고 구조를 바꿀 때마다 오르는데, 열거자가 매 `MoveNext()`에서 "순회 시작 때 버전과 같은가"를 확인해 다르면 즉시 던짐(이후 코드 미실행).
+
+심술이 아니라 보호장치 — 순회 중 지우면 인덱스가 당겨져 원소를 조용히 건너뛰는 논리 버그가 생김. 그걸 소리 없이 틀리게 두느니 시끄럽게 터뜨리는 것.
+
+해법은 하나로 관통됨 — 도는 대상과 바꾸는 대상을 분리.
+
+- 역순 `for` — `foreach`가 아니라 인덱스 접근이라 버전 검사 자체가 없음. 뒤에서부터 지우면 안 본 앞 인덱스가 안 밀림. 삭제+수정 섞일 때, `List`·배열만
+- 복사본 순회 — `ToList()` 사본을 돌고 원본을 조작. 도는 대상이 달라 충돌 없음. 모든 컬렉션에 통하나 사본 메모리 한 벌
+- 전용 삭제 API — `List.RemoveAll(조건)`, `HashSet.RemoveWhere(조건)`. 내부에서 한 번 훑어 안전·효율적(O(n)). 조건 삭제뿐일 때 최선
 
 ```csharp
 foreach (var x in list) list.Remove(x);       // InvalidOperationException
 for (int i = list.Count - 1; i >= 0; i--)     // 역순 for는 안전
     if (IsDead(list[i])) list.RemoveAt(i);
-list.RemoveAll(IsDead);                        // 또는 이 한 줄
+list.RemoveAll(IsDead);                        // 조건 삭제뿐이면 이 한 줄
 ```
+
+인덱스 없는 컬렉션은 역순 for를 못 씀 — `Dictionary`는 `Keys.ToList()` 사본 순회, `HashSet`은 `RemoveWhere`, `Queue`·배열은 `Where(...)`로 거른 걸 새로 만들어 갈아끼움.
 
 ## async/await와 Task
 

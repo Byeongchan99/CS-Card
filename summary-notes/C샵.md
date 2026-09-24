@@ -1349,15 +1349,25 @@ list.RemoveAll(IsDead);                        // 조건 삭제뿐이면 이 한
 
 ## async/await와 Task
 
-`async` 메서드는 `await`를 만나면 그 지점에서 제어를 호출자에게 돌려주고, 기다리던 작업이 끝나면 이어서 실행 — 스레드를 붙잡지 않아 UI·서버가 안 멈춤. 컴파일러가 메서드를 상태 기계로 변환(yield와 같은 원리). `Task`는 진행 중이거나 완료될 작업의 핸들. async void는 예외를 못 잡으니 이벤트 핸들러 외엔 `Task`를 반환하고, 무작정 `.Result`/`.Wait()`로 기다리면 교착(deadlock) 위험.
+오래 걸리는 작업(네트워크·파일·DB)을 그냥 기다리면(동기) 그동안 스레드가 묶여 아무 일도 못 함 — UI 스레드면 화면이 얼고, 서버면 다른 요청을 못 받음. `await`는 기다리는 동안 스레드를 놓아주고, 작업이 끝나면 그 자리부터 재개함.
+
+<svg viewBox="0 0 620 150" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="동기는 대기 동안 스레드가 묶이고, await는 대기 동안 스레드를 놓아줘 다른 일을 처리한 뒤 재개한다"><text x="16" y="36" font-size="12" fill="currentColor" opacity="0.7">동기 — 기다리는 동안 스레드 묶임</text><g font-size="12" text-anchor="middle"><g fill="#3fae7a" fill-opacity="0.14" stroke="#3fae7a"><rect x="70" y="44" width="58" height="26" rx="3"/></g><text x="99" y="61" fill="currentColor">시작</text><g fill="#e2574c" fill-opacity="0.14" stroke="#e2574c"><rect x="132" y="44" width="344" height="26" rx="3"/></g><text x="304" y="61" fill="currentColor">2초 대기 (스레드 묶임 → UI 얼음)</text><g fill="#3fae7a" fill-opacity="0.14" stroke="#3fae7a"><rect x="480" y="44" width="106" height="26" rx="3"/></g><text x="533" y="61" fill="currentColor">이어서</text></g><text x="16" y="100" font-size="12" fill="currentColor" opacity="0.7">await — 대기 동안 스레드 놓아줌</text><g font-size="12" text-anchor="middle"><g fill="#3fae7a" fill-opacity="0.14" stroke="#3fae7a"><rect x="70" y="108" width="58" height="26" rx="3"/></g><text x="99" y="125" fill="currentColor">시작</text><g fill="#4f83e0" fill-opacity="0.14" stroke="#4f83e0"><rect x="132" y="108" width="344" height="26" rx="3"/></g><text x="304" y="125" fill="currentColor">스레드 놓아줌 — 다른 일 처리</text><g fill="#3fae7a" fill-opacity="0.14" stroke="#3fae7a"><rect x="480" y="108" width="106" height="26" rx="3"/></g><text x="533" y="125" fill="currentColor">완료 후 재개</text></g></svg>
 
 ```csharp
-async Task<int> LoadAsync() {
-    var data = await FetchAsync();   // 여기서 제어 반환, 완료 후 이어서 실행
-    return data.Length;
+async Task LoadAsync() {
+    string data = await DownloadAsync(url);   // 여기서 제어 반환 (스레드 놓음)
+    label.Text = data;                         // 완료 후 이 줄부터 재개
 }
-// async void는 예외를 못 잡음, .Result / .Wait() 는 교착 위험
 ```
+
+작동 원리는 yield와 같은 상태 기계 — 컴파일러가 메서드를 변환해 `await` 지점에서 멈춰 위치를 기억하고, 작업이 끝나면 이어감. yield가 이터레이터용이면 async는 Task용.
+
+`Task`는 미래에 끝날(또는 이미 끝난) 작업의 핸들(JS의 Promise). `DownloadAsync`는 결과를 바로 못 주니 즉시 `Task<string>`을 반환하고, `await`가 그게 채워질 때까지 기다렸다 값을 꺼냄.
+
+함정 둘.
+
+- `async void` — 반환 `Task`가 없어 예외를 담을 데가 없음 → 터지면 못 잡고 크래시. 이벤트 핸들러 외엔 `async Task` 반환
+- `.Result`·`.Wait()` 동기 대기 — 서로 스레드를 기다리는 교착(deadlock) 위험. 끝까지 `await`로 이어감("async all the way")
 
 ## lock과 스레드 안전 컬렉션
 

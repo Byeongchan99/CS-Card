@@ -1431,12 +1431,30 @@ flowchart LR
 
 ## IDisposable과 using
 
-GC는 관리 메모리만 회수하고 비관리 리소스(파일 핸들, 소켓, 네이티브 메모리 등)는 못 챙김. GC 시점도 비결정적. `IDisposable`로 직접 해제하고, `using`으로 예외 상황에서도 `Dispose` 호출을 보장.
+GC가 아는 건 관리 힙의 메모리뿐. 파일 핸들·소켓·DB 연결·네이티브 메모리는 OS가 준 비관리 자원이라 GC 관할 밖이고, GC 입장에선 그걸 쥔 래퍼가 그냥 작은 객체로만 보임. 그래서 맡기면 안 되는 이유가 둘.
+
+- 존재를 모름 — 래퍼는 관리 메모리로 작아 메모리 압박을 안 만들어, GC가 한참 안 돎. 그동안 자원은 계속 붙들림
+- 시점이 비결정적 — 언제 회수될지 코드가 못 정함. 희소 자원은 "언젠가"가 아니라 "즉시" 놓아야 함
+
+방치하면 실제로 터지는 것 — 열린 핸들이 있는 동안 OS가 공유 모드에 안 맞는 접근을 거부해(Windows에서 `File.OpenRead` 중이면 쓰기·삭제 불가, 자기 프로그램도 예외 아님) 같은 파일을 못 덮어씀. OS와 무관하게 핸들 수에는 상한이 있어 안 닫으면 고갈되고, 소켓은 포트, DB는 커넥션 풀이 같은 식으로 마름.
+
+`IDisposable`은 "나는 다 쓰면 명시적으로 놓아줘야 하는 자원을 들었다"는 계약. 타입이 `IDisposable`이면 GC에 맡기지 말고 직접 닫으라는 신호.
+
+| | 담당 | 시점 |
+| --- | --- | --- |
+| GC | 관리 메모리 | 비결정적(언젠가) |
+| `Dispose()` | 비관리 자원 | 결정적(부를 때) |
+
+`Dispose()`를 손으로 부르면 중간에 예외가 날 때 건너뛰므로 `finally`에 둬야 하는데, `using`이 그 `try/finally`를 자동으로 깔아주는 설탕(앞 예외 항목과 만나는 지점).
 
 ```csharp
-using (var f = File.OpenRead(path)) { /* ... */ }   // 예외에도 Dispose 보장
-using var g = File.OpenRead(path);                   // C# 8 축약(스코프 끝에 해제)
+using (var f = File.OpenRead(path)) { Process(f); }
+// ≡ var f = ...; try { Process(f); } finally { f?.Dispose(); }
+
+using var g = File.OpenRead(path);   // C# 8 축약 — 스코프 끝에 해제
 ```
+
+`IDisposable`이면 `using`으로 감싸는 게 기본. 직접 만들 때도 비관리 자원을 직접 들거나 `IDisposable`인 멤버를 들었으면 내 타입도 `IDisposable`을 구현해 그 책임을 위로 전달함.
 
 ## 소멸자(finalizer)
 

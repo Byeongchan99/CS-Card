@@ -495,6 +495,37 @@ Math.Abs(a - b) < 1e-6;        // 실수 비교는 오차 범위로
 decimal price = 0.1m + 0.2m;   // 0.3 정확 — 금액엔 decimal
 ```
 
+## 정수 나눗셈
+
+`25 / 4`는 둘 다 int라 정수 나눗셈으로 6 → float에 대입돼도 6.0. `1 / 3 * 100f`는 `1/3`이 먼저 int 0이 된 뒤 ×100f → 0. 나눗셈이 int끼리 먼저 평가되는 게 함정. 고치려면 `(float)`로 캐스팅.
+
+```csharp
+float a = 25 / 4;               // int끼리 나눠 6 → 6.0
+float b = 1 / 3 * 100f;         // (1/3)=0 먼저 → 0
+float c = (float)1 / 3 * 100f;  // 33.33
+```
+
+## 정수 오버플로와 2의 보수
+
+정수는 고정된 비트 수(int는 32비트)에 담김. 음수를 어떻게 표현하느냐가 오버플로 동작을 정하는데, C#(과 대부분 CPU)은 2의 보수(two's complement)를 씀. 음수 `-x`는 "`x`의 비트를 전부 뒤집고 1을 더한" 값으로 저장하고, 최상위 비트가 부호 역할(1이면 음수)을 겸함.
+
+왜 이렇게 하냐가 핵심 — 이러면 뺄셈 회로를 따로 안 만들고 덧셈 하나로 뺄셈까지 처리됨(`a - b = a + (-b)`). 4비트로 보면 `3`=`0011`, `-3`=`1100+1`=`1101`, `3 + (-3)` = `0011 + 1101 = 10000` → 넘친 자리를 버리면 `0000`=0. 부호가 있어도 덧셈 회로 하나로 다 되고 0의 표현도 하나뿐(`+0`/`-0`이 안 갈림).
+
+비트 수가 고정이라 표현 범위도 고정(int는 `−2³¹ ~ 2³¹−1`). 최댓값에서 +1하면 자리올림이 부호 비트를 넘어가, 비트 패턴이 최솟값으로 감싸짐(wrap around). `0111…111`에 1을 더하면 `1000…000`이 되는데 2의 보수에선 이 패턴이 곧 최솟값 — 숫자 원판을 한 바퀴 돌아 반대편으로 넘어간 셈.
+
+<svg viewBox="0 0 620 200" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="int 최댓값에 1을 더하면 2의 보수 비트가 최솟값으로 감싸진다"><defs><marker id="of-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="30" y="76" width="210" height="66" rx="4"/></g><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="380" y="76" width="210" height="66" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="135" y="98">int.MaxValue</text><text x="135" y="116" font-size="11" opacity="0.7">2³¹−1 = 2,147,483,647</text><text x="135" y="133" font-size="11" font-family="monospace" opacity="0.7">0111…111</text><text x="485" y="98">int.MinValue</text><text x="485" y="116" font-size="11" opacity="0.7">−2³¹ = −2,147,483,648</text><text x="485" y="133" font-size="11" font-family="monospace" opacity="0.7">1000…000</text></g><path d="M240 92 C310 58, 310 58, 378 92" fill="none" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#of-a)"/><text x="310" y="52" font-size="11" fill="currentColor" opacity="0.7" text-anchor="middle">+1 (자리올림이 부호 비트를 넘김)</text><path d="M378 130 C310 166, 310 166, 242 130" fill="none" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#of-a)"/><text x="310" y="186" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">범위를 원판처럼 한 바퀴 돌아 반대편으로</text></svg>
+
+```csharp
+int max = int.MaxValue;   //  2,147,483,647  (0111…111)
+int wrap = max + 1;       // -2,147,483,648  (1000…000) — 최솟값으로 감쌈
+```
+
+C#은 성능을 위해 기본으로 오버플로를 검사하지 않고 조용히 감쌈. 그래서 큰 수 계산에서 값이 엉뚱해지는 버그가 숨을 수 있음. `checked`로 감싸면 오버플로 시 예외를 던짐(뒤 형 변환 항목의 "조용한 감쌈 vs 예외로 드러냄"과 연결). 더 큰 범위가 필요하면 `long`(64비트), 아주 크면 `BigInteger`.
+
+```csharp
+checked { int c = int.MaxValue + 1; }   // OverflowException — 조용히 안 넘어감
+```
+
 ## 문자열 불변성과 StringBuilder
 
 `string`은 한 번 만들어지면 내용이 절대 안 바뀜. `Replace`·`ToUpper`·`Trim`·`Substring`은 원본을 고치는 게 아니라 바뀐 새 문자열을 반환 — 반환값을 안 받으면 아무 일도 안 일어남.
@@ -596,6 +627,29 @@ int id = int.Parse(configValue);   // 실패=버그 → 예외로 즉시 터뜨�
 ```
 
 이 "예외 vs 반환값"은 형 변환만이 아니라 API 설계 전반의 원리. Dictionary도 `dict[key]`(없으면 예외) vs `TryGetValue`(없으면 false)로 갈리고(앞 out 항목), 파일·네트워크도 예외 기반과 Try 기반 API가 공존. Try 패턴은 "실패가 흔한 조회·파싱"에서 예외를 피하는 C#의 관용구.
+
+## 예외 처리 — try/catch/finally
+
+예외는 정상 흐름으로 처리 못 할 문제를 알리고, 잡을 수 있는 곳까지 흐름을 되감는 장치. `throw`가 실행되면 그 자리부터 남은 코드를 건너뛰고, 자기를 잡을 `catch`를 찾아 호출 스택을 거슬러 올라감 — 중간 단계는 다 건너뜀. 아무도 안 잡으면 최상위까지 올라가 프로그램이 죽음. 반환값 에러는 매 단계 손으로 검사·전달해야 하지만, 예외는 중간을 건너뛰고 처리 가능한 곳으로 점프.
+
+```csharp
+try { file = Open(path); Process(file); }  // 위험한 작업
+catch (IOException e) { Log(e); }            // 맞는 예외를 잡아 처리
+finally { file?.Close(); }                   // 어느 경로로 나가든 자원 정리
+```
+
+`finally`가 "항상"인 이유 — 예외로 `try` 중간에 튕겨 나가도 열어둔 자원(파일·연결·락)을 반드시 닫아야 하니까. 정상 경로에만 `Close()`를 두면 예외 시 그 줄에 도달 못 해 자원이 샘. 세 경로가 다 `finally`를 지남.
+
+```mermaid
+flowchart LR
+    T["try"] -->|정상| F["finally"]
+    T -->|예외 → catch| C["catch"] --> F
+    T -->|미포착| F
+    F -->|정상·처리됨| E["이후 코드"]
+    F -.->|미포착| P["위로 전파"]
+```
+
+`catch`는 위에서부터 처음 맞는 것이 잡으므로 구체 타입부터 넓은 순으로 — `IOException`(자식)을 `Exception`(부모)보다 위에 둬야 안 가려짐. 그리고 빈 catch로 삼키면(`catch { }`) 에러가 조용히 사라져 나중에 엉뚱한 곳에서 터지니, 잡았으면 처리·로깅·재던지기(`throw;`). `using`이 곧 try/finally의 축약.
 
 ## as vs 형변환 캐스트
 
@@ -855,44 +909,6 @@ var e = Eff.Fire | Eff.Ice;          // 조합
 bool onFire = (e & Eff.Fire) != 0;   // 검사
 ```
 
-## 정수 나눗셈
-
-`25 / 4`는 둘 다 int라 정수 나눗셈으로 6 → float에 대입돼도 6.0. `1 / 3 * 100f`는 `1/3`이 먼저 int 0이 된 뒤 ×100f → 0. 나눗셈이 int끼리 먼저 평가되는 게 함정. 고치려면 `(float)`로 캐스팅.
-
-```csharp
-float a = 25 / 4;               // int끼리 나눠 6 → 6.0
-float b = 1 / 3 * 100f;         // (1/3)=0 먼저 → 0
-float c = (float)1 / 3 * 100f;  // 33.33
-```
-
-## 정수 오버플로와 2의 보수
-
-정수는 고정된 비트 수(int는 32비트)에 담김. 음수를 어떻게 표현하느냐가 오버플로 동작을 정하는데, C#(과 대부분 CPU)은 2의 보수(two's complement)를 씀. 음수 `-x`는 "`x`의 비트를 전부 뒤집고 1을 더한" 값으로 저장하고, 최상위 비트가 부호 역할(1이면 음수)을 겸함.
-
-왜 이렇게 하냐가 핵심 — 이러면 뺄셈 회로를 따로 안 만들고 덧셈 하나로 뺄셈까지 처리됨(`a - b = a + (-b)`). 4비트로 보면 `3`=`0011`, `-3`=`1100+1`=`1101`, `3 + (-3)` = `0011 + 1101 = 10000` → 넘친 자리를 버리면 `0000`=0. 부호가 있어도 덧셈 회로 하나로 다 되고 0의 표현도 하나뿐(`+0`/`-0`이 안 갈림).
-
-비트 수가 고정이라 표현 범위도 고정(int는 `−2³¹ ~ 2³¹−1`). 최댓값에서 +1하면 자리올림이 부호 비트를 넘어가, 비트 패턴이 최솟값으로 감싸짐(wrap around). `0111…111`에 1을 더하면 `1000…000`이 되는데 2의 보수에선 이 패턴이 곧 최솟값 — 숫자 원판을 한 바퀴 돌아 반대편으로 넘어간 셈.
-
-<svg viewBox="0 0 620 200" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="int 최댓값에 1을 더하면 2의 보수 비트가 최솟값으로 감싸진다"><defs><marker id="of-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="30" y="76" width="210" height="66" rx="4"/></g><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="380" y="76" width="210" height="66" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="135" y="98">int.MaxValue</text><text x="135" y="116" font-size="11" opacity="0.7">2³¹−1 = 2,147,483,647</text><text x="135" y="133" font-size="11" font-family="monospace" opacity="0.7">0111…111</text><text x="485" y="98">int.MinValue</text><text x="485" y="116" font-size="11" opacity="0.7">−2³¹ = −2,147,483,648</text><text x="485" y="133" font-size="11" font-family="monospace" opacity="0.7">1000…000</text></g><path d="M240 92 C310 58, 310 58, 378 92" fill="none" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#of-a)"/><text x="310" y="52" font-size="11" fill="currentColor" opacity="0.7" text-anchor="middle">+1 (자리올림이 부호 비트를 넘김)</text><path d="M378 130 C310 166, 310 166, 242 130" fill="none" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#of-a)"/><text x="310" y="186" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">범위를 원판처럼 한 바퀴 돌아 반대편으로</text></svg>
-
-```csharp
-int max = int.MaxValue;   //  2,147,483,647  (0111…111)
-int wrap = max + 1;       // -2,147,483,648  (1000…000) — 최솟값으로 감쌈
-```
-
-C#은 성능을 위해 기본으로 오버플로를 검사하지 않고 조용히 감쌈. 그래서 큰 수 계산에서 값이 엉뚱해지는 버그가 숨을 수 있음. `checked`로 감싸면 오버플로 시 예외를 던짐(앞 형 변환의 "조용한 감쌈 vs 예외로 드러냄"과 연결). 더 큰 범위가 필요하면 `long`(64비트), 아주 크면 `BigInteger`.
-
-```csharp
-checked { int c = int.MaxValue + 1; }   // OverflowException — 조용히 안 넘어감
-```
-
-## const vs readonly
-
-| | 확정 시점 | 쓸 수 있는 값 | 함정 |
-| --- | --- | --- | --- |
-| `const` | 컴파일 타임 | 리터럴/불변값 전용 | 사용처에 값이 인라인됨 → 라이브러리 const를 참조하는 쪽이 재컴파일 안 하면 옛값 유지 |
-| `readonly` | 런타임(선언/생성자) | 인스턴스별 값, 참조 타입도 가능 | 참조 타입은 재할당만 막고 객체 내부는 변경 가능 |
-
 ## 객체지향 4대 특성
 
 | 특성 | 뜻 | C#에서 |
@@ -940,44 +956,6 @@ class Player {
 ```
 
 `{ get; set; }` 자동 프로퍼티는 컴파일러가 숨은 백킹 필드를 만들어 줌. 처음부터 프로퍼티로 여는 이유는 변경 격리 — 나중에 검증 로직이 필요해져도 공개 표면(프로퍼티)은 그대로라 쓰는 코드가 안 깨짐. 반대로 `public` 필드로 열었다가 나중에 프로퍼티로 바꾸면 바이너리 호환이 깨질 수 있음. 유니티의 `[SerializeField]`가 프로퍼티가 아니라 필드에 붙는 것도, 인스펙터 직렬화가 필드를 대상으로 하기 때문.
-
-## 생성자 실행 순서
-
-상속 관계에서 자식 생성자는 본문 전에 부모 생성자를 암묵 호출 → 부모 생성자가 먼저 실행되고 자식 생성자가 나중. 부모가 완전히 초기화된 뒤 자식이 동작.
-
-```csharp
-class A { public A() => Console.Write("A"); }
-class B : A { public B() => Console.Write("B"); }
-new B();   // "AB" — 부모 먼저
-```
-
-## static 필드
-
-static은 클래스당 하나라 모든 인스턴스가 공유. 인스턴스 필드는 객체별로 따로. `id = ++total`이면 `a.id = 1`, `b.id = 2`, `total = 2`.
-
-```csharp
-class E { static int total; public int id = ++total; }
-var a = new E(); var b = new E();   // a.id=1, b.id=2, total=2
-```
-
-## sealed·정적 클래스·정적 생성자
-
-`sealed`는 더 이상의 상속·재정의를 막음. 클래스에 붙이면 상속 불가, `override` 메서드에 붙이면 그 아래에서 더는 재정의 불가. 확장 지점을 닫아 의도를 못 벗어나게 하고, 가상 호출을 직접 호출로 바꿀 여지를 줘 약간의 최적화도 됨.
-
-정적 클래스(`static class`)는 인스턴스를 못 만들고 정적 멤버만 담는 상자. 상태 없는 유틸리티 모음에 씀(예: `Math`). 확장 메서드도 정적 클래스에만 둘 수 있음.
-
-정적 생성자는 그 타입이 처음 쓰이기 직전에 딱 한 번 자동 실행돼 정적 필드를 초기화. 호출 시점을 못 정하고 매개변수도 못 받음.
-
-```csharp
-sealed class FinalBoss : Enemy {}       // 더는 상속 불가
-static class MathUtil {                   // 인스턴스 없음
-    public static float Sq(float x) => x * x;
-}
-class Config {
-    public static readonly string Path;
-    static Config() { Path = Load(); }    // 최초 사용 직전 1회
-}
-```
 
 ## 추상 클래스 vs 인터페이스
 
@@ -1046,7 +1024,7 @@ Enemy e = new Goblin();
 e.DealDamage();   // Goblin.Attack 실행
 ```
 
-가상 호출은 vtable을 한 번 더 거치는 간접 참조라 직접 호출보다 아주 약간 느림. `sealed`를 붙이면 더 파생 못 함이 확정돼 컴파일러가 직접 호출로 최적화할 여지가 생김(앞 sealed 항목).
+가상 호출은 vtable을 한 번 더 거치는 간접 참조라 직접 호출보다 아주 약간 느림. `sealed`를 붙이면 더 파생 못 함이 확정돼 컴파일러가 직접 호출로 최적화할 여지가 생김(뒤 sealed 항목).
 
 ## 메서드 오버로딩 vs 오버라이딩
 
@@ -1072,6 +1050,51 @@ A a = new B();  a.Hit();   // B.Hit — 실제 객체가 B라서
 flowchart TD
     OL["오버로딩 호출"] -->|"인자의 정적 타입"| OLC["컴파일 타임에 버전 확정"]
     OR["오버라이딩 호출"] -->|"실제 객체 타입"| ORD["런타임에 디스패치로 확정"]
+```
+
+## 생성자 실행 순서
+
+상속 관계에서 자식 생성자는 본문 전에 부모 생성자를 암묵 호출 → 부모 생성자가 먼저 실행되고 자식 생성자가 나중. 부모가 완전히 초기화된 뒤 자식이 동작.
+
+```csharp
+class A { public A() => Console.Write("A"); }
+class B : A { public B() => Console.Write("B"); }
+new B();   // "AB" — 부모 먼저
+```
+
+## static 필드
+
+static은 클래스당 하나라 모든 인스턴스가 공유. 인스턴스 필드는 객체별로 따로. `id = ++total`이면 `a.id = 1`, `b.id = 2`, `total = 2`.
+
+```csharp
+class E { static int total; public int id = ++total; }
+var a = new E(); var b = new E();   // a.id=1, b.id=2, total=2
+```
+
+## const vs readonly
+
+| | 확정 시점 | 쓸 수 있는 값 | 함정 |
+| --- | --- | --- | --- |
+| `const` | 컴파일 타임 | 리터럴/불변값 전용 | 사용처에 값이 인라인됨 → 라이브러리 const를 참조하는 쪽이 재컴파일 안 하면 옛값 유지 |
+| `readonly` | 런타임(선언/생성자) | 인스턴스별 값, 참조 타입도 가능 | 참조 타입은 재할당만 막고 객체 내부는 변경 가능 |
+
+## sealed·정적 클래스·정적 생성자
+
+`sealed`는 더 이상의 상속·재정의를 막음. 클래스에 붙이면 상속 불가, `override` 메서드에 붙이면 그 아래에서 더는 재정의 불가. 확장 지점을 닫아 의도를 못 벗어나게 하고, 가상 호출을 직접 호출로 바꿀 여지를 줘 약간의 최적화도 됨.
+
+정적 클래스(`static class`)는 인스턴스를 못 만들고 정적 멤버만 담는 상자. 상태 없는 유틸리티 모음에 씀(예: `Math`). 확장 메서드도 정적 클래스에만 둘 수 있음.
+
+정적 생성자는 그 타입이 처음 쓰이기 직전에 딱 한 번 자동 실행돼 정적 필드를 초기화. 호출 시점을 못 정하고 매개변수도 못 받음.
+
+```csharp
+sealed class FinalBoss : Enemy {}       // 더는 상속 불가
+static class MathUtil {                   // 인스턴스 없음
+    public static float Sq(float x) => x * x;
+}
+class Config {
+    public static readonly string Path;
+    static Config() { Path = Load(); }    // 최초 사용 직전 1회
+}
 ```
 
 ## 제네릭과 where 제약
@@ -1201,32 +1224,6 @@ f += () => 3;
 int r = f();   // 3 — 마지막 것만, 앞의 1·2는 버려짐
 ```
 
-## for 루프 클로저
-
-람다가 바깥 변수를 쓰면 그 순간의 값을 복사해 가는 게 아니라 변수 그 자체를 붙듦(캡처, closure). 그래서 "만든 시점의 값"이 아니라 "실행하는 시점에 그 변수에 든 값"이 나옴.
-
-```csharp
-var acts = new List<Action>();
-for (int i = 0; i < 3; i++)
-    acts.Add(() => Console.Write(i));   // i를 공유 캡처
-foreach (var a in acts) a();            // 3 3 3
-```
-
-`for`의 `i`는 루프 전체에 걸친 하나의 변수라, 람다 셋이 같은 변수를 공유함. 루프는 `i`가 3이 되며 끝나므로 나중에 실행하면 다 3. 반복마다 새 지역 변수를 만들면 각 람다가 서로 다른 걸 붙들어 해결.
-
-<svg viewBox="0 0 620 150" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="공유 캡처는 한 변수를 셋이 공유해 다 3, 반복마다 새 변수는 각자 붙들어 0 1 2"><defs><marker id="fc-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><text x="20" y="18" font-size="12" fill="currentColor" opacity="0.7">공유 캡처 → 3 3 3</text><g fill="none" stroke="currentColor" stroke-opacity="0.55"><rect x="20" y="34" width="86" height="26" rx="4"/><rect x="20" y="70" width="86" height="26" rx="4"/><rect x="20" y="106" width="86" height="26" rx="4"/></g><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="196" y="56" width="92" height="52" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="63" y="51">람다0</text><text x="63" y="87">람다1</text><text x="63" y="123">람다2</text><text x="242" y="86">i = 3</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#fc-a)"><line x1="106" y1="47" x2="194" y2="70"/><line x1="106" y1="83" x2="194" y2="82"/><line x1="106" y1="119" x2="194" y2="94"/></g><line x1="312" y1="14" x2="312" y2="140" stroke="currentColor" stroke-opacity="0.2"/><text x="338" y="18" font-size="12" fill="currentColor" opacity="0.7">반복마다 새 변수 → 0 1 2</text><g fill="none" stroke="currentColor" stroke-opacity="0.55"><rect x="338" y="34" width="86" height="26" rx="4"/><rect x="338" y="70" width="86" height="26" rx="4"/><rect x="338" y="106" width="86" height="26" rx="4"/></g><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="512" y="34" width="92" height="26" rx="4"/><rect x="512" y="70" width="92" height="26" rx="4"/><rect x="512" y="106" width="92" height="26" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="381" y="51">람다0</text><text x="381" y="87">람다1</text><text x="381" y="123">람다2</text><text x="558" y="51">copy=0</text><text x="558" y="87">copy=1</text><text x="558" y="123">copy=2</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#fc-a)"><line x1="424" y1="47" x2="510" y2="47"/><line x1="424" y1="83" x2="510" y2="83"/><line x1="424" y1="119" x2="510" y2="119"/></g></svg>
-
-```csharp
-for (int i = 0; i < 3; i++) {
-    int copy = i;                       // 반복마다 새 지역 변수 → 상자 3개
-    acts.Add(() => Console.Write(copy));
-}                                       // 0 1 2
-```
-
-캡처의 의미는 변수의 수명 연장 — 컴파일러가 캡처된 변수를 스택이 아니라 힙의 숨은 객체에 넣어, 람다가 살아있는 한 그 변수도 살아있음. `for`가 끝나도 `i`(정확히는 그 힙 객체)는 람다가 참조하니 사라지지 않고, 나중에 열어보면 마지막 값 3이 들어있는 것.
-
-`foreach`의 반복 변수는 C# 5부터 반복마다 새 변수로 바뀌어 이 함정이 없음. 하지만 `for`의 `i`는 여전히 옛 방식(루프 전체에 하나)이라 함정이 살아있음.
-
 ## 로컬 함수 vs 람다
 
 먼저 층위를 나눠야 함.
@@ -1264,6 +1261,32 @@ Func<int,int> sq = x => x * x;     // 람다 — 델리게이트 자리에 짧�
 ```
 
 한 줄 — 메서드 안에서만 부를 헬퍼면 로컬 함수(할당 없고 이름이 있어 디버깅 쉬움), 함수를 값으로 넘겨야 하면 람다.
+
+## for 루프 클로저
+
+람다가 바깥 변수를 쓰면 그 순간의 값을 복사해 가는 게 아니라 변수 그 자체를 붙듦(캡처, closure). 그래서 "만든 시점의 값"이 아니라 "실행하는 시점에 그 변수에 든 값"이 나옴.
+
+```csharp
+var acts = new List<Action>();
+for (int i = 0; i < 3; i++)
+    acts.Add(() => Console.Write(i));   // i를 공유 캡처
+foreach (var a in acts) a();            // 3 3 3
+```
+
+`for`의 `i`는 루프 전체에 걸친 하나의 변수라, 람다 셋이 같은 변수를 공유함. 루프는 `i`가 3이 되며 끝나므로 나중에 실행하면 다 3. 반복마다 새 지역 변수를 만들면 각 람다가 서로 다른 걸 붙들어 해결.
+
+<svg viewBox="0 0 620 150" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="공유 캡처는 한 변수를 셋이 공유해 다 3, 반복마다 새 변수는 각자 붙들어 0 1 2"><defs><marker id="fc-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><text x="20" y="18" font-size="12" fill="currentColor" opacity="0.7">공유 캡처 → 3 3 3</text><g fill="none" stroke="currentColor" stroke-opacity="0.55"><rect x="20" y="34" width="86" height="26" rx="4"/><rect x="20" y="70" width="86" height="26" rx="4"/><rect x="20" y="106" width="86" height="26" rx="4"/></g><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="196" y="56" width="92" height="52" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="63" y="51">람다0</text><text x="63" y="87">람다1</text><text x="63" y="123">람다2</text><text x="242" y="86">i = 3</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#fc-a)"><line x1="106" y1="47" x2="194" y2="70"/><line x1="106" y1="83" x2="194" y2="82"/><line x1="106" y1="119" x2="194" y2="94"/></g><line x1="312" y1="14" x2="312" y2="140" stroke="currentColor" stroke-opacity="0.2"/><text x="338" y="18" font-size="12" fill="currentColor" opacity="0.7">반복마다 새 변수 → 0 1 2</text><g fill="none" stroke="currentColor" stroke-opacity="0.55"><rect x="338" y="34" width="86" height="26" rx="4"/><rect x="338" y="70" width="86" height="26" rx="4"/><rect x="338" y="106" width="86" height="26" rx="4"/></g><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="512" y="34" width="92" height="26" rx="4"/><rect x="512" y="70" width="92" height="26" rx="4"/><rect x="512" y="106" width="92" height="26" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="381" y="51">람다0</text><text x="381" y="87">람다1</text><text x="381" y="123">람다2</text><text x="558" y="51">copy=0</text><text x="558" y="87">copy=1</text><text x="558" y="123">copy=2</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#fc-a)"><line x1="424" y1="47" x2="510" y2="47"/><line x1="424" y1="83" x2="510" y2="83"/><line x1="424" y1="119" x2="510" y2="119"/></g></svg>
+
+```csharp
+for (int i = 0; i < 3; i++) {
+    int copy = i;                       // 반복마다 새 지역 변수 → 상자 3개
+    acts.Add(() => Console.Write(copy));
+}                                       // 0 1 2
+```
+
+캡처의 의미는 변수의 수명 연장 — 컴파일러가 캡처된 변수를 스택이 아니라 힙의 숨은 객체에 넣어, 람다가 살아있는 한 그 변수도 살아있음. `for`가 끝나도 `i`(정확히는 그 힙 객체)는 람다가 참조하니 사라지지 않고, 나중에 열어보면 마지막 값 3이 들어있는 것.
+
+`foreach`의 반복 변수는 C# 5부터 반복마다 새 변수로 바뀌어 이 함정이 없음. 하지만 `for`의 `i`는 여전히 옛 방식(루프 전체에 하나)이라 함정이 살아있음.
 
 ## yield return과 지연 실행
 
@@ -1388,29 +1411,6 @@ lock (gate) { balance += amount; }   // 이 안은 한 번에 한 스레드만
 - 단순 숫자 증감·교체 — `Interlocked.Increment` 등. 락 없이 CPU 명령 하나로 원자 처리해 훨씬 빠름
 
 무거운 순: `lock`(복합 갱신 범용) > `Concurrent___`(컬렉션 전용) > `Interlocked`(단순 연산 전용). 아래로 갈수록 가볍고 빠르나 적용 범위가 좁음.
-
-## 예외 처리 — try/catch/finally
-
-예외는 정상 흐름으로 처리 못 할 문제를 알리고, 잡을 수 있는 곳까지 흐름을 되감는 장치. `throw`가 실행되면 그 자리부터 남은 코드를 건너뛰고, 자기를 잡을 `catch`를 찾아 호출 스택을 거슬러 올라감 — 중간 단계는 다 건너뜀. 아무도 안 잡으면 최상위까지 올라가 프로그램이 죽음. 반환값 에러는 매 단계 손으로 검사·전달해야 하지만, 예외는 중간을 건너뛰고 처리 가능한 곳으로 점프.
-
-```csharp
-try { file = Open(path); Process(file); }  // 위험한 작업
-catch (IOException e) { Log(e); }            // 맞는 예외를 잡아 처리
-finally { file?.Close(); }                   // 어느 경로로 나가든 자원 정리
-```
-
-`finally`가 "항상"인 이유 — 예외로 `try` 중간에 튕겨 나가도 열어둔 자원(파일·연결·락)을 반드시 닫아야 하니까. 정상 경로에만 `Close()`를 두면 예외 시 그 줄에 도달 못 해 자원이 샘. 세 경로가 다 `finally`를 지남.
-
-```mermaid
-flowchart LR
-    T["try"] -->|정상| F["finally"]
-    T -->|예외 → catch| C["catch"] --> F
-    T -->|미포착| F
-    F -->|정상·처리됨| E["이후 코드"]
-    F -.->|미포착| P["위로 전파"]
-```
-
-`catch`는 위에서부터 처음 맞는 것이 잡으므로 구체 타입부터 넓은 순으로 — `IOException`(자식)을 `Exception`(부모)보다 위에 둬야 안 가려짐. 그리고 빈 catch로 삼키면(`catch { }`) 에러가 조용히 사라져 나중에 엉뚱한 곳에서 터지니, 잡았으면 처리·로깅·재던지기(`throw;`). `using`이 곧 try/finally의 축약.
 
 ## 세대별 GC
 

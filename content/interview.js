@@ -153,7 +153,7 @@
   background: var(--osiv-accent-soft); color: var(--osiv-accent-ink);
   font-size: 0.62em; letter-spacing: 0.06em; line-height: 1.7; vertical-align: 1px;
 }
-.osiv .qtext { font-size: 1.02em; font-weight: 600; line-height: 1.5; }
+.osiv .qtext { display: block; font-size: 1.02em; font-weight: 600; line-height: 1.5; }
 .osiv .chev { width: 16px; height: 16px; margin-top: 5px; color: var(--osiv-muted); transition: transform .18s ease; flex: none; }
 .osiv details[open] .chev { transform: rotate(180deg); }
 .osiv .ans { padding: 2px 0 20px 6px; display: grid; gap: 14px; }

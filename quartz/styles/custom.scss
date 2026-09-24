@@ -482,3 +482,37 @@ button,
     0 0 0 4px var(--light),
     0 0 0 5px var(--gray);
 }
+
+// 요약 노트는 한 페이지에 항목이 수십 개라(C# 노트는 54개) 제목 레벨만으로는 항목 경계가
+// 약하다. 항목을 ### 로 내리면 본문 16px 대비 17.9px밖에 안 돼 문단처럼 읽히고, 항목 사이
+// 여백(26px)과 문단 사이 여백(14.4px) 차이도 작아 내용이 뭉쳐 보인다. 그래서 크기 위계를
+// 벌리고(카테고리 25.6 / 항목 20 / 본문 16) 경계마다 선을 둔다.
+//
+// 카테고리(h2) 규칙은 h3가 있는 2단 구조 노트에만 건다 — 평평한 노트에서는 h2가 곧 항목이라
+// 굵은 선이 과하다. :has()를 못 쓰는 브라우저에서는 기본 스타일로 남는다(점진적 향상).
+body[data-slug^="summary-notes/"] article {
+  &:has(h3) h2 {
+    margin-top: 3.4rem;
+    padding-top: 1.1rem;
+    border-top: 2px solid var(--gray);
+    font-size: 1.6rem;
+  }
+
+  &:has(h3) h2:first-of-type {
+    margin-top: 1.6rem;
+  }
+
+  h3 {
+    margin-top: 2.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--lightgray);
+    font-size: 1.25rem;
+  }
+
+  // 카테고리 설명 바로 다음 첫 항목은 카테고리 선과 겹쳐 보이므로 선을 뺀다.
+  h2 + p + h3 {
+    margin-top: 1.4rem;
+    padding-top: 0;
+    border-top: none;
+  }
+}

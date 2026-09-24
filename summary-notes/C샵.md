@@ -1391,21 +1391,26 @@ lock (gate) { balance += amount; }   // 이 안은 한 번에 한 스레드만
 
 ## 예외 처리 — try/catch/finally
 
-`try`에서 예외가 나면 그 지점부터 남은 코드를 건너뛰고 맞는 `catch`로 점프, `finally`는 정상·예외에 상관없이 항상 실행돼 자원을 해제. `catch`는 구체 타입부터 잡고, 빈 catch로 삼키지 말고 처리·로깅·재던지기. `using`이 곧 try/finally의 축약.
+예외는 정상 흐름으로 처리 못 할 문제를 알리고, 잡을 수 있는 곳까지 흐름을 되감는 장치. `throw`가 실행되면 그 자리부터 남은 코드를 건너뛰고, 자기를 잡을 `catch`를 찾아 호출 스택을 거슬러 올라감 — 중간 단계는 다 건너뜀. 아무도 안 잡으면 최상위까지 올라가 프로그램이 죽음. 반환값 에러는 매 단계 손으로 검사·전달해야 하지만, 예외는 중간을 건너뛰고 처리 가능한 곳으로 점프.
 
 ```csharp
-try { Risky(); }
-catch (IOException e) { Log(e); }   // 구체 타입부터
-finally { Cleanup(); }              // 정상·예외 무관 항상 실행
+try { file = Open(path); Process(file); }  // 위험한 작업
+catch (IOException e) { Log(e); }            // 맞는 예외를 잡아 처리
+finally { file?.Close(); }                   // 어느 경로로 나가든 자원 정리
 ```
 
+`finally`가 "항상"인 이유 — 예외로 `try` 중간에 튕겨 나가도 열어둔 자원(파일·연결·락)을 반드시 닫아야 하니까. 정상 경로에만 `Close()`를 두면 예외 시 그 줄에 도달 못 해 자원이 샘. 세 경로가 다 `finally`를 지남.
+
 ```mermaid
-flowchart TD
-    T["try 블록"] -->|정상| F["finally"]
-    T -->|예외 발생| C["catch"]
-    C --> F
-    F --> E["이후 코드"]
+flowchart LR
+    T["try"] -->|정상| F["finally"]
+    T -->|예외 → catch| C["catch"] --> F
+    T -->|미포착| F
+    F -->|정상·처리됨| E["이후 코드"]
+    F -.->|미포착| P["위로 전파"]
 ```
+
+`catch`는 위에서부터 처음 맞는 것이 잡으므로 구체 타입부터 넓은 순으로 — `IOException`(자식)을 `Exception`(부모)보다 위에 둬야 안 가려짐. 그리고 빈 catch로 삼키면(`catch { }`) 에러가 조용히 사라져 나중에 엉뚱한 곳에서 터지니, 잡았으면 처리·로깅·재던지기(`throw;`). `using`이 곧 try/finally의 축약.
 
 ## 세대별 GC
 

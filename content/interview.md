@@ -2830,7 +2830,7 @@ title: 면접 대비 문답
 <div class="field" data-field="csharp" hidden>
 <p class="note"><strong>답변 프레임.</strong> 정의 한 문장으로 결론 먼저 → 왜 그렇게 동작·설계됐는지 → 트레이드오프(꼬리질문의 90%가 여기를 찌릅니다) → 필요하면 실제 예시 한 줄. 단정("절대 안 됩니다")은 반례 하나로 무너지니 "일반적으로 ~지만 ~한 경우엔 다릅니다"로.</p>
 <div class="bar">
-<span class="prog"><b class="prog-done">0</b> / <span class="prog-total">30</span> 자신 있음</span>
+<span class="prog"><b class="prog-done">0</b> / <span class="prog-total">32</span> 자신 있음</span>
 <span class="bar-sp"></span>
 <button class="tool tool-open" type="button">모두 펼치기</button>
 <button class="tool tool-hide" type="button" aria-pressed="false">체크 숨기기</button>
@@ -2980,7 +2980,7 @@ title: 면접 대비 문답
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>GC와 리소스 관리</h3><span class="cnt">3문항</span></div>
+<div class="grp-head"><h3>GC와 리소스 관리</h3><span class="cnt">4문항</span></div>
 <p class="grp-note">가비지 컬렉터가 무엇을 챙기고 무엇을 못 챙기는지가 핵심입니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q8" aria-label="8번 자신 있음"></label>
@@ -2990,13 +2990,15 @@ title: 면접 대비 문답
 <div class="core">
 <p class="lab">핵심 답변</p>
 <p><strong>객체를 나이로 세대를 나눠서, 대부분 금방 죽는 젊은 객체만 자주 훑는 방식입니다.</strong></p>
-<p>힙을 0세대, 1세대, 2세대로 나눕니다. 새로 만든 객체는 0세대에 들어가고, 수집에서 살아남으면 위 세대로 승격됩니다. 0세대 수집이 빠른 건 최근에 할당된 작은 영역만 훑으면 되고, 대부분의 객체는 금방 죽어서 적은 일로 많이 회수하기 때문입니다.</p>
-<p>오래 살아남은 객체는 2세대로 올라가 훨씬 드물게 수집됩니다. 자주 안 죽을 객체를 매번 검사하는 낭비를 줄이는 겁니다.</p>
+<p>전제가 되는 관찰이 있습니다. 실제 프로그램에서는 임시 변수나 중간 계산 결과처럼 만들어지자마자 죽는 객체가 압도적으로 많고, 반대로 오래 살아남은 객체는 앞으로도 계속 살 확률이 높습니다. 이걸 세대 가설이라고 합니다.</p>
+<p>그래서 힙을 0세대, 1세대, 2세대로 나눕니다. 새로 만든 객체는 0세대에 들어가고, 수집에서 살아남으면 위 세대로 승격됩니다. 자주 도는 수집은 0세대만 보는데, 0세대는 최근 것만 있어 작고 가설대로 대부분 죽어 있어서 조금만 훑어도 많이 회수됩니다. 적은 일로 큰 성과를 내는 겁니다.</p>
+<p>반대로 2세대는 잘 안 죽으니 자주 검사해 봐야 헛수고라 드물게만 전체 수집을 합니다. 힙 전체를 매번 훑는 대신 젊은 영역만 자주 훑어서 전체 비용을 크게 줄인 구조입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>게임에서 GC 때문에 프레임이 튀는데 어떻게 줄이나요?</q>매 프레임 새로 할당하는 걸 줄이는 게 핵심입니다. 임시 객체가 계속 생기면 0세대가 자주 차서 수집이 잦아집니다. 그래서 자주 쓰는 객체는 미리 만들어 재사용하는 오브젝트 풀을 쓰고, 박싱이나 문자열 이어붙이기처럼 숨은 할당을 걷어냅니다.</span></li>
+<li><span><q>GC 때문에 프레임이 튀는데 어떻게 줄이나요?</q>할당 자체를 줄이는 게 핵심입니다. 임시 객체가 계속 생기면 그만큼 수집이 자주 일어나고, 그때마다의 멈칫함이 쌓여 프레임이 끊깁니다. 그래서 자주 쓰는 객체는 미리 만들어 재사용하는 오브젝트 풀을 쓰고, 박싱이나 문자열 이어붙이기처럼 눈에 안 보이는 할당을 걷어냅니다. 값 타입이나 <code>Span</code>, <code>stackalloc</code>을 쓰는 것도 같은 목적입니다.</span></li>
+<li><span><q>그 세대 모델은 어느 런타임에나 똑같이 적용되나요?</q>아닙니다. 방금 설명한 0세대, 1세대, 2세대 구조는 표준 닷넷인 CoreCLR 기준입니다. 런타임마다 가비지 컬렉터가 달라서, 예를 들어 유니티의 기본 런타임인 모노나 IL2CPP는 세대 구분이 없는 Boehm 컬렉터를 씁니다. 세대가 없으니 수집할 때마다 전체를 멈추고 훑고, 그 멈춤을 여러 프레임에 나눠 분산하는 증분 GC 옵션이 따로 있습니다. 할당을 줄이라는 결론은 같지만 이유가 다른 셈입니다.</span></li>
 </ul>
 </div>
 </div>
@@ -3010,8 +3012,15 @@ title: 면접 대비 문답
 <div class="core">
 <p class="lab">핵심 답변</p>
 <p><strong>가비지 컬렉터는 관리되는 메모리만 회수하고, 파일 핸들이나 소켓 같은 비관리 자원은 챙기지 못하기 때문입니다.</strong></p>
-<p>메모리는 가비지 컬렉터가 알아서 정리하지만, 운영체제가 쥐여준 파일 핸들이나 네트워크 소켓, 네이티브 메모리 같은 건 언제 어떻게 풀어야 하는지 모릅니다. 게다가 수집이 도는 시점도 정해져 있지 않아서, 자원을 언제 놓을지 예측할 수 없습니다.</p>
-<p>그래서 <code>IDisposable</code>의 <code>Dispose</code>로 이런 자원을 직접 놓아 주고, <code>using</code>으로 감싸서 블록을 벗어나거나 예외가 나도 <code>Dispose</code>가 반드시 불리게 보장합니다.</p>
+<p>메모리는 가비지 컬렉터가 알아서 정리하지만, 운영체제가 쥐여준 파일 핸들이나 네트워크 소켓, 네이티브 메모리 같은 건 언제 어떻게 풀어야 하는지 모릅니다. 게다가 그 자원을 쥔 래퍼 객체는 관리 메모리로 보면 아주 작아서 메모리 압박을 만들지 않습니다. 그래서 수집이 한참 안 돌고, 그동안 귀한 자원은 계속 붙들려 있습니다. 수집 시점 자체도 정해져 있지 않아 언제 놓일지 예측할 수 없습니다.</p>
+<p>그래서 <code>IDisposable</code>의 <code>Dispose</code>로 이런 자원을 직접 놓아 주고, <code>using</code>으로 감싸서 블록을 벗어나거나 예외가 나도 <code>Dispose</code>가 반드시 불리게 보장합니다. 타입이 <code>IDisposable</code>이라는 건 가비지 컬렉터에 맡기지 말고 직접 닫으라는 신호로 읽으면 됩니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>안 닫으면 구체적으로 뭐가 문제가 되나요?</q>두 가지입니다. 먼저 핸들이 열려 있는 동안 운영체제가 그 파일에 대한 다른 접근을 거부합니다. 윈도우에서 읽기로 열어 둔 파일은 남이 쓰거나 지울 수 없고, 자기 프로그램도 예외가 아니라 자기가 안 닫은 파일을 자기가 못 덮어쓰는 일이 흔합니다. 그다음 프로세스가 열 수 있는 핸들 수에는 상한이 있어서, 계속 새면 결국 고갈됩니다. 소켓은 포트가, 데이터베이스는 커넥션 풀이 같은 식으로 마릅니다.</span></li>
+<li><span><q>using은 정확히 뭘 해 주나요?</q><code>try</code>와 <code>finally</code>를 깔아 줍니다. <code>Dispose</code>를 손으로 부르면 그 위에서 예외가 났을 때 건너뛰어 자원이 새는데, <code>using</code>은 해제를 <code>finally</code>에 넣은 것과 같아서 어느 경로로 빠져나가든 불립니다. C# 8부터는 중괄호 없이 선언형으로 써서 스코프가 끝날 때 해제되게 할 수도 있습니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -3036,12 +3045,33 @@ title: 면접 대비 문답
 </div>
 </details>
 </div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="csharp-q11" aria-label="11번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">GC-04</span><span class="qtext">소멸자는 언제 불리고, 왜 함부로 쓰면 안 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>가비지 컬렉터가 객체를 수거하기 직전에 불리는 안전망이고, 시점을 못 정하는 데다 수거를 두 배로 늦추기 때문에 꼭 필요할 때만 씁니다.</strong></p>
+<p>이름이 소멸자라서 C++ 것과 같다고 오해하기 쉬운데 성격이 다릅니다. C++ 소멸자는 스코프를 벗어나면 즉시 불려서 자원을 객체 수명에 묶는 패턴이 성립하지만, C#에서는 가비지 컬렉터가 언제 돌지 모르니 시점이 비결정적입니다. C#에서 그 역할을 하는 건 소멸자가 아니라 <code>using</code>과 <code>IDisposable</code>입니다.</p>
+<p>비용이 큰 이유는 한 번의 수집으로 끝나지 않아서입니다. 1차 수집에서 죽은 걸 확인해도 소멸자가 있으면 회수하지 않고 큐에 넣어 두고, 전용 스레드가 소멸자를 실행한 다음 2차 수집에서야 실제로 메모리를 회수합니다. 최소 두 주기를 살아남으니 위 세대로 승격되고, 승격된 세대는 드물게 수집되니 더 오래 남습니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>그럼 Dispose와 소멸자를 같이 쓸 때는 어떻게 하나요?</q><code>Dispose</code>를 정상 경로로 두고 소멸자는 깜빡했을 때의 보험으로만 둡니다. 그리고 <code>Dispose</code> 안에서 <code>GC.SuppressFinalize</code>를 불러서 이미 정리했으니 소멸자 큐에 넣지 말라고 알려 줍니다. 그러면 정상 경로에서는 수집 한 번으로 회수되고, 깜빡했을 때만 두 번 비용을 치르면서 자원은 새지 않습니다.</span></li>
+<li><span><q>어떤 클래스에 소멸자를 두면 안 되나요?</q>관리되는 객체만 담은 클래스입니다. 놓아 줄 비관리 자원이 없으면 소멸자가 할 일이 없는데, 두기만 해도 방금 말한 2단계 수거 비용이 붙어서 수거만 느려집니다. 비관리 자원을 직접 쥐고 있을 때만 두는 게 원칙입니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
 </section>
 <section class="grp">
 <div class="grp-head"><h3>상속과 다형성</h3><span class="cnt">3문항</span></div>
 <p class="grp-note">선언 타입과 런타임 타입 중 무엇을 기준으로 부르는지가 관건입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q11" aria-label="11번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q12" aria-label="12번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">OOP-01</span><span class="qtext">virtual과 override, 그리고 new는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3061,7 +3091,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q12" aria-label="12번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q13" aria-label="13번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">OOP-02</span><span class="qtext">추상 클래스와 인터페이스는 언제 각각 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3084,7 +3114,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q13" aria-label="13번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q14" aria-label="14번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">OOP-03</span><span class="qtext">상속에서 생성자는 어떤 순서로 실행되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3105,7 +3135,7 @@ title: 면접 대비 문답
 <div class="grp-head"><h3>델리게이트와 지연 실행</h3><span class="cnt">4문항</span></div>
 <p class="grp-note">호출과 실행이 분리되는 지점, 그리고 무엇을 캡처하는지가 자주 나옵니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q14" aria-label="14번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q15" aria-label="15번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">DEL-01</span><span class="qtext">yield return과 지연 실행은 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3119,13 +3149,19 @@ title: 면접 대비 문답
 <p class="lab">꼬리질문</p>
 <ul>
 <li><span><q>이게 왜 쓸모가 있나요?</q>필요한 만큼만 계산하고 멈출 수 있어서입니다. 무한 수열이나 아주 큰 데이터도 전부 미리 만들지 않고, 앞에서 몇 개만 꺼내 쓰고 멈추면 그만큼만 계산됩니다. 메모리도 아끼고 불필요한 계산도 피합니다.</span></li>
+<li><span><q>실행을 일으키는 건 foreach뿐인가요?</q>아닙니다. 값을 요청하는 건 모두 방아쇠가 됩니다. <code>ToList</code>나 <code>Count</code>는 전부 요청하니 끝까지 돌고, <code>First</code>나 <code>Take(2)</code>는 필요한 만큼만 돌리고 멈춥니다. 열거자를 직접 얻어서 <code>MoveNext</code>를 손으로 눌러도 똑같이 실행됩니다. <code>foreach</code>는 사실 그 <code>MoveNext</code> 반복을 감싼 문법일 뿐입니다.</span></li>
+<li><span><q>유니티 코루틴도 이것과 같은 건가요?</q>같은 메커니즘입니다. 코루틴 메서드의 반환형이 <code>IEnumerator</code>인 것도 그래서고, 함수가 중간에 멈췄다 이어지는 것도 방금 말한 상태 기계 덕분입니다. 차이는 두 가지입니다. 먼저 <code>MoveNext</code>를 눌러 주는 주체가 <code>foreach</code>가 아니라 유니티 엔진의 프레임 루프라는 점이고, 그다음 <code>yield</code>가 내놓는 값이 꺼내 쓸 데이터가 아니라 언제 재개할지 알려 주는 지시라는 점입니다. <code>WaitForSeconds</code>가 그 지시에 해당합니다.</span></li>
 </ul>
+</div>
+<div class="trap">
+<p class="lab">함정</p>
+<p>이터레이터 메서드 안에 인자 검증을 넣으면 호출한 자리에서 안 터집니다. 본문이 지연되니 예외도 실제로 열거하는 시점까지 미뤄져서, 원인과 멀리 떨어진 곳에서 터집니다. 그래서 검증은 즉시 실행되는 바깥 메서드로 분리하고 안쪽만 이터레이터로 두는 게 관례입니다.</p>
 </div>
 </div>
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q15" aria-label="15번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q16" aria-label="16번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">DEL-02</span><span class="qtext">LINQ 쿼리는 언제 실행되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3138,14 +3174,15 @@ title: 면접 대비 문답
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>같은 쿼리를 두 번 쓰면 어떻게 되나요?</q>두 번 다 계산됩니다. 열거할 때마다 처음부터 다시 도는 거라, 무거운 쿼리를 여러 번 쓰거나 결과를 고정하고 싶으면 <code>ToList</code>로 한 번 실체화해 두고 그걸 재사용합니다.</span></li>
+<li><span><q>같은 쿼리를 두 번 쓰면 어떻게 되나요?</q>두 번 다 계산됩니다. 열거할 때마다 처음부터 다시 도는 거라, 무거운 쿼리를 여러 번 쓰거나 결과를 고정하고 싶으면 <code>ToList</code>로 한 번 실체화해 두고 그걸 재사용합니다. 쿼리 변수는 결과가 아니라 계산 방법을 담은 계획이라고 보면 이해하기 쉽습니다.</span></li>
+<li><span><q>지연 실행이 함정만 있는 건 아닐 텐데, 이점은 뭔가요?</q>필요한 만큼만 계산하고 중간 결과를 쌓아 두지 않는 겁니다. 백만 개에서 <code>Where</code>와 <code>Select</code>를 거쳐 <code>Take(3)</code>을 하면, 원소 하나가 파이프라인 전체를 통과하는 식으로 흘러서 세 개가 채워지는 순간 멈춥니다. 백만 개를 다 훑지 않습니다. 즉시 실행이었다면 <code>Where</code>가 걸러 낸 리스트를 만들고 <code>Select</code>가 또 만들면서 중간 리스트가 겹겹이 생겼을 겁니다.</span></li>
 </ul>
 </div>
 </div>
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q16" aria-label="16번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q17" aria-label="17번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">DEL-03</span><span class="qtext">delegate와 event는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3165,7 +3202,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q17" aria-label="17번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q18" aria-label="18번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">DEL-04</span><span class="qtext">for 루프 안에서 만든 람다가 왜 예상과 다른 값을 출력하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3174,6 +3211,14 @@ title: 면접 대비 문답
 <p><strong>람다가 반복 변수의 값을 복사해 가는 게 아니라 그 변수 자체를 공유해서 캡처하기 때문입니다.</strong></p>
 <p>for 문의 변수 하나를 여러 람다가 함께 캡처하면, 나중에 람다가 실행될 때 다들 그 변수의 마지막 상태를 봅니다. 0부터 2까지 도는 루프라면 끝날 때 변수가 3이 되어 있으니, 람다들이 모두 3을 출력합니다.</p>
 <p>고치려면 반복마다 새 지역 변수에 값을 복사하고 그 지역 변수를 캡처하게 합니다. 그러면 각 람다가 자기만의 변수를 잡아서 0, 1, 2가 제대로 나옵니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>for 문이 끝나면 그 변수는 사라질 텐데, 람다는 어떻게 그걸 읽나요?</q>캡처된 변수는 보통의 지역 변수처럼 안 사라집니다. 컴파일러가 그 변수를 스택이 아니라 힙에 있는 숨은 객체 안으로 옮기고, 람다가 그 객체를 참조하게 만들기 때문입니다. 그래서 람다가 살아 있는 한 변수도 같이 살아 있습니다. 캡처는 값을 복사하는 게 아니라 변수의 수명을 람다에 맞춰 연장하는 동작이라고 보면 정확합니다.</span></li>
+<li><span><q>그럼 그 캡처된 변수는 언제 해제되나요?</q>그 숨은 객체를 참조하는 람다가 전부 도달 불가능해졌을 때 가비지 컬렉터가 회수합니다. 일반 힙 객체와 규칙이 같습니다. 그래서 오래 사는 이벤트에 람다를 등록해 두면 람다가 계속 참조되어 캡처한 객체까지 같이 오래 남습니다. 구독을 해지해서 그 참조를 끊어 줘야 회수됩니다.</span></li>
+<li><span><q>foreach에서도 같은 문제가 생기나요?</q>지금은 안 생깁니다. C# 5부터 <code>foreach</code>의 반복 변수는 반복마다 새로 만들어지도록 바뀌어서 각 람다가 서로 다른 변수를 잡습니다. 다만 <code>for</code> 문의 변수는 여전히 루프 전체에 하나라서 이 함정이 그대로 남아 있습니다.</span></li>
+</ul>
 </div>
 <div class="trap">
 <p class="lab">함정</p>
@@ -3184,10 +3229,10 @@ title: 면접 대비 문답
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>제네릭과 타입 도구</h3><span class="cnt">3문항</span></div>
+<div class="grp-head"><h3>제네릭과 타입 도구</h3><span class="cnt">4문항</span></div>
 <p class="grp-note">컴파일러에게 무엇을 약속하고 무엇을 얻는지를 설명할 수 있어야 합니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q18" aria-label="18번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q19" aria-label="19번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">GEN-01</span><span class="qtext">제네릭 where 제약은 왜 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3207,7 +3252,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q19" aria-label="19번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q20" aria-label="20번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">GEN-02</span><span class="qtext">공변성과 반공변성은 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3227,7 +3272,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q20" aria-label="20번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q21" aria-label="21번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">GEN-03</span><span class="qtext">as와 괄호 캐스트는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3246,12 +3291,33 @@ title: 면접 대비 문답
 </div>
 </details>
 </div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="csharp-q22" aria-label="22번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">GEN-04</span><span class="qtext">리플렉션은 무엇이고 어디에 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>실행 중에 타입의 구조를 물어보고, 멤버 이름을 코드에 직접 박는 대신 멤버를 대표하는 객체를 통해 간접적으로 접근하는 기능입니다.</strong></p>
+<p>보통 코드는 멤버 이름을 그대로 적어서 컴파일 타임에 확정합니다. 리플렉션은 그러지 않고 타입에게 어떤 필드와 메서드가 있는지 물어본 다음, 돌려받은 <code>Type</code>이나 <code>FieldInfo</code>, <code>MethodInfo</code> 같은 객체로 값을 읽거나 메서드를 부릅니다. 이름을 문자열로 찾거나 전체를 순회할 수도 있습니다.</p>
+<p>그래서 쓰임새는 컴파일 타임에 타입을 모르는데 그 구조를 다뤄야 할 때로 모입니다. 어떤 객체든 필드를 훑어 저장하는 직렬화, 스크립트 필드를 훑어 편집 화면을 만들어 주는 유니티 인스펙터, 특정 어트리뷰트가 붙은 메서드만 찾아 실행하는 테스트나 의존성 주입 프레임워크가 대표적입니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>어트리뷰트와는 어떤 관계인가요?</q>짝입니다. 어트리뷰트는 클래스나 필드에 붙이는 선언적인 표시일 뿐이고 그 자체로는 아무 동작도 하지 않습니다. 리플렉션이 그 표시를 읽어서 동작을 바꾸는 겁니다. <code>SerializeField</code>를 붙이면 유니티가 리플렉션으로 그걸 읽어 인스펙터에 노출하는 식이라, 표시하는 쪽과 읽는 쪽이 나뉘어 있다고 보면 됩니다.</span></li>
+<li><span><q>단점은 없나요?</q>두 가지가 있습니다. 먼저 실행 중에 조회하는 방식이라 직접 호출보다 느립니다. 그다음 이름을 문자열로 접근하니 오타가 나거나 나중에 이름을 바꿔도 컴파일 에러가 안 나고 실행할 때 터집니다. 컴파일 타임 검사를 우회하는 셈입니다. 그래서 자주 도는 구간에서는 조회 결과를 캐싱하거나, 컴파일 타임에 코드를 대신 만들어 주는 소스 제너레이터로 대체합니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
 </section>
 <section class="grp">
 <div class="grp-head"><h3>값의 함정과 null</h3><span class="cnt">3문항</span></div>
 <p class="grp-note">사소해 보이지만 실수가 잦아 코드 리뷰에서 자주 걸리는 지점입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q21" aria-label="21번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q23" aria-label="23번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">TRAP-01</span><span class="qtext">정수끼리 나눗셈에서 자주 하는 실수는 뭔가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3269,7 +3335,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q22" aria-label="22번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q24" aria-label="24번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">TRAP-02</span><span class="qtext">const와 readonly는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3293,7 +3359,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q23" aria-label="23번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q25" aria-label="25번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">TRAP-03</span><span class="qtext">nullable 참조 타입 기능은 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3317,7 +3383,7 @@ title: 면접 대비 문답
 <div class="grp-head"><h3>비동기와 동시성</h3><span class="cnt">3문항</span></div>
 <p class="grp-note">비동기와 병렬을 구분하고, 공유 상태를 어떻게 지키는지가 핵심입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q24" aria-label="24번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q26" aria-label="26번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">ASYNC-01</span><span class="qtext">async와 await는 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3337,38 +3403,42 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q25" aria-label="25번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q27" aria-label="27번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">ASYNC-02</span><span class="qtext">lock은 무엇이고 무엇을 잠가야 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
 <p><strong>lock은 한 번에 한 스레드만 임계 구역에 들이는 장치로, 바깥에 드러나지 않은 전용 객체로 잠가야 합니다.</strong></p>
-<p>여러 스레드가 같은 데이터를 동시에 고치면 값이 꼬이는데, <code>lock</code>으로 그 구간을 감싸면 한 스레드가 끝날 때까지 다른 스레드가 기다립니다. 잠글 객체는 바깥에서 접근할 수 없는 전용 인스턴스를 씁니다. this나 타입 객체로 잠그면 바깥 코드도 같은 걸로 잠글 수 있어 예상 못 한 교착이 생기기 때문입니다.</p>
+<p>왜 꼬이는지부터 보면, 잔고에 금액을 더하는 한 줄도 실제로는 세 단계입니다. 먼저 현재 값을 읽고, 그다음 더하고, 마지막에 결과를 씁니다. 두 스레드가 이걸 겹치면 둘 다 갱신 전 값을 읽어서 각자 같은 결과를 계산하고, 나중에 쓴 쪽이 먼저 쓴 쪽을 덮어써서 갱신 하나가 통째로 사라집니다. 이걸 경쟁 상태라고 합니다.</p>
+<p><code>lock</code>으로 그 구간을 감싸면 한 스레드가 읽고 쓰기를 끝낼 때까지 다른 스레드가 기다리므로, 뒤 스레드는 앞 스레드가 쓴 값을 제대로 보고 이어갑니다. 잠글 객체는 바깥에서 접근할 수 없는 전용 인스턴스를 씁니다. this나 타입 객체로 잠그면 바깥 코드도 같은 걸로 잠글 수 있어 예상 못 한 교착이 생기기 때문입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
 <li><span><q>잠금 말고 다른 방법도 있나요?</q>동시 접근이 잦으면 잠금 자체가 병목이 됩니다. 그럴 때는 스레드 안전하게 만들어진 동시성 컬렉션을 쓰거나, 단순한 증감이면 <code>Interlocked</code> 같은 원자적 연산으로 잠금 없이 처리하는 편이 경합을 줄여 유리합니다.</span></li>
+<li><span><q>그럼 셋 중에 뭘 기준으로 고르나요?</q>보호해야 할 범위가 기준입니다. 여러 줄을 하나의 단위로 묶어 보호해야 하면 <code>lock</code>밖에 없습니다. 여러 스레드가 공유하는 컬렉션이면 동시성 컬렉션이 내부에서 잘게 쪼갠 잠금을 써서 경합이 덜합니다. 단순한 숫자 증감이나 값 교체 하나면 <code>Interlocked</code>가 잠금 없이 CPU 명령 하나로 끝내서 가장 빠릅니다. 아래로 갈수록 가볍지만 쓸 수 있는 범위가 좁아지는 관계입니다.</span></li>
 </ul>
 </div>
 </div>
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q26" aria-label="26번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q28" aria-label="28번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">ASYNC-03</span><span class="qtext">try, catch, finally는 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
 <p><strong>try에서 예외가 나면 남은 코드를 건너뛰고 맞는 catch로 가며, finally는 예외가 나든 안 나든 항상 실행됩니다.</strong></p>
-<p><code>try</code> 도중에 예외가 터지면 그 지점부터 아래는 실행되지 않고, 타입이 맞는 <code>catch</code>로 점프합니다. <code>finally</code>는 정상 흐름이든 예외 흐름이든 반드시 실행되어서, 파일이나 잠금 같은 자원을 놓는 자리로 씁니다. <code>using</code>이 사실 이 <code>try</code>와 <code>finally</code>의 축약입니다.</p>
+<p><code>try</code> 도중에 예외가 터지면 그 지점부터 아래는 실행되지 않고, 타입이 맞는 <code>catch</code>로 점프합니다. 그 <code>catch</code>가 현재 메서드에 없으면 호출 스택을 거슬러 올라가면서 잡아 줄 곳을 찾고, 지나치는 메서드들의 남은 코드는 전부 건너뜁니다. 끝까지 아무도 안 잡으면 프로그램이 종료됩니다. 반환값으로 오류를 알리면 매 단계에서 직접 검사하고 전달해야 하는데, 예외는 중간을 건너뛰고 처리할 수 있는 곳까지 한 번에 간다는 게 차이입니다.</p>
+<p><code>finally</code>는 정상 흐름이든 예외 흐름이든, 심지어 아무도 안 잡아서 위로 전파되는 중이든 반드시 실행됩니다. 어느 경로로 빠져나가도 지나가기 때문에 파일이나 잠금 같은 자원을 놓는 자리로 씁니다. 정상 경로에만 해제 코드를 두면 예외가 났을 때 그 줄에 도달하지 못해 자원이 샙니다. <code>using</code>이 사실 이 <code>try</code>와 <code>finally</code>의 축약입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>catch를 쓸 때 주의할 점은요?</q>구체적인 예외 타입부터 잡아야 합니다. 그리고 빈 catch로 예외를 삼켜서 조용히 넘기면, 문제가 숨어 나중에 더 찾기 어려워집니다. 처리하든 로그를 남기든 다시 던지든 해야 합니다.</span></li>
+<li><span><q>catch를 쓸 때 주의할 점은요?</q>구체적인 예외 타입부터 잡아야 합니다. <code>catch</code>는 위에서부터 처음 맞는 것이 잡는데, 넓은 <code>Exception</code>을 위에 두면 아래의 구체적인 타입은 영영 도달하지 못합니다. 그리고 빈 catch로 예외를 삼켜서 조용히 넘기면, 문제가 숨어 나중에 더 찾기 어려워집니다. 처리하든 로그를 남기든 다시 던지든 해야 합니다.</span></li>
+<li><span><q>그럼 오류는 항상 예외로 알리는 게 좋은가요?</q>아닙니다. 예외는 스택을 거슬러 올라가는 비용이 있어서, 실패가 흔하고 예상된 범위면 반환값으로 알리는 게 맞습니다. 사용자 입력이 숫자가 아닌 건 정상 범위라 <code>TryParse</code>처럼 성공 여부를 <code>bool</code>로 받고, 반드시 숫자여야 하는 내부 설정값이면 <code>Parse</code>로 바로 터뜨려서 버그를 드러냅니다. 판단 기준은 이 실패가 예외적인 상황인지 예상된 정상 범위인지입니다.</span></li>
 </ul>
 </div>
 </div>
@@ -3379,7 +3449,7 @@ title: 면접 대비 문답
 <div class="grp-head"><h3>상황형 문제 해결</h3><span class="cnt">4문항</span></div>
 <p class="grp-note">정답보다 접근 순서를 봅니다. 한 증상에 여러 개념이 얽혀 있으니, 측정으로 원인을 좁힌 뒤 설명하세요.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q27" aria-label="27번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q29" aria-label="29번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-01</span><span class="qtext">게임을 오래 켜 두면 점점 느려지고, 가끔 프레임이 툭툭 멈칫합니다. 어디부터 보나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3404,14 +3474,15 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q28" aria-label="28번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q30" aria-label="30번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-02</span><span class="qtext">리스트를 foreach로 돌면서 죽은 적을 Remove했더니 예외가 납니다. 왜 그런가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
 <p><strong>foreach로 도는 중에 컬렉션의 크기를 바꿔서입니다.</strong></p>
-<p>열거자는 도는 동안 컬렉션이 바뀌면 그걸 감지해 예외를 던집니다. 순회 중에 원소를 지우면 지금 보고 있는 위치가 어긋나서, 조용히 잘못 도느니 바로 멈추는 겁니다. 고치는 방법은 몇 가지입니다.</p>
+<p>감지하는 방법은 버전 번호입니다. 컬렉션 안에는 구조를 바꿀 때마다 하나씩 오르는 번호가 있고, 열거자는 순회를 시작할 때 그 번호를 기억해 뒀다가 한 칸 나아갈 때마다 지금 번호와 같은지 확인합니다. 중간에 <code>Add</code>나 <code>Remove</code>가 일어나면 번호가 달라지니 바로 예외를 던집니다.</p>
+<p>굳이 예외를 던지는 건 심술이 아니라 보호 장치입니다. 순회 중에 원소를 지우면 뒤 원소들이 앞으로 당겨져서 하나를 통째로 건너뛰게 되는데, 그렇게 조용히 잘못 도는 논리 버그는 찾기가 훨씬 어렵습니다. 그래서 조용히 틀리느니 바로 멈추는 쪽을 택한 겁니다. 고치는 방법은 도는 대상과 바꾸는 대상을 떼어 놓는 것으로 모입니다.</p>
 <ul>
 <li><strong>역순 for 문.</strong> 뒤에서 앞으로 인덱스로 돌면 지워도 남은 인덱스가 안 밀려서 안전합니다.</li>
 <li><strong>복사본 순회.</strong> 원본을 복사해 그걸 돌면서 원본을 지웁니다.</li>
@@ -3421,14 +3492,16 @@ title: 면접 대비 문답
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>왜 역순 for는 괜찮은가요?</q>앞에서 지우면 뒤 원소들이 한 칸씩 당겨져 인덱스가 어긋나지만, 뒤에서부터 지우면 이미 지나온 뒤쪽만 영향받아서 아직 안 본 앞쪽 인덱스는 그대로이기 때문입니다.</span></li>
+<li><span><q>왜 역순 for는 괜찮은가요?</q>두 가지 이유가 겹칩니다. 먼저 <code>foreach</code>가 아니라 인덱스로 접근하는 방식이라 열거자를 안 쓰고, 따라서 방금 말한 버전 검사 자체가 일어나지 않습니다. 그다음 뒤에서부터 지우면 이미 지나온 뒤쪽만 당겨지고 아직 안 본 앞쪽 인덱스는 그대로라서 건너뛰는 원소가 없습니다.</span></li>
+<li><span><q>리스트가 아니라 딕셔너리나 해시셋이면 어떻게 하나요?</q>인덱스가 없으니 역순 <code>for</code>를 못 씁니다. 딕셔너리는 키 목록을 <code>ToList</code>로 복사해 두고 그걸 돌면서 원본을 지우는 게 일반적입니다. 해시셋은 <code>RemoveWhere</code>라는 조건 삭제 메서드가 따로 있어서 그걸 쓰면 되고, 큐나 배열처럼 중간 제거가 없는 구조는 조건으로 거른 결과로 새로 만들어 갈아 끼웁니다.</span></li>
+<li><span><q>세 방법 중에 뭘 고르나요?</q>목적이 조건에 맞는 것만 지우는 거라면 <code>RemoveAll</code>이 가장 명확하고, 한 번만 훑어서 효율도 좋습니다. 삭제뿐 아니라 인덱스를 보며 값을 고치는 작업이 섞이면 역순 <code>for</code>가 맞고 복사본도 안 만듭니다. 복사본 순회는 어떤 컬렉션에나 통하는 대신 사본만큼 메모리를 더 쓰니, 앞의 둘이 안 될 때 씁니다.</span></li>
 </ul>
 </div>
 </div>
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q29" aria-label="29번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q31" aria-label="31번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-03</span><span class="qtext">이벤트에 등록해 둔 오브젝트를 파괴했는데, 이벤트가 발생하니 파괴된 오브젝트가 불려서 에러가 납니다.</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3448,7 +3521,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q30" aria-label="30번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q32" aria-label="32번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-04</span><span class="qtext">리스트에 담아 둔 struct를 꺼내 고쳤는데 반영이 안 됩니다. 왜 그런가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">

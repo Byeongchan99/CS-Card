@@ -2828,7 +2828,7 @@ title: 면접 대비 문답
 </section>
 </div>
 <div class="field" data-field="csharp" hidden>
-<p class="note"><strong>답변 프레임.</strong> 정의 한 문장으로 결론 먼저 → 왜 그렇게 동작·설계됐는지 → 트레이드오프(꼬리질문의 90%가 여기를 찌릅니다) → 필요하면 실제 예시 한 줄. 단정("절대 안 됩니다")은 반례 하나로 무너지니 "일반적으로 ~지만 ~한 경우엔 다릅니다"로.</p>
+<p class="note"><strong>답변 프레임.</strong> 정의 한 문장으로 결론 먼저 → 왜 그렇게 동작·설계됐는지 → 트레이드오프(꼬리질문의 90%가 여기를 찌릅니다) → 필요하면 실제 예시 한 줄. 단정("절대 안 됩니다")은 반례 하나로 무너지니 "일반적으로 ~지만 ~한 경우엔 다릅니다"로. <strong>필수</strong> 배지는 개념·원리를 깊게 파고드는 문항이라는 표시입니다. 나머지도 필수 문항의 꼬리질문에서 나오니 건너뛰지 마세요.</p>
 <div class="bar">
 <span class="prog"><b class="prog-done">0</b> / <span class="prog-total">36</span> 자신 있음</span>
 <span class="bar-sp"></span>
@@ -2842,7 +2842,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q1" aria-label="1번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">VAL-01</span><span class="qtext">값 타입과 참조 타입은 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">VAL-01</span><span class="pri">필수</span><span class="qtext">값 타입과 참조 타입은 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -2862,7 +2862,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q2" aria-label="2번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">VAL-02</span><span class="qtext">struct와 class는 각각 언제 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">VAL-02</span><span class="pri">필수</span><span class="qtext">struct와 class는 각각 언제 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -2880,7 +2880,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q3" aria-label="3번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">VAL-03</span><span class="qtext">struct와 class의 기본 Equals는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">VAL-03</span><span class="pri">필수</span><span class="qtext">struct와 class의 기본 Equals는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -2924,7 +2924,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q5" aria-label="5번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">MEM-01</span><span class="qtext">박싱이 무엇이고 왜 성능 문제가 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">MEM-01</span><span class="pri">필수</span><span class="qtext">박싱이 무엇이고 왜 성능 문제가 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -2944,7 +2944,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q6" aria-label="6번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">MEM-02</span><span class="qtext">"값 타입은 스택, 참조 타입은 힙"이 왜 부정확한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">MEM-02</span><span class="pri">필수</span><span class="qtext">"값 타입은 스택, 참조 타입은 힙"이 왜 부정확한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -2981,7 +2981,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q8" aria-label="8번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">MEM-04</span><span class="qtext">문자열이 불변이라 생기는 문제와 StringBuilder는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">MEM-04</span><span class="pri">필수</span><span class="qtext">문자열이 불변이라 생기는 문제와 StringBuilder는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3005,7 +3005,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q9" aria-label="9번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">GC-01</span><span class="qtext">세대별 GC는 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">GC-01</span><span class="pri">필수</span><span class="qtext">세대별 GC는 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3027,7 +3027,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q10" aria-label="10번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">GC-02</span><span class="qtext">가비지 컬렉터가 있는데 왜 IDisposable과 using이 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">GC-02</span><span class="pri">필수</span><span class="qtext">가비지 컬렉터가 있는데 왜 IDisposable과 using이 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3073,7 +3073,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q12" aria-label="12번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">OOP-01</span><span class="qtext">캡슐화는 왜 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">OOP-01</span><span class="pri">필수</span><span class="qtext">캡슐화는 왜 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3100,7 +3100,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q13" aria-label="13번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">OOP-02</span><span class="qtext">상속의 문제는 무엇이고, 구성은 왜 대안이 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">OOP-02</span><span class="pri">필수</span><span class="qtext">상속의 문제는 무엇이고, 구성은 왜 대안이 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3123,7 +3123,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q14" aria-label="14번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">OOP-03</span><span class="qtext">추상 클래스와 인터페이스는 언제 각각 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">OOP-03</span><span class="pri">필수</span><span class="qtext">추상 클래스와 인터페이스는 언제 각각 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3146,7 +3146,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q15" aria-label="15번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">OOP-04</span><span class="qtext">virtual과 override, 그리고 new는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">OOP-04</span><span class="pri">필수</span><span class="qtext">virtual과 override, 그리고 new는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3187,7 +3187,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q17" aria-label="17번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">GEN-01</span><span class="qtext">제네릭 where 제약은 왜 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">GEN-01</span><span class="pri">필수</span><span class="qtext">제네릭 where 제약은 왜 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3252,7 +3252,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q20" aria-label="20번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">DEL-01</span><span class="qtext">yield return과 지연 실행은 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">DEL-01</span><span class="pri">필수</span><span class="qtext">yield return과 지연 실행은 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3278,7 +3278,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q21" aria-label="21번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">DEL-02</span><span class="qtext">LINQ 쿼리는 언제 실행되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">DEL-02</span><span class="pri">필수</span><span class="qtext">LINQ 쿼리는 언제 실행되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3299,7 +3299,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q22" aria-label="22번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">DEL-03</span><span class="qtext">delegate와 event는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">DEL-03</span><span class="pri">필수</span><span class="qtext">delegate와 event는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3319,7 +3319,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q23" aria-label="23번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">DEL-04</span><span class="qtext">for 루프 안에서 만든 람다가 왜 예상과 다른 값을 출력하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">DEL-04</span><span class="pri">필수</span><span class="qtext">for 루프 안에서 만든 람다가 왜 예상과 다른 값을 출력하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3349,7 +3349,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q24" aria-label="24번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">ERR-01</span><span class="qtext">try, catch, finally는 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">ERR-01</span><span class="pri">필수</span><span class="qtext">try, catch, finally는 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3432,7 +3432,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q28" aria-label="28번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">TRAP-02</span><span class="qtext">실수 비교에 등호를 쓰면 왜 안 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">TRAP-02</span><span class="pri">필수</span><span class="qtext">실수 비교에 등호를 쓰면 왜 안 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3485,7 +3485,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q30" aria-label="30번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">ASYNC-01</span><span class="qtext">async와 await는 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">ASYNC-01</span><span class="pri">필수</span><span class="qtext">async와 await는 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3505,7 +3505,7 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q31" aria-label="31번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">ASYNC-02</span><span class="qtext">lock은 무엇이고 무엇을 잠가야 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">ASYNC-02</span><span class="pri">필수</span><span class="qtext">lock은 무엇이고 무엇을 잠가야 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>

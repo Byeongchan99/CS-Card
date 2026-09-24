@@ -144,8 +144,14 @@
 }
 .osiv summary::-webkit-details-marker { display: none; }
 .osiv .qtag {
-  display: block; font-family: var(--osiv-mono); font-size: 0.68em;
+  display: inline-block; font-family: var(--osiv-mono); font-size: 0.68em;
   letter-spacing: 0.08em; color: var(--osiv-accent); margin-bottom: 2px;
+}
+.osiv .pri {
+  display: inline-block; margin-left: 7px; padding: 0 7px;
+  border: 1px solid var(--osiv-accent); border-radius: 999px;
+  background: var(--osiv-accent-soft); color: var(--osiv-accent-ink);
+  font-size: 0.62em; letter-spacing: 0.06em; line-height: 1.7; vertical-align: 1px;
 }
 .osiv .qtext { font-size: 1.02em; font-weight: 600; line-height: 1.5; }
 .osiv .chev { width: 16px; height: 16px; margin-top: 5px; color: var(--osiv-muted); transition: transform .18s ease; flex: none; }

@@ -957,6 +957,52 @@ class Player {
 
 `{ get; set; }` 자동 프로퍼티는 컴파일러가 숨은 백킹 필드를 만들어 줌. 처음부터 프로퍼티로 여는 이유는 변경 격리 — 나중에 검증 로직이 필요해져도 공개 표면(프로퍼티)은 그대로라 쓰는 코드가 안 깨짐. 반대로 `public` 필드로 열었다가 나중에 프로퍼티로 바꾸면 바이너리 호환이 깨질 수 있음. 유니티의 `[SerializeField]`가 프로퍼티가 아니라 필드에 붙는 것도, 인스펙터 직렬화가 필드를 대상으로 하기 때문.
 
+## 상속과 구성(composition)
+
+상속(`class Goblin : Enemy`)은 한 줄로 두 가지를 동시에 줌. 이 둘이 항상 붙어 다니고 따로 떼어낼 수 없다는 게 상속의 성격을 정함.
+
+- 구현 재사용 — 부모의 필드·메서드를 물려받아 다시 안 짬
+- 타입 계층(is-a) — 자식을 부모 자리에 넣을 수 있음. 다형성이 여기서 성립
+
+```csharp
+class Enemy {
+    protected int hp = 100;
+    public void TakeDamage(int d) { hp -= d; }   // 구현 재사용
+}
+class Goblin : Enemy {
+    public Goblin(int start) : base() { hp = start; }   // base로 부모 생성자 호출
+}
+Enemy e = new Goblin(50);   // 타입 계층 — Enemy 자리에 들어감
+```
+
+대가는 결합. 상속은 두 타입을 가장 강하게 묶는 관계라 자식이 부모의 `protected` 멤버와 내부 동작 순서에 의존하게 됨. 그래서 부모를 고치면 자식이 조용히 깨질 수 있음(취약한 기반 클래스 문제, fragile base class). 컴파일은 되는데 동작만 어긋나는 형태라 찾기 어려움.
+
+구성은 물려받는 대신 부품 객체를 필드로 품고 일을 넘기는 것(위임). 상속이 is-a면 구성은 has-a.
+
+```csharp
+class Mover { public void Move() { } }
+class Enemy {
+    private readonly Mover mover = new();   // 가졌다(has-a)
+    public void Update() => mover.Move();    // 위임
+}
+```
+
+부품은 밖에서 갈아끼울 수 있어 런타임에 행동을 바꿀 수 있고, 부모·자식처럼 내부에 묶이지 않아 결합이 약함. 대신 부모 자리에 넣어 쓰는 다형성은 공짜로 안 생겨 인터페이스를 따로 둬야 함.
+
+세 관계를 구분하면 선택이 쉬워짐. 인터페이스로 여러 능력을 구현하는 건 타입 계약을 여럿 갖는 것이지 구현을 재사용하는 구성이 아님 — can-do와 has-a는 다름.
+
+| 관계 | 의미 | 도구 | 주는 것 |
+| --- | --- | --- | --- |
+| is-a | ~의 일종이다 | 상속(추상 클래스) | 구현 재사용 + 타입 계층 |
+| has-a | ~를 가졌다 | 구성(필드로 품고 위임) | 구현 재사용만 |
+| can-do | ~할 수 있다 | 인터페이스 | 타입 계약만 |
+
+<svg viewBox="0 0 620 176" width="620" style="max-width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="is-a는 상속으로 부모 자리를 대신하고, has-a는 부품을 품어 위임하며, can-do는 인터페이스로 능력만 약속한다"><defs><marker id="rel-a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L6,3L0,6Z" fill="currentColor" opacity="0.6"/></marker></defs><text x="16" y="20" font-size="12" fill="currentColor" opacity="0.7">is-a — 상속</text><g fill="#4f83e0" fill-opacity="0.12" stroke="#4f83e0"><rect x="50" y="36" width="112" height="30" rx="4"/></g><g fill="none" stroke="currentColor" stroke-opacity="0.55"><rect x="50" y="102" width="112" height="30" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="106" y="56">Enemy</text><text x="106" y="122">Goblin</text></g><line x1="106" y1="102" x2="106" y2="70" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#rel-a)"/><text x="106" y="156" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">Enemy의 일종이다</text><line x1="204" y1="12" x2="204" y2="164" stroke="currentColor" stroke-opacity="0.2"/><text x="214" y="20" font-size="12" fill="currentColor" opacity="0.7">has-a — 구성</text><g fill="none" stroke="#3fae7a"><rect x="228" y="36" width="160" height="96" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="308" y="58">Enemy</text></g><g fill="#3fae7a" fill-opacity="0.12" stroke="#3fae7a"><rect x="248" y="74" width="120" height="30" rx="4"/></g><g font-size="12" fill="currentColor" text-anchor="middle"><text x="308" y="94">Mover</text></g><text x="308" y="156" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">품고 일을 넘김(위임)</text><line x1="406" y1="12" x2="406" y2="164" stroke="currentColor" stroke-opacity="0.2"/><text x="416" y="20" font-size="12" fill="currentColor" opacity="0.7">can-do — 인터페이스</text><g fill="#e2574c" fill-opacity="0.12" stroke="#e2574c"><rect x="444" y="36" width="140" height="30" rx="4"/></g><g fill="none" stroke="currentColor" stroke-opacity="0.55"><rect x="418" y="102" width="56" height="30" rx="4"/><rect x="482" y="102" width="56" height="30" rx="4"/><rect x="546" y="102" width="56" height="30" rx="4"/></g><g font-size="11" fill="currentColor" text-anchor="middle"><text x="514" y="56" font-size="12">IDamageable</text><text x="446" y="121">Goblin</text><text x="510" y="121">상자</text><text x="574" y="121">문</text></g><g stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" marker-end="url(#rel-a)"><line x1="446" y1="102" x2="486" y2="70"/><line x1="510" y1="102" x2="512" y2="70"/><line x1="574" y1="102" x2="540" y2="70"/></g><text x="514" y="156" font-size="11" fill="currentColor" opacity="0.6" text-anchor="middle">피해를 입을 수 있다</text></svg>
+
+"상속보다 구성"이 통하는 이유 — 상속은 강결합과 컴파일 타임 고정이라는 대가를 치르는데, 그 값어치는 진짜 is-a이고 다형성이 필요할 때뿐. 그냥 코드를 재사용하고 싶은 거면 구성이 거의 항상 나음. 실무에선 타입 계층은 인터페이스로 얕게 잡고 구현 재사용은 구성으로 가져가는 조합을 많이 씀.
+
+상속으로 기능을 조합하면 조합마다 클래스가 필요해 수가 폭발하는데, 이를 위임으로 푸는 게 브리지·전략 패턴, 부품 조립으로 푸는 게 컴포넌트 패턴(디자인 패턴 노트).
+
 ## 추상 클래스 vs 인터페이스
 
 둘 다 직접 인스턴스를 못 만들고 파생·구현 쪽이 내용을 채우는 틀이지만, 표현하는 관계가 다름.
@@ -982,7 +1028,7 @@ C# 8부터 인터페이스도 기본 구현(default method)을 가질 수 있으
 - 서로 무관한 타입들이 같은 기능만 갖춤 → 인터페이스 (적·상자·문이 다 상호작용 가능)
 - 섞기도 — 추상 클래스로 공통 뼈대를 주고 부가 능력은 인터페이스로 붙임
 
-설계 원칙으로는 "상속보다 구성(composition)"이 통함. is-a가 확실할 때만 상속(추상 클래스)으로 묶고, 아니면 능력을 인터페이스로 조합하는 쪽이 유연 — 상속은 부모 변경이 자식 전체에 파급되지만 인터페이스 조합은 능력 단위로 갈아 끼울 수 있어서.
+둘 다 타입 계약을 주는 도구라, 구현 재사용을 주는 구성(has-a)과는 축이 다름(앞 상속과 구성 항목). is-a가 확실할 때만 추상 클래스로 묶고, 무관한 타입에 같은 능력만 얹을 땐 인터페이스로 가는 게 유연 — 추상 클래스는 부모 변경이 자식 전체에 파급되지만 인터페이스는 상태가 없어 능력 단위로 갈아 끼울 수 있어서.
 
 ## 다형성과 가상 디스패치 (virtual/override vs new)
 

@@ -2830,7 +2830,7 @@ title: 면접 대비 문답
 <div class="field" data-field="csharp" hidden>
 <p class="note"><strong>답변 프레임.</strong> 정의 한 문장으로 결론 먼저 → 왜 그렇게 동작·설계됐는지 → 트레이드오프(꼬리질문의 90%가 여기를 찌릅니다) → 필요하면 실제 예시 한 줄. 단정("절대 안 됩니다")은 반례 하나로 무너지니 "일반적으로 ~지만 ~한 경우엔 다릅니다"로.</p>
 <div class="bar">
-<span class="prog"><b class="prog-done">0</b> / <span class="prog-total">34</span> 자신 있음</span>
+<span class="prog"><b class="prog-done">0</b> / <span class="prog-total">36</span> 자신 있음</span>
 <span class="bar-sp"></span>
 <button class="tool tool-open" type="button">모두 펼치기</button>
 <button class="tool tool-hide" type="button" aria-pressed="false">체크 숨기기</button>
@@ -3068,23 +3068,30 @@ title: 면접 대비 문답
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>상속과 다형성</h3><span class="cnt">3문항</span></div>
-<p class="grp-note">선언 타입과 런타임 타입 중 무엇을 기준으로 부르는지가 관건입니다.</p>
+<div class="grp-head"><h3>객체지향 기초</h3><span class="cnt">5문항</span></div>
+<p class="grp-note">4대 특성을 외운 항목으로 말하지 말고, 무엇을 얻고 무엇을 대가로 치르는지로 설명하세요.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q12" aria-label="12번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">OOP-01</span><span class="qtext">virtual과 override, 그리고 new는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">OOP-01</span><span class="qtext">캡슐화는 왜 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>override는 실제 객체 타입을 기준으로 부르고, new는 변수에 적힌 선언 타입을 기준으로 부릅니다.</strong></p>
-<p><code>virtual</code>로 연 메서드를 자식이 <code>override</code>하면 가상 디스패치가 걸립니다. 부모 타입 변수에 담겨 있어도 실제로 가리키는 객체가 자식이면 자식 것이 불립니다. 반면 <code>new</code>는 부모 메서드를 가리기만 해서, 변수의 선언 타입이 부모면 부모 것이 불립니다.</p>
-<p>그래서 부모 타입 변수에 자식 객체를 담았을 때 둘이 갈립니다. <code>override</code>는 자식 구현이 나오고, <code>new</code>는 변수 타입을 따라 부모 구현이 나옵니다.</p>
+<p><strong>내부 상태를 밖에서 직접 못 건드리게 감추고 정해진 통로로만 접근하게 해서, 객체가 항상 올바른 상태를 유지하도록 강제하는 겁니다.</strong></p>
+<p>이유는 크게 셋입니다.</p>
+<ul>
+<li><strong>불변식 보호.</strong> 체력은 0 아래로 안 내려간다거나 잔고가 음수가 안 된다는 규칙을 객체가 스스로 지키게 합니다. 필드를 그대로 열어 두면 밖에서 아무 값이나 넣어 그 규칙을 우회할 수 있습니다.</li>
+<li><strong>변경 격리.</strong> 공개된 표면만 그대로면 내부 구현을 바꿔도 쓰는 코드가 안 깨집니다. 바깥이 내부 구조가 아니라 표면에만 의존하게 만드는 겁니다.</li>
+<li><strong>복잡도 감춤.</strong> 쓰는 쪽은 무엇을 하는지만 알면 되고 어떻게 하는지는 몰라도 됩니다.</li>
+</ul>
+<p>C#에서는 접근 제한자로 무엇을 감출지 정하고, 프로퍼티로 열어 둔 통로에 규칙을 심습니다. 필드는 <code>private</code>로 숨기고 프로퍼티로 노출하는 게 기본형입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>왜 이렇게 갈리게 설계했나요?</q><code>override</code>는 다형성을 위한 것이라 실제 타입의 동작을 부르는 게 목적이고, <code>new</code>는 이미 있는 부모 메서드와 이름만 같은 별개 메서드를 두는 것이라 선언 타입을 따릅니다. <code>new</code>는 의도치 않게 이름이 겹쳤을 때 경고를 끄는 용도에 가깝고, 다형성이 필요하면 <code>override</code>를 씁니다.</span></li>
+<li><span><q>프로퍼티는 필드와 뭐가 다른가요?</q>겉모습은 필드지만 실제로는 <code>get</code>과 <code>set</code> 메서드입니다. 그래서 값을 읽고 쓰는 순간에 검증이나 계산, 변경 알림을 끼워 넣을 수 있습니다. 체력 프로퍼티의 <code>set</code>에서 값을 0과 최대치 사이로 잘라 주면 음수나 초과가 아예 들어올 수 없습니다.</span></li>
+<li><span><q>어차피 지금은 검증할 게 없는데 그냥 public 필드로 두면 안 되나요?</q>나중이 문제입니다. 처음부터 프로퍼티로 열어 두면 검증 로직이 필요해져도 공개 표면은 그대로라 쓰는 코드가 안 깨집니다. 반대로 <code>public</code> 필드로 열었다가 나중에 프로퍼티로 바꾸면 소스는 같아 보여도 바이너리 호환이 깨질 수 있습니다. 변경 격리라는 이점은 미리 열어 둬야 얻습니다.</span></li>
+<li><span><q>접근 제한자는 어떤 기준으로 고르나요?</q>기본을 최대한 닫고 꼭 필요한 것만 최소한으로 여는 게 원칙입니다. 좁게 열수록 바깥이 의존할 표면이 줄어 내부를 자유롭게 바꿀 수 있습니다. <code>protected</code>는 상속 축이고 <code>internal</code>은 어셈블리 축이라 서로 직교한다는 점도 같이 보면 좋습니다.</span></li>
 </ul>
 </div>
 </div>
@@ -3093,7 +3100,30 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="csharp-q13" aria-label="13번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">OOP-02</span><span class="qtext">추상 클래스와 인터페이스는 언제 각각 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">OOP-02</span><span class="qtext">상속의 문제는 무엇이고, 구성은 왜 대안이 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>상속은 구현 재사용과 타입 계층을 한 번에 주는데 이 둘을 떼어낼 수 없고 결합이 아주 강합니다. 구성은 부품 객체를 품고 일을 넘겨서 구현만 재사용합니다.</strong></p>
+<p>클래스 하나를 상속하면 두 가지가 동시에 따라옵니다. 부모의 필드와 메서드를 물려받는 구현 재사용이 하나고, 자식을 부모 자리에 넣어 쓸 수 있게 되는 타입 계층이 다른 하나입니다. 다형성이 성립하는 것도 이 타입 계층 덕분입니다. 문제는 둘 중 하나만 원해도 항상 같이 딸려온다는 점입니다.</p>
+<p>그리고 상속은 두 타입을 가장 강하게 묶습니다. 자식이 부모의 <code>protected</code> 멤버와 내부 동작 순서에 의존하게 되니까, 부모를 고치면 자식이 조용히 깨질 수 있습니다. 이걸 취약한 기반 클래스 문제라고 합니다.</p>
+<p>구성은 물려받는 대신 필요한 객체를 필드로 품고 그쪽에 일을 넘기는 방식입니다. 상속이 "~의 일종이다"라면 구성은 "~를 가졌다"입니다. 부품은 밖에서 갈아끼울 수 있어 실행 중에 행동을 바꿀 수 있고, 부모와 자식처럼 내부에 묶이지 않아 결합이 약합니다. 대신 부모 자리에 넣어 쓰는 다형성은 공짜로 안 생기니 인터페이스를 따로 둬야 합니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>그럼 상속은 언제 쓰나요?</q>정말 "~의 일종"이 맞고 부모 자리에 자식을 넣어 쓸 일이 있을 때입니다. 고블린은 확실히 적의 일종이니 상속이 맞습니다. 반대로 적이 이동 기능을 쓰고 싶을 뿐이라면 적은 이동기의 일종이 아니니 구성이 맞습니다. 강결합과 컴파일 타임 고정이라는 대가를 치를 값어치는 진짜 "~의 일종"이고 다형성이 필요할 때뿐입니다.</span></li>
+<li><span><q>인터페이스를 여러 개 구현하는 것도 구성인가요?</q>아닙니다. 축이 다릅니다. 인터페이스는 "~할 수 있다"는 타입 계약만 주고 구현은 하나도 안 줍니다. 구성은 반대로 구현 재사용이 목적이고 타입 계약은 안 줍니다. 그래서 실무에서는 타입 계층은 인터페이스로 얕게 잡고 구현 재사용은 구성으로 가져가는 조합을 많이 씁니다.</span></li>
+<li><span><q>상속으로 기능을 조합하면 어떤 문제가 생기나요?</q>조합마다 클래스가 필요해서 수가 폭발합니다. 날 수 있는 적과 쏠 수 있는 적을 상속으로 만들면 둘 다 하는 적을 위한 클래스가 또 필요하고, 능력이 하나 늘 때마다 배로 늡니다. 단일 상속이라 두 부모를 다 가질 수도 없어 코드 중복까지 생깁니다. 이걸 위임으로 푸는 게 브리지나 전략 패턴이고, 부품 조립으로 푸는 게 유니티 같은 컴포넌트 구조입니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="csharp-q14" aria-label="14번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">OOP-03</span><span class="qtext">추상 클래스와 인터페이스는 언제 각각 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3114,9 +3144,29 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q14" aria-label="14번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q15" aria-label="15번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">OOP-03</span><span class="qtext">상속에서 생성자는 어떤 순서로 실행되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">OOP-04</span><span class="qtext">virtual과 override, 그리고 new는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>override는 실제 객체 타입을 기준으로 부르고, new는 변수에 적힌 선언 타입을 기준으로 부릅니다.</strong></p>
+<p><code>virtual</code>로 연 메서드를 자식이 <code>override</code>하면 가상 디스패치가 걸립니다. 부모 타입 변수에 담겨 있어도 실제로 가리키는 객체가 자식이면 자식 것이 불립니다. 반면 <code>new</code>는 부모 메서드를 가리기만 해서, 변수의 선언 타입이 부모면 부모 것이 불립니다.</p>
+<p>그래서 부모 타입 변수에 자식 객체를 담았을 때 둘이 갈립니다. <code>override</code>는 자식 구현이 나오고, <code>new</code>는 변수 타입을 따라 부모 구현이 나옵니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>왜 이렇게 갈리게 설계했나요?</q><code>override</code>는 다형성을 위한 것이라 실제 타입의 동작을 부르는 게 목적이고, <code>new</code>는 이미 있는 부모 메서드와 이름만 같은 별개 메서드를 두는 것이라 선언 타입을 따릅니다. <code>new</code>는 의도치 않게 이름이 겹쳤을 때 경고를 끄는 용도에 가깝고, 다형성이 필요하면 <code>override</code>를 씁니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="csharp-q16" aria-label="16번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">OOP-05</span><span class="qtext">상속에서 생성자는 어떤 순서로 실행되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
@@ -3135,7 +3185,7 @@ title: 면접 대비 문답
 <div class="grp-head"><h3>제네릭과 타입 도구</h3><span class="cnt">3문항</span></div>
 <p class="grp-note">타입을 컴파일 타임에 어떻게 약속하고, 런타임에 어떻게 들여다보는지를 다룹니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q15" aria-label="15번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q17" aria-label="17번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">GEN-01</span><span class="qtext">제네릭 where 제약은 왜 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3155,7 +3205,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q16" aria-label="16번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q18" aria-label="18번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">GEN-02</span><span class="qtext">공변성과 반공변성은 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3175,7 +3225,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q17" aria-label="17번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q19" aria-label="19번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">GEN-03</span><span class="qtext">리플렉션은 무엇이고 어디에 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3200,7 +3250,7 @@ title: 면접 대비 문답
 <div class="grp-head"><h3>델리게이트와 지연 실행</h3><span class="cnt">4문항</span></div>
 <p class="grp-note">호출과 실행이 분리되는 지점, 그리고 무엇을 캡처하는지가 자주 나옵니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q18" aria-label="18번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q20" aria-label="20번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">DEL-01</span><span class="qtext">yield return과 지연 실행은 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3226,7 +3276,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q19" aria-label="19번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q21" aria-label="21번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">DEL-02</span><span class="qtext">LINQ 쿼리는 언제 실행되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3247,7 +3297,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q20" aria-label="20번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q22" aria-label="22번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">DEL-03</span><span class="qtext">delegate와 event는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3267,7 +3317,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q21" aria-label="21번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q23" aria-label="23번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">DEL-04</span><span class="qtext">for 루프 안에서 만든 람다가 왜 예상과 다른 값을 출력하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3297,7 +3347,7 @@ title: 면접 대비 문답
 <div class="grp-head"><h3>오류 처리와 null</h3><span class="cnt">3문항</span></div>
 <p class="grp-note">실패를 어떻게 알리느냐의 축입니다. 예외로 던질지, null로 돌려줄지, 컴파일러 경고로 미리 막을지를 구분해 설명하세요.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q22" aria-label="22번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q24" aria-label="24번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">ERR-01</span><span class="qtext">try, catch, finally는 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3318,7 +3368,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q23" aria-label="23번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q25" aria-label="25번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">ERR-02</span><span class="qtext">as와 괄호 캐스트는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3338,7 +3388,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q24" aria-label="24번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q26" aria-label="26번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">ERR-03</span><span class="qtext">nullable 참조 타입 기능은 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3362,7 +3412,7 @@ title: 면접 대비 문답
 <div class="grp-head"><h3>값의 함정</h3><span class="cnt">3문항</span></div>
 <p class="grp-note">사소해 보이지만 실수가 잦아 코드 리뷰에서 자주 걸리는 지점입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q25" aria-label="25번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q27" aria-label="27번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">TRAP-01</span><span class="qtext">정수끼리 나눗셈에서 자주 하는 실수는 뭔가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3380,7 +3430,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q26" aria-label="26번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q28" aria-label="28번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">TRAP-02</span><span class="qtext">실수 비교에 등호를 쓰면 왜 안 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3405,7 +3455,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q27" aria-label="27번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q29" aria-label="29번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">TRAP-03</span><span class="qtext">const와 readonly는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3433,7 +3483,7 @@ title: 면접 대비 문답
 <div class="grp-head"><h3>비동기와 동시성</h3><span class="cnt">3문항</span></div>
 <p class="grp-note">비동기와 병렬을 구분하고, 공유 상태를 어떻게 지키는지가 핵심입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q28" aria-label="28번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q30" aria-label="30번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">ASYNC-01</span><span class="qtext">async와 await는 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3453,7 +3503,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q29" aria-label="29번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q31" aria-label="31번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">ASYNC-02</span><span class="qtext">lock은 무엇이고 무엇을 잠가야 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3474,7 +3524,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q30" aria-label="30번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q32" aria-label="32번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">ASYNC-03</span><span class="qtext">async void는 왜 피해야 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3499,7 +3549,7 @@ title: 면접 대비 문답
 <div class="grp-head"><h3>상황형 문제 해결</h3><span class="cnt">4문항</span></div>
 <p class="grp-note">정답보다 접근 순서를 봅니다. 한 증상에 여러 개념이 얽혀 있으니, 측정으로 원인을 좁힌 뒤 설명하세요.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q31" aria-label="31번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q33" aria-label="33번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-01</span><span class="qtext">게임을 오래 켜 두면 점점 느려지고, 가끔 프레임이 툭툭 멈칫합니다. 어디부터 보나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3524,7 +3574,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q32" aria-label="32번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q34" aria-label="34번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-02</span><span class="qtext">리스트를 foreach로 돌면서 죽은 적을 Remove했더니 예외가 납니다. 왜 그런가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3551,7 +3601,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q33" aria-label="33번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q35" aria-label="35번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-03</span><span class="qtext">이벤트에 등록해 둔 오브젝트를 파괴했는데, 이벤트가 발생하니 파괴된 오브젝트가 불려서 에러가 납니다.</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -3571,7 +3621,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="csharp-q34" aria-label="34번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="csharp-q36" aria-label="36번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-04</span><span class="qtext">리스트에 담아 둔 struct를 꺼내 고쳤는데 반영이 안 됩니다. 왜 그런가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">

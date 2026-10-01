@@ -643,7 +643,7 @@ title: 면접 대비 문답
 <div class="field" data-field="ds" hidden>
 <p class="note"><strong>답변 프레임.</strong> 정의 한 문장으로 결론을 먼저 말하고, 그다음 왜 그렇게 동작하거나 설계됐는지, 이어서 트레이드오프(꼬리질문의 상당수가 여기를 찌릅니다), 필요하면 실제 예시 한 줄. 자료구조 답은 대부분 "무엇이 빨라지고 대신 무엇을 포기하는가"로 귀결되니, 얻는 것과 잃는 것을 같이 말하면 좋습니다.</p>
 <div class="bar">
-<span class="prog"><b class="prog-done">0</b> / <span class="prog-total">29</span> 자신 있음</span>
+<span class="prog"><b class="prog-done">0</b> / <span class="prog-total">28</span> 자신 있음</span>
 <span class="bar-sp"></span>
 <button class="tool tool-open" type="button">모두 펼치기</button>
 <button class="tool tool-hide" type="button" aria-pressed="false">체크 숨기기</button>
@@ -912,7 +912,7 @@ title: 면접 대비 문답
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>힙과 우선순위 큐</h3><span class="cnt">4문항</span></div>
+<div class="grp-head"><h3>힙과 우선순위 큐</h3><span class="cnt">3문항</span></div>
 <p class="grp-note">최솟값이나 최댓값만 빠르게 뽑는 데 특화된 구조입니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q13" aria-label="13번 자신 있음"></label>
@@ -974,32 +974,12 @@ title: 면접 대비 문답
 </div>
 </details>
 </div>
-<div class="q">
-<label class="chk"><input type="checkbox" id="ds-q16" aria-label="16번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">HEAP-04</span><span class="qtext">스트림에서 중앙값을 계속 구하려면 어떤 자료구조를 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>최대 힙과 최소 힙 두 개로 데이터를 절반씩 나눠 담으면, 중앙값을 상수 시간에 읽고 삽입을 로그 시간에 할 수 있습니다.</strong></p>
-<p>작은 절반은 최대 힙에, 큰 절반은 최소 힙에 담습니다. 그리고 두 힙의 크기 차이를 1 이하로 맞추면, 중앙값은 두 힙의 루트에서 바로 읽힙니다. 삽입할 때는 값이 어느 쪽에 속하는지 정해 넣고, 크기가 틀어지면 한쪽 루트를 반대편으로 옮겨 재조정하기 때문에 로그 시간입니다.</p>
-<p>매번 전체를 다시 정렬한다면 삽입마다 비용이 훨씬 크지만, 두 힙 방식은 정렬을 다시 하지 않고 중앙값만 실시간으로 추적합니다.</p>
-</div>
-<div class="tails">
-<p class="lab">꼬리질문</p>
-<ul>
-<li><span><q>왜 한쪽은 최대 힙, 다른 쪽은 최소 힙인가요?</q>중앙값은 작은 절반에서 가장 큰 값과, 큰 절반에서 가장 작은 값 사이에 있습니다. 그래서 작은 쪽은 최댓값이 루트로 오는 최대 힙, 큰 쪽은 최솟값이 루트로 오는 최소 힙이어야 두 후보를 상수 시간에 볼 수 있습니다.</span></li>
-</ul>
-</div>
-</div>
-</details>
-</div>
 </section>
 <section class="grp">
 <div class="grp-head"><h3>트리</h3><span class="cnt">6문항</span></div>
 <p class="grp-note">균형을 어떻게 유지하고, 무엇에 최적화했느냐로 종류가 갈립니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q17" aria-label="17번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q16" aria-label="16번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">TREE-01</span><span class="qtext">이진 탐색 트리는 왜 균형이 깨지면 느려지나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -1019,7 +999,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q18" aria-label="18번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q17" aria-label="17번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">TREE-02</span><span class="qtext">AVL 트리는 어떻게 균형을 유지하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -1039,7 +1019,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q19" aria-label="19번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q18" aria-label="18번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">TREE-03</span><span class="qtext">AVL과 Red-Black 트리는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -1065,7 +1045,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q20" aria-label="20번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q19" aria-label="19번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">TREE-04</span><span class="qtext">트리 순회 세 가지는 각각 언제 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -1088,7 +1068,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q21" aria-label="21번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q20" aria-label="20번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">TREE-05</span><span class="qtext">데이터베이스 인덱스는 왜 이진 트리 대신 B-트리·B+트리를 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -1108,7 +1088,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q22" aria-label="22번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q21" aria-label="21번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">TREE-06</span><span class="qtext">트라이는 해시 테이블에 비해 어떤 장점이 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -1132,7 +1112,7 @@ title: 면접 대비 문답
 <div class="grp-head"><h3>그래프와 응용 구조</h3><span class="cnt">3문항</span></div>
 <p class="grp-note">기본 구조들을 조합해 실제 문제를 푸는 자료구조들입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q23" aria-label="23번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q22" aria-label="22번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">GRPH-01</span><span class="qtext">그래프를 인접 행렬과 인접 리스트 중 무엇으로 표현하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -1158,7 +1138,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q24" aria-label="24번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q23" aria-label="23번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">GRPH-02</span><span class="qtext">유니온-파인드는 무엇을 판단하는 자료구조인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -1178,7 +1158,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q25" aria-label="25번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q24" aria-label="24번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">GRPH-03</span><span class="qtext">LRU 캐시는 어떤 자료구조로 모든 연산을 상수 시간에 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -1202,7 +1182,7 @@ title: 면접 대비 문답
 <div class="grp-head"><h3>상황형 문제 해결</h3><span class="cnt">4문항</span></div>
 <p class="grp-note">증상을 던지고 자료구조로 풀게 하는 유형입니다. 먼저 무엇으로 원인을 좁힐지부터 말하세요.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q26" aria-label="26번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q25" aria-label="25번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-01</span><span class="qtext">게임을 오래 켜둘수록 점점 느려지고 메모리도 계속 늘어납니다. 자료구조 관점에서 무엇을 의심하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -1225,7 +1205,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q27" aria-label="27번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q26" aria-label="26번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-02</span><span class="qtext">적이 많아지니 충돌 검사가 프레임을 잡아먹습니다. 어떻게 개선하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -1245,7 +1225,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q28" aria-label="28번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q27" aria-label="27번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-03</span><span class="qtext">인벤토리에 특정 아이템이 있는지 확인하는 코드가 느립니다. 지금은 List를 처음부터 훑고 있어요.</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
@@ -1265,7 +1245,7 @@ title: 면접 대비 문답
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q29" aria-label="29번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q28" aria-label="28번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-04</span><span class="qtext">실시간 순위표에서 상위 몇 명을 계속 뽑아야 하는데, 지금은 점수가 갱신될 때마다 전체를 다시 정렬합니다.</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">

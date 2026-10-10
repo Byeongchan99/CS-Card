@@ -643,15 +643,15 @@ title: 면접 대비 문답
 <div class="field" data-field="ds" hidden>
 <p class="note"><strong>답변 프레임.</strong> 정의 한 문장으로 결론을 먼저 말하고, 그다음 왜 그렇게 동작하거나 설계됐는지, 이어서 트레이드오프(꼬리질문의 상당수가 여기를 찌릅니다), 필요하면 실제 예시 한 줄. 자료구조 답은 대부분 "무엇이 빨라지고 대신 무엇을 포기하는가"로 귀결되니, 얻는 것과 잃는 것을 같이 말하면 좋습니다.</p>
 <div class="bar">
-<span class="prog"><b class="prog-done">0</b> / <span class="prog-total">28</span> 자신 있음</span>
+<span class="prog"><b class="prog-done">0</b> / <span class="prog-total">30</span> 자신 있음</span>
 <span class="bar-sp"></span>
 <button class="tool tool-open" type="button">모두 펼치기</button>
 <button class="tool tool-hide" type="button" aria-pressed="false">체크 숨기기</button>
 <button class="tool tool-reset" type="button">초기화</button>
 </div>
 <section class="grp">
-<div class="grp-head"><h3>스택·큐·버퍼</h3><span class="cnt">3문항</span></div>
-<p class="grp-note">넣고 빼는 순서를 어떻게 정하느냐가 각 구조의 정체성입니다.</p>
+<div class="grp-head"><h3>선형 구조</h3><span class="cnt">4문항</span></div>
+<p class="grp-note">넣고 빼는 순서를 어떻게 제한하느냐가 각 구조의 정체성이고, 같은 인터페이스라도 배열로 짜느냐 연결로 짜느냐에 따라 성능 성격이 갈립니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q1" aria-label="1번 자신 있음"></label>
 <details>
@@ -659,14 +659,15 @@ title: 면접 대비 문답
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>스택은 가장 최근에 넣은 것을 가장 먼저 꺼내는 후입선출 구조라, 중첩되거나 되돌아가는 문제에 자연스럽습니다.</strong></p>
-<p>대표적인 게 괄호 짝 검사입니다. 여는 괄호는 넣어두고, 닫는 괄호가 나오면 가장 최근에 넣은 것과 맞춰봅니다. 가장 최근에 연 괄호가 가장 먼저 닫히니 후입선출과 정확히 맞아떨어집니다.</p>
-<p>같은 원리로 함수 호출 스택, 실행 취소 기능, 깊이 우선 탐색의 되돌아가기에도 쓰입니다. 대신 한쪽 끝에서만 넣고 빼기 때문에 중간에 있는 값에는 바로 접근할 수 없습니다.</p>
+<p><strong>스택은 가장 최근에 넣은 것을 가장 먼저 꺼내는 후입선출 구조라, 중첩된 것을 안쪽부터 풀어야 하는 문제에 맞습니다.</strong></p>
+<p>중첩을 다루려면 가장 최근에 시작한 것을 먼저 끝내야 합니다. 함수 호출이 그렇고, 열린 순서의 역순으로 닫히는 팝업 창이나 실행 취소 기록도 같은 구조입니다. 깊이 우선 탐색에서 막다른 길을 만나 바로 직전 갈림길로 돌아가는 것도 스택입니다.</p>
+<p>구현은 배열 기반이 기본입니다. 꼭대기 위치를 정수 하나로 들고 있다가 꽉 차면 두 배로 늘리는데, 재할당은 드물고 연속 메모리라 캐시에 유리합니다. C#의 <code>Stack&lt;T&gt;</code>도 이 방식입니다. 대신 꼭대기가 아닌 중간 값에는 바로 접근할 수 없습니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>재귀와 스택은 무슨 관계인가요?</q>재귀는 내부적으로 함수를 부를 때마다 호출 스택에 프레임을 쌓는 것입니다. 그래서 깊은 재귀는 명시적인 스택 하나를 두고 반복문으로 바꿔 풀 수 있고, 그렇게 하면 스택 오버플로도 피할 수 있습니다.</span></li>
+<li><span><q>연결 리스트로 만든 스택은 언제 쓰나요?</q>재할당 순간의 지연이 튀면 안 될 때나, 여러 스레드가 동시에 쓸 때입니다. <code>ConcurrentStack&lt;T&gt;</code>가 연결 리스트 기반인데, 머리 포인터 하나를 원자적으로 바꾸는 것은 가능하지만 배열 재할당은 원자적으로 할 수 없기 때문입니다. 대신 노드마다 할당이 생기고 캐시 효율이 떨어집니다.</span></li>
+<li><span><q>재귀와 스택은 무슨 관계인가요?</q>재귀는 함수를 부를 때마다 호출 스택에 프레임을 쌓는 것입니다. 그래서 깊은 재귀는 명시적인 스택 하나를 두고 반복문으로 바꿀 수 있고, 그러면 스택 오버플로도 피할 수 있습니다.</span></li>
 </ul>
 </div>
 </div>
@@ -675,18 +676,18 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q2" aria-label="2번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">LIN-02</span><span class="qtext">덱은 스택·큐와 무엇이 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">LIN-02</span><span class="qtext">큐를 배열로 구현하면 무엇이 문제이고 어떻게 해결하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>덱은 양쪽 끝에서 모두 넣고 뺄 수 있는 구조라, 한쪽 끝만 쓰는 스택과 한 방향만 쓰는 큐를 포괄합니다.</strong></p>
-<p>스택은 한쪽 끝에서만, 큐는 뒤로 넣고 앞에서 빼는 한 방향으로만 동작합니다. 덱은 앞뒤 어느 쪽에서든 넣고 빼는 것이 모두 상수 시간이라 더 유연합니다.</p>
-<p>그래서 "최근 몇 개만 유지"하는 상황에 잘 맞습니다. 앞에서 오래된 것을 버리고 뒤에서 최근 것을 넣는 식으로 양 끝을 다 쓰기 때문입니다.</p>
+<p><strong>배열 앞에서 꺼낼 때마다 뒤 원소를 전부 당기면 꺼내기가 선형 시간이 되므로, 앞뒤 위치를 나머지 연산으로 회전시키는 원형 배열로 해결합니다.</strong></p>
+<p>당기지 않고 앞 위치만 한 칸 올리면 꺼내기는 상수 시간이 되지만, 배열 앞쪽이 다시 못 쓰는 빈 공간으로 버려집니다. 그래서 끝에 닿으면 처음으로 돌아가도록 위치를 배열 길이로 나눈 나머지로 계산해 그 앞쪽을 재사용합니다.</p>
+<p>꽉 차서 늘릴 때가 함정입니다. 데이터가 끝을 넘어 감겨 있을 수 있어서, 그대로 복사하면 순서가 꼬입니다. 앞 위치부터 순서대로 펴서 새 배열의 0번부터 옮겨야 합니다. C#의 <code>Queue&lt;T&gt;</code>가 이렇게 구현된 원형 배열입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>그럼 덱 하나로 스택과 큐를 다 대신할 수 있나요?</q>됩니다. 한쪽 끝만 쓰면 스택처럼, 한쪽으로 넣고 반대쪽에서 빼면 큐처럼 동작합니다. 다만 그만큼 인터페이스가 넓어져서, 스택이나 큐로만 쓸 의도라면 그 이름으로 제한해 쓰는 편이 실수를 줄입니다.</span></li>
+<li><span><q>스택 대신 큐를 써야 하는 경우는 어떻게 구분하나요?</q>처리 순서 자체가 의미를 가지면 큐입니다. 입력이나 네트워크 메시지처럼 들어온 순서대로 처리해야 하는 것, 그리고 너비 우선 탐색이 그렇습니다. 너비 우선 탐색은 큐를 써야 가까운 것부터 퍼져 나가고, 스택으로 바꾸면 깊이 우선이 되어 최단 거리 보장이 사라집니다.</span></li>
 </ul>
 </div>
 </div>
@@ -695,18 +696,38 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q3" aria-label="3번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">LIN-03</span><span class="qtext">원형 버퍼는 동적 큐에 비해 어떤 장점이 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">LIN-03</span><span class="qtext">덱은 언제 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>원형 버퍼는 고정 크기 배열에서 데이터를 옮기지 않고 시작과 끝 인덱스만 회전시켜, 할당과 가비지 컬렉션 없이 최근 몇 개를 유지합니다.</strong></p>
-<p>인덱스를 배열 크기로 나눈 나머지로 돌리기 때문에 끝에 닿으면 다시 앞으로 돌아옵니다. 넣기가 상수 시간이고, 꽉 차면 가장 오래된 것을 자동으로 덮어씁니다. 미리 잡아둔 연속 배열을 재사용하니 캐시에도 친화적입니다.</p>
-<p>동적 큐는 꽉 차면 더 큰 배열로 다시 할당하고 복사하는 비용이 생기고 가비지 컬렉션 부담도 있는데, 원형 버퍼는 그게 없습니다. 대신 크기가 고정이라는 대가를 치릅니다. 격투 게임의 입력 버퍼나 최근 로그를 담는 링 버퍼에 잘 맞습니다.</p>
+<p><strong>덱은 양쪽 끝에서 모두 상수 시간에 넣고 뺄 수 있는 구조라, 한 자료구조에서 앞과 뒤를 동시에 다뤄야 할 때 필요합니다.</strong></p>
+<p>예를 들어 최근 몇 프레임의 입력 기록을 유지하면 새 입력은 뒤에 넣고 오래된 것은 앞에서 버립니다. 실행 취소 기록에 개수 상한을 두면 최근 것은 뒤에서 꺼내고 넘친 옛 기록은 앞에서 버립니다.</p>
+<p>구현은 원형 배열이나 이중 연결 리스트입니다. 단일 연결 리스트로는 안 되는데, 뒤에서 빼려면 마지막의 바로 앞 노드를 알아야 하고 그걸 찾으려면 처음부터 훑어야 하기 때문입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>크기가 고정인 게 문제가 되지는 않나요?</q>"최근 몇 개만 필요"한 용도에서는 오히려 장점입니다. 오래된 것은 어차피 버릴 값이라 덮어써도 되기 때문입니다. 다만 모든 원소를 잃어선 안 되는 상황이라면 원형 버퍼는 맞지 않고, 크기가 늘어나는 동적 큐가 필요합니다.</span></li>
+<li><span><q>C#에는 덱이 있나요?</q>표준 컬렉션에는 없습니다. 이중 연결 리스트인 <code>LinkedList&lt;T&gt;</code>로 양 끝 연산을 할 수 있지만 노드마다 할당이 생기므로, 성능이 중요하면 원형 배열로 직접 만드는 경우가 많습니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="ds-q4" aria-label="4번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">LIN-04</span><span class="qtext">원형 버퍼는 동적 큐와 무엇이 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>원형 버퍼는 크기가 고정된 배열에서 앞뒤 위치를 회전시키는 구조라, 꽉 차면 늘리지 않고 가장 오래된 것을 덮어씁니다.</strong></p>
+<p>동적 큐는 꽉 차면 두 배로 재할당하지만 원형 버퍼는 처음 잡은 배열을 계속 재사용합니다. 그래서 메모리가 일정하고 실행 중 할당과 가비지 컬렉션 부담이 없습니다. 최근 몇 개만 의미 있는 데이터, 예를 들어 격투 게임의 입력 버퍼, 프레임 시간 기록, 리플레이용 최근 상태 기록에 잘 맞습니다.</p>
+<p>꽉 찼을 때 덮어쓸지 거부할지는 설계 선택입니다. 최신이 중요한 입력 기록은 덮어쓰고, 하나라도 잃으면 안 되는 네트워크 패킷은 거부하거나 다른 방법을 씁니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>앞 위치와 뒤 위치가 같으면 빈 건가요, 꽉 찬 건가요?</q>둘 다 같은 상태로 보여서 구별이 안 됩니다. 가장 흔한 해법은 개수를 따로 세는 것이고, 칸 하나를 일부러 비워 두는 방법도 있습니다. 개수를 세면 뒤 위치는 앞 위치와 개수로 계산할 수 있어 필드를 하나 줄일 수 있습니다.</span></li>
 </ul>
 </div>
 </div>
@@ -715,47 +736,23 @@ title: 면접 대비 문답
 </section>
 <section class="grp">
 <div class="grp-head"><h3>배열과 연결 리스트</h3><span class="cnt">4문항</span></div>
-<p class="grp-note">연속 메모리냐 흩어진 노드냐, 이 하나가 성능 차이의 뿌리입니다.</p>
-<div class="q">
-<label class="chk"><input type="checkbox" id="ds-q4" aria-label="4번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">ARR-01</span><span class="qtext">배열과 연결 리스트는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>배열은 데이터를 연속된 메모리에 담고, 연결 리스트는 노드가 흩어져 포인터로 이어집니다. 그래서 인덱스로 바로 접근하는 건 배열이 상수 시간, 연결 리스트는 앞에서부터 세어 가야 해 대상 수에 비례합니다.</strong></p>
-<p>더 중요한 이유는 캐시 지역성입니다. 배열은 값들이 연속으로 붙어 있어 순회할 때 캐시가 잘 맞지만, 연결 리스트는 노드가 메모리 여기저기 흩어져 있어 순회마다 캐시 미스가 잦습니다. 그래서 단순히 처음부터 끝까지 훑는 작업조차 실제로는 배열이 더 빠릅니다.</p>
-<p>대신 위치를 이미 알고 있다면 연결 리스트는 포인터만 바꿔 끼우거나 빼서 삽입과 삭제가 상수 시간입니다. 결국 무작위 접근과 순회 성능을 볼 거냐, 특정 위치의 삽입과 삭제를 볼 거냐의 선택입니다.</p>
-</div>
-<div class="tails">
-<p class="lab">꼬리질문</p>
-<ul>
-<li><span><q>그럼 연결 리스트는 언제 쓰는 게 맞나요?</q>순회하면서 지금 손에 쥔 노드를 그 자리에서 빼거나 끼워야 할 때입니다. 대표적으로 LRU 캐시가 노드를 맨 앞으로 옮기려고 이중 연결 리스트를 씁니다. 반대로 위치를 매번 찾아가야 한다면 이점이 거의 사라집니다.</span></li>
-</ul>
-</div>
-</div>
-</details>
-</div>
+<p class="grp-note">연속 메모리냐 흩어진 노드냐가 접근 비용과 캐시 효율, 삽입 비용의 차이를 모두 만듭니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q5" aria-label="5번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">ARR-02</span><span class="qtext">연결 리스트가 중간 삽입에 유리하다는데 항상 그런가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">ARR-01</span><span class="qtext">배열의 인덱스 접근은 왜 상수 시간인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>삽입할 위치를 이미 알고 있을 때만 상수 시간이고, 그 위치를 찾아가는 탐색까지 포함하면 결국 대상 수에 비례합니다.</strong></p>
-<p>배열의 중간 삽입은 뒤 원소를 전부 한 칸씩 밀어야 해서 원소 수에 비례하고, 연결 리스트는 포인터 몇 개만 교체하면 되니 상수 시간입니다. 여기까지만 보면 연결 리스트가 압도적입니다.</p>
-<p>그런데 삽입할 그 지점까지 가려면 앞에서부터 노드를 따라 세어 가야 하고, 이게 다시 원소 수에 비례합니다. 그래서 "위치를 찾은 다음 삽입"이라면 전체가 선형이라 배열과 큰 차이가 없고, 캐시 지역성까지 고려하면 배열이 나은 경우도 많습니다.</p>
+<p><strong>원소가 같은 크기로 연속해 놓여 있어서, 시작 주소에 인덱스와 원소 크기를 곱해 더하면 원하는 원소의 주소가 바로 나오기 때문입니다.</strong></p>
+<p>몇 번째 원소든 곱셈과 덧셈 한 번이면 되니 배열 크기와 상관없습니다. 연결 리스트는 노드가 흩어져 있어 이런 계산이 원리적으로 불가능하고, 링크를 처음부터 따라가야 합니다.</p>
+<p>순회도 빠른데, 이건 캐시 라인 때문입니다. CPU는 메모리를 보통 64바이트 단위로 가져오므로 정수 배열이면 한 번에 16개가 같이 올라옵니다. 첫 원소에서만 캐시 미스가 나고 이어지는 원소는 이미 캐시에 있습니다. 게임에서 수천 개의 엔티티 데이터를 매 프레임 순회할 때 연속 배열을 고르는 이유입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>그럼 연결 리스트의 상수 시간 삽입이 진짜 빛나는 경우는요?</q>순회하는 동안 현재 노드를 이미 손에 쥐고 있어서, 탐색 없이 바로 그 자리에서 지우거나 끼우는 경우입니다. LRU 캐시에서 방금 쓴 노드를 맨 앞으로 옮기는 동작이 대표적입니다.</span></li>
+<li><span><q>C#의 다차원 배열과 배열의 배열은 무엇이 다른가요?</q>다차원 배열은 한 덩어리의 연속 메모리라 격자 데이터에 맞고, 배열의 배열은 행마다 따로 할당되어 행 길이가 들쭉날쭉할 수 있습니다. 성능이 중요한 격자는 아예 1차원 배열에 행 번호 곱하기 폭 더하기 열 번호로 담는 경우도 많습니다.</span></li>
 </ul>
-</div>
-<div class="trap">
-<p class="lab">함정</p>
-<p>"연결 리스트는 삽입이 무조건 빠르다"고 단정하면 감점입니다. 상수 시간은 위치를 이미 알 때의 이야기이고, 탐색 비용과 캐시 미스를 함께 말해야 정확합니다.</p>
 </div>
 </div>
 </details>
@@ -763,22 +760,17 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q6" aria-label="6번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">ARR-03</span><span class="qtext">단일·이중·원형 연결 리스트는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">ARR-02</span><span class="qtext">연결 리스트가 중간 삽입에 유리하다는데 항상 그런가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>노드가 가진 링크의 방향과 끝을 어떻게 처리하느냐로 나뉩니다.</strong></p>
-<ul>
-<li><strong>단일 연결 리스트.</strong> 다음을 가리키는 링크만 있습니다. 앞으로만 순회할 수 있고 그만큼 메모리를 적게 씁니다.</li>
-<li><strong>이중 연결 리스트.</strong> 이전과 다음 링크를 둘 다 가집니다. 양방향 순회와 이전 노드로의 상수 시간 접근이 되는 대신 링크가 두 배입니다. 노드 삭제나 LRU 캐시에 유리합니다.</li>
-<li><strong>원형 연결 리스트.</strong> 마지막이 다시 처음을 가리킵니다. 라운드로빈처럼 계속 도는 순회나 턴 관리에 씁니다.</li>
-</ul>
+<p><strong>아닙니다. 상수 시간 삽입은 넣을 위치의 노드를 이미 손에 쥐고 있을 때의 이야기입니다.</strong></p>
+<p>위치를 모르면 처음부터 링크를 따라가 찾아야 하므로 결국 선형 시간입니다. 게다가 노드가 메모리에 흩어져 있어 따라갈 때마다 캐시 미스가 날 수 있습니다. 그래서 실제로는 원소를 당기는 배열의 삽입이 수천 개 규모까지 연결 리스트보다 빠른 경우가 많습니다.</p>
+<p>메모리 부담도 큽니다. 64비트 .NET에서 정수 하나를 담는 클래스 노드는 객체 헤더와 링크까지 합쳐 원소 하나에 수십 바이트를 씁니다. 그래서 연결 리스트는 직접 쓰기보다 LRU 캐시처럼 노드 위치를 따로 기억해 두는 구조의 부품으로 들어가는 일이 많습니다.</p>
 </div>
-<div class="tails">
-<p class="lab">꼬리질문</p>
-<ul>
-<li><span><q>LRU 캐시는 왜 하필 이중 연결 리스트인가요?</q>방금 쓴 노드를 맨 앞으로 상수 시간에 옮겨야 하는데, 노드를 중간에서 떼어내려면 그 앞 노드의 링크를 고쳐야 합니다. 단일 링크면 앞 노드를 찾느라 다시 훑어야 하므로, 이전 링크를 가진 이중 연결 리스트가 필요합니다.</span></li>
-</ul>
+<div class="trap">
+<p class="lab">함정</p>
+<p>"연결 리스트는 삽입이 빠르다"고 단정하면 감점입니다. 위치를 알 때만이라는 조건과, 탐색 비용과 캐시 미스를 함께 말해야 정확합니다.</p>
 </div>
 </div>
 </details>
@@ -786,18 +778,39 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q7" aria-label="7번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">ARR-04</span><span class="qtext">List에 계속 추가하는데 어떻게 평균 상수 시간이 되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">ARR-03</span><span class="qtext">이중 연결 리스트는 왜 필요한가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>내부 배열이 꽉 차면 두 배 크기로 다시 할당하는데, 두 배씩 늘리기 때문에 복사가 점점 드물어져 추가당 평균이 상수 시간이 됩니다.</strong></p>
-<p>추가를 여러 번 하는 동안 일어나는 복사 비용을 전부 합치면 원소 수의 약 두 배 정도입니다. 이걸 추가 횟수로 나누면 추가 한 번당 평균이 상수가 되고, 이것이 분할 상환 상수 시간입니다.</p>
-<p>대신 하필 재할당이 걸리는 그 한 번은 전체를 복사하느라 원소 수에 비례합니다. 그리고 두 배로 잡다 보니 최대 절반 가까이는 빈 공간으로 남는 낭비가 있습니다. 만약 한 칸씩만 늘린다면 추가마다 복사가 일어나 전체가 원소 수의 제곱이 되어 버립니다.</p>
+<p><strong>노드 하나를 떼어 내려면 그 앞 노드의 다음 링크를 고쳐야 하는데, 단일 연결 리스트는 앞 노드를 모르기 때문입니다.</strong></p>
+<p>단일 연결 리스트에서 임의의 노드를 지우려면 앞 노드를 찾으려고 처음부터 훑어야 해서 선형 시간이 됩니다. 이중 연결 리스트는 노드가 이전 링크를 들고 있어서, 앞뒤 노드를 서로 이어 주기만 하면 상수 시간에 떨어집니다. 뒤에서 빼는 연산도 같은 이유로 이중이 필요합니다.</p>
+<p>대신 노드마다 참조가 하나 더 붙어 메모리를 더 씁니다. 그래서 스택처럼 한쪽 끝만 쓰는 구조는 단일로 충분하고, 임의 노드 삭제가 필요한 LRU 캐시는 이중이 강제됩니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>넣을 개수를 미리 안다면요?</q>처음부터 그 개수만큼 용량을 잡아두면 재할당과 복사가 아예 일어나지 않아 더 빠르고, 두 배로 늘리며 생기는 빈 공간 낭비도 없앨 수 있습니다.</span></li>
+<li><span><q>원형 연결 리스트와 센티널 노드는 왜 쓰나요?</q>원형은 턴제 순서처럼 끝에서 다시 처음으로 도는 순회에 맞고, 마지막 노드를 머리의 이전 링크로 바로 얻을 수 있습니다. 센티널은 값 없는 더미 노드를 항상 두어, 비어 있는 리스트나 끝 노드 같은 특수한 경우의 분기를 없애 줍니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="ds-q8" aria-label="8번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">ARR-04</span><span class="qtext">리스트에 원소를 계속 추가하면 가끔 재할당이 일어나는데, 왜 추가가 평균 상수 시간인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>꽉 찰 때마다 크기를 두 배로 늘리면, 비싼 재할당이 드물게 일어나서 n번 추가의 총비용을 n으로 나눈 평균이 상수가 되기 때문입니다. 이것을 분할 상환 분석이라고 합니다.</strong></p>
+<p>재할당 때 복사하는 양은 4, 8, 16처럼 두 배씩 늘어나는 등비수열이라, 다 더해도 마지막 복사량의 두 배를 넘지 않습니다. 그래서 n번 추가하는 동안 복사한 원소 수는 n에 비례하고, 한 번당으로 나누면 상수입니다.</p>
+<p>핵심은 곱하느냐 더하느냐입니다. 매번 고정된 개수만큼만 늘리면 재할당이 일정 간격으로 계속 일어나서 총비용이 n의 제곱에 비례하게 됩니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>평균이 상수면 게임에서는 신경 안 써도 되나요?</q>평균은 상수지만 재할당하는 그 한 번은 큰 복사와 할당이 한꺼번에 일어나 프레임 시간이 튈 수 있습니다. 그래서 개수를 대략 알면 처음에 용량을 잡아 두어 재할당을 아예 없애는 것이 정석입니다.</span></li>
+<li><span><q>C#의 Count와 Capacity는 무엇이 다른가요?</q><code>Count</code>는 실제로 담긴 개수이고 <code>Capacity</code>는 확보해 둔 칸 수입니다. 용량을 미리 잡아도 개수는 0이라 인덱스로 바로 접근할 수 없습니다.</span></li>
 </ul>
 </div>
 </div>
@@ -805,43 +818,24 @@ title: 면접 대비 문답
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>해시 기반 자료구조</h3><span class="cnt">5문항</span></div>
-<p class="grp-note">평균 상수 시간의 조회가 어떻게 나오고, 언제 무너지는지가 핵심입니다.</p>
-<div class="q">
-<label class="chk"><input type="checkbox" id="ds-q8" aria-label="8번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">HASH-01</span><span class="qtext">포함 여부를 자주 확인해야 하면 List·Dictionary·HashSet 중 무엇을 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>포함 여부만 자주 본다면 HashSet입니다. 평균 상수 시간에 확인되기 때문입니다.</strong></p>
-<p>List는 앞에서부터 하나씩 훑어야 해서 원소 수에 비례합니다. Dictionary와 HashSet은 값을 해시해서 바로 해당 버킷으로 가기 때문에 평균 상수 시간입니다. 존재 여부만 필요하면 HashSet, 그 키에 값까지 매달아 함께 저장할 게 있으면 Dictionary를 씁니다.</p>
-<p>대신 HashSet은 순서와 인덱스 접근, 중복 저장을 포기합니다. 그리고 Dictionary의 상수 시간은 키로 찾을 때의 이야기이고, 값으로 찾는 <code>ContainsValue</code>는 딕셔너리라도 전부 훑어 원소 수에 비례합니다.</p>
-</div>
-<div class="tails">
-<p class="lab">꼬리질문</p>
-<ul>
-<li><span><q>원소가 몇 개 안 되면요?</q>수십 개 이하로 적으면 List의 선형 탐색이 캐시에 잘 맞아 오히려 빠를 수 있습니다. 해시는 해시 계산과 버킷 점프 비용이 있어서, 규모가 어느 정도 커져야 그 이득이 비용을 넘어섭니다.</span></li>
-</ul>
-</div>
-</div>
-</details>
-</div>
+<div class="grp-head"><h3>해시</h3><span class="cnt">5문항</span></div>
+<p class="grp-note">키를 해시로 배열 위치에 바꿔 평균 상수 시간을 얻는 대신 순서를 포기합니다. 평균이 깨지는 조건과 키 설계가 꼬리질문의 단골입니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q9" aria-label="9번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">HASH-02</span><span class="qtext">Dictionary 키로 커스텀 클래스를 쓸 때 무엇을 주의하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">HASH-01</span><span class="qtext">해시 테이블 조회가 평균 상수 시간인 원리는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>GetHashCode와 Equals를 일관되게 함께 오버라이드해야 합니다. 안 하면 내용이 같아도 다른 키로 인식됩니다.</strong></p>
-<p>딕셔너리는 <code>GetHashCode</code>로 버킷을 찾고 <code>Equals</code>로 그 안의 항목을 비교합니다. 그런데 커스텀 클래스는 기본이 참조 기준이라, 필드 값이 똑같은 다른 객체라도 해시가 다르고 다른 키로 취급됩니다.</p>
-<p>그래서 규칙이 두 가지입니다. <code>Equals</code>가 참이면 해시도 반드시 같아야 하고, 키로 쓰는 객체는 가급적 불변이어야 합니다. 넣은 뒤에 그 객체의 필드를 바꿔 해시가 달라지면, 원래 넣어둔 버킷에서 다시 못 찾게 됩니다.</p>
+<p><strong>키를 해시 함수로 정수로 바꾸고 그 값을 배열 크기로 나눈 나머지를 칸 번호로 써서, 배열처럼 위치를 계산으로 바로 찾기 때문입니다.</strong></p>
+<p>배열이 인덱스로 주소를 계산하듯, 해시 테이블은 키로 칸 번호를 계산합니다. 다만 서로 다른 키가 같은 칸에 올 수 있어서, 그 칸 안에서는 키를 하나씩 비교합니다. 칸마다 평균 원소 수가 상수로 유지되면 비교도 상수 번이라 평균 상수 시간이 됩니다.</p>
+<p>대가는 순서입니다. 정렬 순서가 없어서 가장 작은 키를 찾거나 범위로 조회하려면 전부 훑어야 합니다. 또 문자열 키는 해시 계산 자체가 글자 수에 비례하므로, 매 프레임 문자열로 조회하는 코드는 미리 정수 ID로 바꿔 두는 편이 좋습니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>왜 키가 불변이어야 하나요?</q>해시 값으로 버킷을 정해 넣었는데 나중에 그 값이 바뀌면, 조회할 때는 새 해시로 엉뚱한 버킷을 뒤지게 됩니다. 그래서 문자열처럼 한 번 만들면 안 바뀌는 불변 타입이 키로 안전합니다.</span></li>
+<li><span><q>C#의 Dictionary는 내부적으로 어떻게 생겼나요?</q>교과서처럼 칸마다 노드 객체를 매다는 대신 배열 두 개를 씁니다. 항목을 담는 entries 배열과 칸마다 첫 항목의 위치를 적은 buckets 배열이고, 같은 칸의 항목들은 다음 항목의 배열 인덱스로 이어집니다. 노드 할당이 없고 체인을 따라가도 같은 배열 안이라 캐시에 유리합니다.</span></li>
+<li><span><q>Dictionary를 순회하면 넣은 순서대로 나오나요?</q>보장되지 않습니다. 지금은 넣은 순서처럼 보여도 항목을 지우면 그 빈칸을 다음 추가가 재사용해서 순서가 섞입니다. 순서가 필요하면 별도의 리스트를 함께 두거나 정렬된 컬렉션을 써야 합니다.</span></li>
 </ul>
 </div>
 </div>
@@ -850,18 +844,19 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q10" aria-label="10번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">HASH-03</span><span class="qtext">해시 테이블이 최악에 선형 시간으로 떨어지는 이유는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">HASH-02</span><span class="qtext">Dictionary 키로 직접 만든 타입을 쓸 때 무엇을 주의하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>서로 다른 키가 같은 버킷으로 몰리는 해시 충돌 때문입니다. 한 버킷이 길어지면 그 안을 처음부터 훑게 됩니다.</strong></p>
-<p>이상적으로는 키가 여러 버킷에 고르게 흩어져서 버킷마다 몇 개뿐이라 상수 시간에 찾습니다. 그런데 해시가 나쁘거나 운이 나빠 한 버킷에 다 몰리면, 사실상 그 버킷 안의 리스트를 훑는 셈이라 원소 수에 비례해 느려집니다.</p>
-<p>그래서 채워진 비율인 로드 팩터를 관리합니다. 이게 임계치를 넘으면 테이블을 더 크게 만들고 전체를 다시 해싱해서 다시 고르게 흩뜨립니다. 좋은 분산을 주는 <code>GetHashCode</code>도 그만큼 중요합니다.</p>
+<p><strong>Equals가 같다고 하는 두 키는 GetHashCode도 반드시 같아야 하고, 키는 넣은 뒤에 바뀌면 안 됩니다.</strong></p>
+<p>조회는 해시로 칸을 고른 다음 그 칸에서 Equals로 비교하는 두 단계입니다. 클래스의 기본 동작은 참조 비교라서, 값이 같은 새 객체로 찾으면 해시가 달라 다른 칸을 뒤지고 못 찾습니다. 그래서 두 메서드를 같은 필드로 함께 재정의해야 하고, 해시는 <code>HashCode.Combine</code>으로 필드를 섞는 것이 안전합니다.</p>
+<p>넣은 뒤 키의 필드가 바뀌면 해시가 달라져서, 원래 칸에 남은 항목을 영영 못 찾게 됩니다. 실무에서 가장 간단한 답은 값 기반 비교를 자동으로 만들어 주는 불변 <code>record</code>를 쓰는 것입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>재해싱은 비싸지 않나요?</q>그 순간은 전체를 다시 담느라 원소 수에 비례합니다. 하지만 List의 배열 확장처럼 드물게만 일어나기 때문에, 분할 상환해서 보면 삽입당 평균은 여전히 상수 시간입니다.</span></li>
+<li><span><q>구조체를 키로 쓰면 무엇이 다른가요?</q>구조체의 기본 Equals는 리플렉션으로 필드를 비교할 수 있어 느리고 박싱이 생길 수 있습니다. 그래서 <code>IEquatable&lt;T&gt;</code>를 구현하거나 <code>record struct</code>를 쓰는 것이 좋습니다.</span></li>
+<li><span><q>게임에서 자주 걸리는 실수는 무엇인가요?</q>실수 좌표를 그리드 딕셔너리의 키로 쓰는 경우입니다. 부동소수점 오차 때문에 같은 칸이어야 할 좌표가 다른 키가 됩니다. 칸 좌표를 정수로 내려서 키로 써야 합니다.</span></li>
 </ul>
 </div>
 </div>
@@ -870,21 +865,19 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q11" aria-label="11번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">HASH-04</span><span class="qtext">해시 충돌을 해결하는 방식에는 무엇이 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">HASH-03</span><span class="qtext">해시 테이블은 언제 최악으로 느려지나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>크게 분리 연결과 개방 주소법 두 가지입니다.</strong></p>
-<ul>
-<li><strong>분리 연결.</strong> 같은 버킷에 충돌한 것들을 연결 리스트로 이어 붙입니다. 구현이 쉽고 테이블 크기 이상도 담을 수 있는 대신, 노드가 흩어져 추가 메모리를 쓰고 캐시에 불리합니다.</li>
-<li><strong>개방 주소법.</strong> 충돌하면 빈 칸을 찾아 다른 자리에 저장합니다. 하나의 연속 배열이라 캐시와 메모리 효율이 좋은 대신, 채운 비율이 높아지면 빈 칸을 찾는 탐사 비용이 커지고 삭제가 까다롭습니다.</li>
-</ul>
-<p>C#의 <code>Dictionary</code>는 분리 연결 방식을 씁니다.</p>
+<p><strong>키들이 한 칸에 몰려 충돌이 쌓이면, 그 칸 안에서 하나씩 비교해야 해서 최악에는 원소 수에 비례하는 선형 시간이 됩니다.</strong></p>
+<p>충돌 자체는 피할 수 없습니다. 가능한 키는 사실상 무한한데 칸은 유한하기 때문입니다. 그래서 평균을 지키는 장치가 칸 대비 원소 비율, 즉 적재율입니다. 적재율이 임계치를 넘으면 테이블을 키우고 모든 키를 다시 해싱해서 칸당 평균 원소 수를 상수로 유지합니다.</p>
+<p>해시 함수가 나쁘거나 키가 한쪽으로 치우치면 그래도 몰립니다. 그래서 칸 수로 소수를 쓰거나 해시를 잘 섞는 함수를 씁니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>개방 주소법에서 삭제가 왜 까다로운가요?</q>그냥 칸을 비워 버리면, 그 자리를 건너뛰며 저장됐던 뒤쪽 항목들을 조회할 때 중간의 빈 칸에서 탐사가 멈춰 못 찾게 됩니다. 그래서 실제로 지우는 대신 지웠다는 표시만 남기는 tombstone을 두어, 탐사는 계속 이어지되 그 칸은 비었다고 알게 합니다.</span></li>
+<li><span><q>충돌을 해결하는 방식에는 무엇이 있나요?</q>크게 두 가지입니다. 분리 연결은 같은 칸의 항목을 체인으로 잇습니다. 구현이 단순하고 적재율이 높아도 버팁니다. C#의 Dictionary가 이 방식입니다. 개방 주소법은 충돌하면 다른 빈칸을 찾아 넣습니다. 연속 배열이라 캐시에 좋지만 비슷한 위치에 몰리는 클러스터링이 생기고, 삭제한 칸을 그냥 비우면 뒤쪽 항목을 못 찾게 되어 삭제 표시를 남겨야 합니다.</span></li>
+<li><span><q>충돌이 보안 문제가 되기도 하나요?</q>공격자가 일부러 같은 칸으로 가는 키를 대량으로 보내면 서버 처리가 선형으로 떨어집니다. .NET의 문자열 키 Dictionary는 평소에는 빠른 비교자를 쓰다가 충돌이 일정 횟수를 넘으면 무작위 시드를 쓰는 비교자로 바꿔 이를 막습니다.</span></li>
 </ul>
 </div>
 </div>
@@ -893,18 +886,39 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q12" aria-label="12번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">HASH-05</span><span class="qtext">블룸 필터는 무엇이고 언제 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">HASH-04</span><span class="qtext">블룸 필터는 무엇이고 언제 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>블룸 필터는 여러 해시 함수로 비트 배열에 표시해, 아주 적은 메모리로 어떤 원소가 있는지를 판단하는 확률적 자료구조입니다.</strong></p>
-<p>핵심 성질은 한쪽으로만 틀린다는 겁니다. 없는데 있다고 하는 거짓 양성은 생길 수 있어도, 있는데 없다고 하는 거짓 음성은 없습니다. 그래서 "확실히 없다"만은 보장합니다. 대신 원소를 실제로 저장하거나 삭제하거나 열거하지는 못하고, 있는지 없는지 묻는 멤버십 질의만 됩니다.</p>
-<p>그래서 캐시나 데이터베이스 앞단에서 "디스크를 뒤질 가치가 있는지" 걸러내는 데 씁니다. 필터가 없다고 하면 바로 건너뛰고, 있다고 할 때만 실제 저장소를 확인하면 헛걸음을 크게 줄일 수 있습니다.</p>
+<p><strong>블룸 필터는 원소를 저장하지 않고 비트 배열에 표시만 해서, 어떤 원소가 확실히 없는지 혹은 아마 있는지를 아주 적은 메모리로 답하는 확률적 구조입니다.</strong></p>
+<p>원소를 넣을 때 해시 함수 여러 개로 비트 위치 여러 개를 구해 켭니다. 조회할 때 그 비트가 하나라도 꺼져 있으면 넣은 적이 없다고 확실히 말할 수 있습니다. 반대로 다 켜져 있어도 다른 원소들이 켜 놓은 비트일 수 있어서 아마 있다까지만 말할 수 있습니다. 그래서 틀리는 방향이 한쪽뿐입니다.</p>
+<p>쓰이는 곳은 뒤져 보는 것이 비싼 경우입니다. 데이터베이스나 디스크를 조회하기 전에 확실히 없는 것을 미리 걸러 비싼 조회를 줄입니다. 게임에서는 닉네임 중복 검사의 1차 필터처럼 서버 쪽 대량 데이터에서 쓰이고, 클라이언트에서 직접 쓸 일은 드뭅니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>거짓 양성이 나면 틀린 결과 아닌가요?</q>최종 판단이 아니라 1차 필터라서 괜찮습니다. 있다고 나온 것만 실제 저장소에서 다시 확인하기 때문에, 거짓 양성은 헛걸음 한 번으로 끝나고 정답 자체는 틀리지 않습니다.</span></li>
+<li><span><q>원소를 지울 수 있나요?</q>기본 형태로는 안 됩니다. 비트를 끄면 그 비트를 함께 쓰던 다른 원소까지 없다고 판정되기 때문입니다. 지워야 하면 비트 대신 개수를 세는 카운팅 블룸 필터를 씁니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="ds-q13" aria-label="13번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">HASH-05</span><span class="qtext">LRU 캐시를 모든 연산이 상수 시간이 되게 구현하려면 어떻게 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>해시맵과 이중 연결 리스트를 합칩니다. 해시맵은 키로 리스트의 노드를 바로 찾고, 리스트는 사용 순서를 유지합니다.</strong></p>
+<p>해시맵만으로는 사용 순서를 알 수 없고, 큐는 넣은 순서만 알 뿐 중간에 다시 쓴 항목을 앞으로 끌어올릴 수 없습니다. 리스트만으로는 키로 찾는 데 선형 시간이 걸립니다. 그래서 해시맵의 값을 리스트 노드 자체로 두어, 조회하면 해시맵으로 노드를 찾고 그 노드를 떼어 맨 앞으로 옮깁니다. 이중 연결이라 떼는 것이 상수 시간입니다.</p>
+<p>꽉 차면 리스트 맨 뒤의 가장 오래 안 쓴 노드를 버립니다. 이때 해시맵에서도 지워야 하는데, 해시맵을 거꾸로 뒤질 수는 없으니 노드에 키를 함께 적어 두는 것이 구현의 핵심입니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>게임에서는 어디에 쓰나요?</q>메모리 예산이 정해진 텍스처나 에셋 캐시, 최근 방문한 맵 구역의 데이터처럼 다시 쓸 가능성이 시간 지역성을 따르는 것들입니다.</span></li>
+<li><span><q>운영체제의 페이지 교체도 LRU인가요?</q>개념은 같지만, 진짜 LRU는 매 접근마다 순서를 갱신해야 해서 하드웨어 비용이 큽니다. 그래서 참조 비트 하나로 흉내 내는 Clock 알고리즘 같은 근사를 씁니다.</span></li>
 </ul>
 </div>
 </div>
@@ -913,42 +927,22 @@ title: 면접 대비 문답
 </section>
 <section class="grp">
 <div class="grp-head"><h3>힙과 우선순위 큐</h3><span class="cnt">3문항</span></div>
-<p class="grp-note">최솟값이나 최댓값만 빠르게 뽑는 데 특화된 구조입니다.</p>
-<div class="q">
-<label class="chk"><input type="checkbox" id="ds-q13" aria-label="13번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">HEAP-01</span><span class="qtext">우선순위 큐는 왜 힙으로 구현하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>힙은 최솟값이나 최댓값을 상수 시간에 보고, 넣고 빼기를 트리 높이인 로그 시간에 하기 때문입니다. 정렬된 리스트나 일반 큐로는 이 둘을 함께 낼 수 없습니다.</strong></p>
-<p>힙은 완전 이진 트리라 높이가 로그 수준입니다. 삽입은 끝에 넣고 부모와 비교하며 위로 올리고, 추출은 루트를 꺼낸 뒤 마지막 원소를 루트로 올려 자식과 비교하며 아래로 내립니다. 둘 다 루트에서 잎까지 한 경로만 정리하므로 로그 시간입니다.</p>
-<p>대안과 비교하면 차이가 분명합니다. 정렬된 리스트는 최솟값 읽기는 상수 시간이지만 삽입마다 자리를 만드느라 원소 수에 비례하고, 일반 큐는 우선순위 순 정렬 자체가 안 됩니다. 그래서 A*의 오픈 리스트나, 시간을 키로 삼는 이벤트 스케줄링에 힙을 씁니다.</p>
-</div>
-<div class="tails">
-<p class="lab">꼬리질문</p>
-<ul>
-<li><span><q>루트를 빼고 나머지를 앞으로 당기면 안 되나요?</q>그건 배열의 앞 삭제라 원소 수에 비례해 느립니다. 힙은 대신 마지막 원소를 루트 자리로 올린 뒤 아래로 내려보내서, 한 경로만 건드리고도 로그 시간을 지킵니다.</span></li>
-</ul>
-</div>
-</div>
-</details>
-</div>
+<p class="grp-note">전체를 정렬하지 않고 루트 하나만 보장하는 느슨한 정렬이 힙이 싼 이유이고, 그 느슨함이 중간 항목 수정을 어렵게 만듭니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q14" aria-label="14번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">HEAP-02</span><span class="qtext">힙을 왜 포인터 없이 배열로 표현할 수 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">HEAP-01</span><span class="qtext">우선순위 큐는 왜 정렬된 리스트가 아니라 힙으로 구현하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>힙은 마지막 레벨만 왼쪽부터 채우는 완전 이진 트리라, 노드를 위에서부터 빈틈없이 배열에 담을 수 있기 때문입니다.</strong></p>
-<p>0부터 세는 배열에서 인덱스 i의 두 자식은 2 곱하기 i에 1과 2를 더한 자리, 부모는 i에서 1을 빼고 2로 나눈 자리입니다. 부모와 자식으로 오가는 게 산술 한 번이라 포인터가 아예 필요 없습니다.</p>
-<p>덕분에 노드가 연속 메모리에 놓여 캐시에 친화적이고 포인터 저장 공간도 아낍니다. 이 조밀한 배열 대응은 완전 트리라는 성질이 보장하는 것이라, 중간에 빈 자리가 생기는 트리에는 이 인덱스 계산이 그대로 들어맞지 않습니다.</p>
+<p><strong>우선순위 큐에 필요한 것은 다음에 처리할 하나뿐인데, 힙은 그 하나만 보장해서 넣기와 꺼내기를 모두 로그 시간에 합니다.</strong></p>
+<p>최소 힙의 규칙은 모든 부모가 자식보다 작거나 같다는 것 하나입니다. 부모와 자식이 아닌 노드끼리는 아무 제약이 없어서, 루트가 최솟값이라는 것만 보장됩니다. 정렬된 리스트는 쓰지도 않을 전체 순서를 유지하느라 넣을 때마다 선형 시간이 듭니다.</p>
+<p>힙은 완전 이진 트리라 높이가 항상 로그 n입니다. 넣을 때는 끝에 두고 부모와 비교하며 올리고, 꺼낼 때는 마지막 원소를 루트로 옮겨 더 작은 자식과 바꾸며 내립니다. 게임에서는 A* 오픈 리스트, 시간순 이벤트 예약, 거리순 AI 타깃 선택에 씁니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>일반 이진 트리도 배열로 담을 수 있나요?</q>담을 수는 있지만 한쪽으로 치우친 트리는 빈 칸이 잔뜩 생겨 메모리가 크게 낭비됩니다. 힙은 항상 완전 트리라서 빈 칸 없이 딱 맞게 들어가는 것이 장점입니다.</span></li>
+<li><span><q>C#의 PriorityQueue는 무엇을 주의해야 하나요?</q>같은 우선순위끼리 넣은 순서가 보장되지 않는 불안정 구조입니다. 순서가 중요하면 우선순위에 넣은 순번을 덧붙여야 합니다. 또 이미 넣은 항목의 우선순위를 바꾸는 기능이 없고, .NET 9부터 생긴 <code>Remove</code>도 전체를 훑는 선형 시간입니다.</span></li>
 </ul>
 </div>
 </div>
@@ -957,18 +951,39 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q15" aria-label="15번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">HEAP-03</span><span class="qtext">다익스트라에서 이미 힙에 든 노드의 우선순위를 낮춰야 할 때, 기본 힙의 문제는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">HEAP-02</span><span class="qtext">힙은 왜 포인터 없이 배열로 표현할 수 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>기본 이진 힙은 특정 원소가 지금 힙의 어디에 있는지 몰라서, 그 원소를 찾는 데만 원소 수에 비례하는 시간이 듭니다.</strong></p>
-<p>다익스트라와 A*는 더 짧은 경로를 발견하면 그 노드의 거리 값을 낮추는 감소 키 연산이 필요합니다. 그런데 힙은 루트 근처의 대소 관계만 알 뿐, 임의의 원소가 배열 어디에 있는지는 알지 못합니다.</p>
-<p>이걸 푸는 방법이 두 가지입니다. 하나는 원소에서 힙 인덱스로 가는 매핑을 따로 두는 인덱스드 힙으로, 위치를 상수 시간에 찾아 위로 올리는 정리를 로그 시간에 합니다. 다른 하나는 갱신 대신 새 값을 그냥 또 넣고, 나중에 꺼낼 때 낡은 항목이면 무시하는 게으른 삭제입니다. 구현이 단순해 실무에서 자주 씁니다.</p>
+<p><strong>힙은 완전 이진 트리라 레벨 순서로 빈칸 없이 배열에 담기고, 그러면 부모와 자식 위치가 인덱스 공식으로 계산되기 때문입니다.</strong></p>
+<p>0부터 세면 i번 노드의 자식은 2i 더하기 1과 2i 더하기 2, 부모는 i 빼기 1을 2로 나눈 몫입니다. 노드마다 자식 참조와 객체 헤더가 필요 없어 메모리를 아끼고, 할당이 없어 가비지 컬렉션 부담도 없습니다.</p>
+<p>이 대응은 완전 트리일 때만 성립합니다. 중간에 빈 노드가 생기는 일반 트리를 이렇게 담으면 배열에 구멍이 생겨 공간을 낭비합니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>게으른 삭제의 단점은요?</q>낡은 항목이 힙에 계속 쌓여 크기가 커지고, 꺼낼 때마다 이게 아직 유효한 값인지 확인하는 절차가 붙습니다. 대신 인덱스 매핑을 따로 관리하지 않아도 되어 코드가 훨씬 간단하다는 이점이 있습니다.</span></li>
+<li><span><q>자식을 4개씩 두는 4진 힙은 왜 쓰나요?</q>높이가 절반이 되어 층을 내려가며 새 캐시 라인을 가져오는 횟수가 줄고, 자식 넷이 배열에 붙어 있어 한 캐시 라인에 같이 들어옵니다. 꺼낼 때 비교 횟수는 이진 힙과 비슷해서 손해가 거의 없습니다. .NET의 <code>PriorityQueue</code>도 4진 힙입니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="ds-q16" aria-label="16번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">HEAP-03</span><span class="qtext">힙에 이미 들어 있는 항목의 우선순위를 바꾸려면 어떻게 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>힙은 루트 말고는 항목이 배열 어디에 있는지 모르기 때문에, 위치를 따로 기록하는 인덱스드 힙을 쓰거나 새 항목을 다시 넣고 옛 항목은 꺼낼 때 버리는 지연 삭제를 씁니다.</strong></p>
+<p>그냥 찾으려면 배열을 전부 훑어야 해서 선형 시간입니다. 인덱스드 힙은 항목에서 힙 칸 번호로 가는 매핑을 두고, 원소를 교환할 때마다 그 매핑도 갱신합니다. 그러면 위치를 상수 시간에 찾고, 값을 낮췄으면 위로, 높였으면 아래로 옮기면 됩니다.</p>
+<p>지연 삭제는 표준 우선순위 큐로 바로 쓸 수 있어 실무에서 흔합니다. 바뀐 값으로 새로 넣고, 꺼낸 항목이 이미 처리됐거나 취소됐으면 버립니다. 대신 죽은 항목이 쌓여 힙이 커집니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>지연 삭제에서 죽은 항목이 계속 쌓이면 어떻게 하나요?</q>살아 있는 항목에 비해 죽은 항목이 일정 비율을 넘으면 살아 있는 것만 모아 힙을 다시 만듭니다. 늦추기만 하는 갱신이라면 아예 다시 넣지 않고 꺼낼 때 최신 값과 비교해 다시 넣는 방법도 있습니다.</span></li>
+<li><span><q>다익스트라에서는 어느 쪽을 쓰나요?</q>보통 지연 삭제입니다. 각 노드의 확정된 최단 거리가 이미 있으니, 꺼낸 거리가 기록된 거리보다 크면 옛 항목이라고 바로 판단할 수 있어 추가 기록이 필요 없습니다.</span></li>
 </ul>
 </div>
 </div>
@@ -976,43 +991,24 @@ title: 면접 대비 문답
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>트리</h3><span class="cnt">6문항</span></div>
-<p class="grp-note">균형을 어떻게 유지하고, 무엇에 최적화했느냐로 종류가 갈립니다.</p>
-<div class="q">
-<label class="chk"><input type="checkbox" id="ds-q16" aria-label="16번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">TREE-01</span><span class="qtext">이진 탐색 트리는 왜 균형이 깨지면 느려지나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>정렬된 순서로 삽입하면 한쪽으로만 자라 사실상 연결 리스트가 되고, 그러면 탐색이 원소 수에 비례해 느려집니다.</strong></p>
-<p>이진 탐색 트리의 탐색과 삽입은 트리의 높이에 비례합니다. 균형이 잡히면 높이가 로그 수준이라 로그 시간이지만, 한쪽으로 치우쳐 높이가 원소 수만큼 되면 결국 전부 훑는 것과 같아집니다.</p>
-<p>그래서 AVL 트리나 Red-Black 트리는 삽입과 삭제 때 회전으로 높이를 로그 수준으로 유지합니다.</p>
-</div>
-<div class="tails">
-<p class="lab">꼬리질문</p>
-<ul>
-<li><span><q>어떤 경우에 이렇게 치우치나요?</q>이미 정렬된 데이터를 순서대로 넣을 때가 대표적입니다. 매번 새 값이 한쪽 끝에만 붙어서 트리가 한 방향으로만 자랍니다. 그래서 입력 순서를 통제하기 어려운 상황일수록 균형 트리가 필요합니다.</span></li>
-</ul>
-</div>
-</div>
-</details>
-</div>
+<div class="grp-head"><h3>트리와 균형</h3><span class="cnt">4문항</span></div>
+<p class="grp-note">트리 연산의 비용은 노드 수가 아니라 높이가 정합니다. 균형 트리는 높이를 로그로 묶는 서로 다른 규칙입니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q17" aria-label="17번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">TREE-02</span><span class="qtext">AVL 트리는 어떻게 균형을 유지하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">TREE-01</span><span class="qtext">이진 탐색 트리의 연산 비용은 왜 높이에 따라 달라지나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>모든 노드에서 좌우 서브트리의 높이 차를 1 이하로 강제하고, 이 조건이 깨지면 회전으로 되돌립니다.</strong></p>
-<p>높이 차를 1 이하로 묶으면 트리가 한쪽으로 치우칠 수 없어서 높이가 로그 수준으로 유지되고, 탐색과 삽입, 삭제가 모두 로그 시간이 보장됩니다.</p>
-<p>대신 삽입과 삭제 때마다 균형이 깨지지 않았는지 확인하고 필요하면 회전해야 합니다. 회전 자체는 링크 몇 개만 바꾸는 상수 시간 작업입니다.</p>
+<p><strong>찾기, 넣기, 빼기가 모두 루트에서 한 경로를 따라 내려가므로 비용이 트리 높이에 비례하고, 높이는 넣는 순서에 따라 로그 n에서 n까지 달라지기 때문입니다.</strong></p>
+<p>이진 탐색 트리는 모든 노드에서 왼쪽 서브트리의 키는 작고 오른쪽은 크다는 규칙으로, 비교할 때마다 한쪽 서브트리를 통째로 버립니다. 고르게 넣으면 높이가 로그 n이라 100만 개에서도 20번 정도면 찾습니다.</p>
+<p>그런데 정렬된 순서로 넣으면 모든 노드가 한쪽 자식만 가져 한 줄이 되고, 높이가 n이 되어 연결 리스트처럼 선형 시간이 됩니다. 그래서 높이를 강제로 로그로 유지하는 AVL이나 Red-Black 같은 균형 트리를 씁니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>회전이 상수 시간인데 왜 AVL이 삽입에 불리하다고 하나요?</q>회전 한 번은 싸지만, 균형 조건이 엄격해서 회전이 자주 일어나기 때문입니다. 그 빈도가 Red-Black 트리보다 높아서 삽입과 삭제가 상대적으로 느립니다.</span></li>
+<li><span><q>자식이 둘인 노드는 어떻게 지우나요?</q>그 노드를 바로 뺄 수 없으니, 오른쪽 서브트리의 최솟값인 후속자를 그 자리에 옮기고 후속자의 원래 자리를 지웁니다. 후속자는 왼쪽 자식이 없어서 자식이 하나 이하인 쉬운 경우로 바뀝니다.</span></li>
+<li><span><q>게임에서 이진 탐색 트리를 직접 짜나요?</q>거의 없습니다. .NET의 <code>SortedSet</code>과 <code>SortedDictionary</code>가 이미 균형 트리입니다. 원소가 수백 개 수준이면 정렬된 배열과 이진 탐색이 더 단순하고 캐시에도 유리한 경우가 많습니다.</span></li>
 </ul>
 </div>
 </div>
@@ -1021,24 +1017,17 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q18" aria-label="18번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">TREE-03</span><span class="qtext">AVL과 Red-Black 트리는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">TREE-02</span><span class="qtext">트리 순회 방식은 각각 언제 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>둘 다 로그 시간을 보장하는 균형 이진 탐색 트리인데, AVL이 더 엄격하게 균형을 잡고 Red-Black은 더 느슨하게 잡습니다.</strong></p>
-<table>
-<thead><tr><th></th><th>균형</th><th>탐색</th><th>삽입·삭제</th></tr></thead>
-<tbody>
-<tr><td>AVL</td><td>엄격(높이 차 1 이하)</td><td>트리가 더 낮아 빠름</td><td>회전이 잦아 느림</td></tr>
-<tr><td>Red-Black</td><td>느슨</td><td>살짝 느림</td><td>회전이 적어 빠름</td></tr>
-</tbody>
-</table>
-<p>그래서 읽기가 압도적으로 많으면 AVL이, 삽입과 삭제가 자주 섞이면 Red-Black이 유리합니다. C#의 <code>SortedDictionary</code>와 <code>SortedSet</code>이 Red-Black 트리로 구현돼 있습니다.</p>
+<p><strong>같은 재귀에서 자기 자신을 언제 처리하느냐의 차이이고, 부모 정보가 먼저 필요하면 전위, 자식 결과를 모아야 하면 후위, 정렬 순서가 필요하면 중위, 층별로 필요하면 레벨 순회를 씁니다.</strong></p>
+<ul><li><strong>전위.</strong> 자기를 먼저 처리하고 내려갑니다. 부모의 월드 위치를 먼저 구해야 자식이 계산되는 트랜스폼 계층 갱신, 부모를 먼저 만들어야 하는 씬 저장과 복원에 씁니다.</li><li><strong>후위.</strong> 자식을 다 처리한 뒤 자기를 처리합니다. 자식들의 경계 상자를 합쳐 부모 상자를 만들거나, 자식부터 정리하는 삭제에 씁니다.</li><li><strong>중위.</strong> 왼쪽, 자기, 오른쪽 순서라 이진 탐색 트리에서는 키가 정렬 순서로 나옵니다.</li><li><strong>레벨.</strong> 큐를 써서 위층부터 훑습니다. 루트에서 가까운 순서가 필요할 때 씁니다.</li></ul>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>표준 라이브러리들이 Red-Black을 많이 쓰는 이유는요?</q>범용 컨테이너가 마주하는 상황은 대개 탐색과 삽입, 삭제가 골고루 섞여 있는데, Red-Black이 그 혼합에서 전체적으로 무난하기 때문입니다. 어느 한쪽에 극단적으로 치우친 워크로드가 아니라면 이쪽이 안전한 기본값입니다.</span></li>
+<li><span><q>재귀 순회에서 주의할 점은 무엇인가요?</q>호출이 트리 높이만큼 쌓입니다. 한 줄로 치우친 깊은 트리면 스택 오버플로가 날 수 있어서, 그럴 때는 명시적인 스택을 둔 반복문으로 바꿉니다.</span></li>
 </ul>
 </div>
 </div>
@@ -1047,21 +1036,19 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q19" aria-label="19번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">TREE-04</span><span class="qtext">트리 순회 세 가지는 각각 언제 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">TREE-03</span><span class="qtext">AVL 트리는 어떻게 균형을 유지하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>루트를 언제 방문하느냐로 나뉘고, 그에 따라 용도가 다릅니다.</strong></p>
-<ul>
-<li><strong>전위 순회.</strong> 루트를 먼저 보고 왼쪽, 오른쪽 순입니다. 트리 복사나 직렬화에 씁니다. 부모를 먼저 만들어야 위에서부터 다시 지을 수 있기 때문입니다.</li>
-<li><strong>중위 순회.</strong> 왼쪽, 루트, 오른쪽 순입니다. 이진 탐색 트리를 오름차순으로 출력할 때 씁니다.</li>
-<li><strong>후위 순회.</strong> 왼쪽, 오른쪽, 루트 순입니다. 트리를 삭제하거나 하위 결과를 위로 모을 때 씁니다. 자식부터 처리해야 안전하게 지우고 합칠 수 있습니다.</li>
-</ul>
+<p><strong>모든 노드에서 왼쪽과 오른쪽 서브트리 높이 차, 즉 균형 인수가 1 이하가 되도록 하고, 넣거나 뺀 뒤 이 차가 2가 된 노드를 회전으로 고칩니다.</strong></p>
+<p>회전은 링크 두 개만 바꾸는 상수 시간 연산입니다. 오른쪽 회전이면 왼쪽 자식을 위로 올리고 원래 부모를 그 오른쪽으로 내리며, 올라간 자식의 오른쪽 서브트리를 내려간 부모의 왼쪽으로 옮깁니다. 그 서브트리는 두 노드 사이의 값이라 정렬 순서가 그대로 유지됩니다.</p>
+<p>깨진 노드와 무거운 쪽 자식이 같은 방향으로 기울었으면 한 번 회전하고, 반대로 꺾였으면 자식을 먼저 돌려 일자로 편 뒤 한 번 더 돌립니다. 이 규칙으로 높이가 최악에도 약 1.44 곱하기 로그 n으로 묶입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>왜 이진 탐색 트리의 중위 순회가 정렬된 순서인가요?</q>이진 탐색 트리는 왼쪽이 자기보다 작고 오른쪽이 큰 성질이 있습니다. 그래서 왼쪽을 다 보고 자기를 본 다음 오른쪽을 보면, 자연스럽게 작은 값부터 큰 값 순으로 나옵니다.</span></li>
+<li><span><q>넣기와 빼기에서 회전 횟수는 같나요?</q>넣기는 처음 깨진 노드 한 곳에서 단일 또는 이중 회전으로 끝나서 회전이 최대 두 번입니다. 빼기는 회전이 서브트리 높이를 줄여 위쪽이 다시 깨질 수 있어서, 루트까지 로그 n번 회전할 수 있습니다.</span></li>
+<li><span><q>빈 자리의 높이를 왜 0이 아니라 -1로 두나요?</q>잎의 높이를 0으로 정했기 때문에, 높이는 자식 높이 중 큰 값에 1을 더한다는 식이 잎에도 맞으려면 빈 자리가 -1이어야 합니다. 잎과 빈 자리를 둘 다 0으로 섞어 쓰면 한쪽으로 기운 노드의 균형 인수를 잘못 계산해 깨짐을 놓칩니다.</span></li>
 </ul>
 </div>
 </div>
@@ -1070,38 +1057,68 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q20" aria-label="20번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">TREE-05</span><span class="qtext">데이터베이스 인덱스는 왜 이진 트리 대신 B-트리·B+트리를 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">TREE-04</span><span class="qtext">AVL과 Red-Black 트리는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>한 노드에 여러 키를 담아 자식을 많이 두면 트리 높이가 확 낮아지고, 그만큼 디스크를 읽는 횟수가 줄기 때문입니다.</strong></p>
-<p>디스크 접근은 메모리보다 수만 배 느려서, 노드를 몇 번 타고 내려가느냐가 성능을 좌우합니다. 이진 트리는 노드마다 자식이 둘뿐이라 높이가 꽤 높아지지만, B-트리는 한 노드가 수백 개의 키를 담아 자식이 많은 만큼 높이가 훨씬 낮습니다.</p>
-<p>B+트리는 여기서 한 걸음 더 나아가, 실제 데이터는 잎에만 두고 그 잎들을 연결 리스트로 이어 둡니다. 그래서 범위 검색과 순차 스캔이 빠르고, 이것이 관계형 데이터베이스 인덱스의 표준입니다.</p>
+<p><strong>둘 다 탐색, 넣기, 빼기를 로그 시간에 보장하지만, AVL은 높이 차를 엄격하게 제한해 더 낮고, Red-Black은 색 규칙으로 느슨하게 제한해 빼기에서 회전이 적습니다.</strong></p>
+<p>Red-Black은 노드마다 색 한 비트를 두고, 빨강이 연속하지 않고 모든 경로의 검정 수가 같다는 규칙을 지킵니다. 그러면 가장 긴 경로가 가장 짧은 경로의 두 배를 넘지 못해 높이가 2 곱하기 로그 n 이하로 묶입니다. AVL은 약 1.44 곱하기 로그 n이라 조회가 조금 빠릅니다.</p>
+<p>넣기 회전은 둘 다 최대 두 번으로 같고, 차이는 빼기입니다. AVL은 로그 n번까지 회전할 수 있지만 Red-Black은 위로 전파되는 일을 색 바꾸기로 처리하고 회전은 최대 세 번입니다. 그래서 수정이 섞이는 범용 컨테이너는 대부분 Red-Black이고, .NET의 <code>SortedSet</code>, Java의 <code>TreeMap</code>, 주요 C++ 구현의 <code>std::map</code>이 그렇습니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>메모리 안에서 쓰는 자료구조는 왜 그냥 이진 트리를 쓰나요?</q>메모리는 접근 속도가 균일하게 빨라서 노드 접근 횟수보다 비교 횟수가 더 중요합니다. 디스크처럼 한 번의 읽기가 비싸지 않으니, 굳이 여러 키를 한 노드에 뭉쳐 다진 트리로 만들 이유가 적습니다.</span></li>
+<li><span><q>Red-Black에서 새 노드는 왜 빨강으로 넣나요?</q>검정으로 넣으면 그 경로만 검정 수가 하나 늘어 규칙이 바로 깨집니다. 빨강으로 넣으면 부모도 빨강인 경우만 문제가 되고, 삼촌이 빨강이면 색만 바꾸고 검정이면 회전으로 해결합니다.</span></li>
+</ul>
+</div>
+<div class="trap">
+<p class="lab">함정</p>
+<p>"Red-Black은 회전이 적어서 넣기가 빠르다"고 하면 부정확합니다. 넣기 회전 수는 둘 다 최대 두 번이고, 회전 수 차이는 빼기에서 납니다.</p>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section class="grp">
+<div class="grp-head"><h3>특수 목적 트리</h3><span class="cnt">2문항</span></div>
+<p class="grp-note">디스크와 문자열이라는 접근 방식에 맞춰 트리 모양을 바꾼 구조입니다.</p>
+<div class="q">
+<label class="chk"><input type="checkbox" id="ds-q21" aria-label="21번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">SPEC-01</span><span class="qtext">데이터베이스 인덱스는 왜 이진 트리 대신 B+트리를 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>디스크는 페이지 단위로 읽기 때문에, 노드 하나를 페이지 하나 크기로 만들어 키를 수백 개씩 담으면 트리가 서너 층으로 낮아져 페이지 읽기 횟수가 크게 줄기 때문입니다.</strong></p>
+<p>이진 트리를 디스크에 두면 노드가 페이지마다 흩어져 한 페이지를 읽어도 쓸 수 있는 키가 하나뿐이고, 100만 개면 약 20번을 읽습니다. B-트리는 한 페이지 안에서 이진 탐색으로 비교를 몰아서 해 수백 갈래 중 하나를 한 번에 고르므로, 비교 총량은 비슷한데 읽는 페이지가 서너 번으로 줍니다.</p>
+<p>B+트리는 여기에 데이터를 잎에만 두고 잎끼리 옆으로 연결합니다. 위쪽 노드에 데이터가 없어 키를 더 많이 담을 수 있고, 범위 조회는 시작 잎을 찾은 뒤 옆 링크만 따라가면 됩니다. 그래서 <code>BETWEEN</code>이나 <code>ORDER BY</code>가 순차 읽기가 됩니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>B-트리는 넣어도 왜 한쪽으로 치우치지 않나요?</q>새 키는 항상 잎에 넣고, 노드가 넘치면 반으로 쪼개면서 가운데 키를 부모로 올립니다. 높이는 루트가 쪼개질 때만 늘고 그때 모든 잎이 함께 한 층 깊어지므로, 트리가 위로 자라서 모든 잎의 깊이가 항상 같습니다.</span></li>
+<li><span><q>해시 인덱스가 더 빠르지 않나요?</q>같은 값 찾기는 해시가 상수 시간이라 빠릅니다. 하지만 순서가 없어서 범위 조건, 정렬, 접두사 검색을 처리하지 못합니다. B+트리는 같은 값 찾기가 로그 시간으로 조금 느린 대신 이것들을 모두 처리합니다.</span></li>
 </ul>
 </div>
 </div>
 </details>
 </div>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q21" aria-label="21번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q22" aria-label="22번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">TREE-06</span><span class="qtext">트라이는 해시 테이블에 비해 어떤 장점이 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">SPEC-02</span><span class="qtext">트라이는 해시 테이블에 비해 어떤 장점이 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>트라이는 같은 접두사로 시작하는 단어들을 빠르게 찾을 수 있습니다. 해시 테이블은 완전히 일치하는 키만 빠르게 찾습니다.</strong></p>
-<p>트라이는 루트에서 문자를 하나씩 자식으로 내려가는 트리라, 검색 시간이 저장된 단어 수와 무관하게 찾는 단어의 길이에만 비례합니다. 접두사에 해당하는 노드까지 내려간 다음 그 아래 서브트리를 순회하면, 같은 접두사를 가진 단어가 전부 나옵니다.</p>
-<p>반면 해시 테이블은 접두사로 시작하는 것들을 찾으려면 전체를 훑어야 합니다. 대신 트라이는 노드마다 자식 링크를 둬서 메모리를 더 씁니다. 게임에서는 채팅 자동완성이나 욕설 필터에 씁니다.</p>
+<p><strong>같은 접두사를 가진 단어들이 같은 경로를 공유하는 글자 단위 트리라, 특정 접두사로 시작하는 단어 전부를 저장된 단어 수와 무관하게 찾을 수 있습니다.</strong></p>
+<p>해시는 문자열 전체를 숫자 하나로 바꾸므로 접두사와 전체 단어의 해시 사이에 관계가 없어, 접두사 검색이면 전부 훑어야 합니다. 트라이는 접두사 길이만큼 내려간 뒤 그 아래를 순회하면 끝납니다. 완전 일치는 둘 다 글자 수에 비례하므로, 트라이의 이점은 속도가 아니라 접두사 질의입니다.</p>
+<p>게임에서는 채팅이나 콘솔 명령 자동완성에 잘 맞습니다. 글자를 하나 칠 때마다 현재 노드에서 한 칸만 내려가면 되고, 그 아래가 곧 후보 목록입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>자동완성이 왜 트라이에 딱 맞나요?</q>사용자가 친 접두사까지 트리를 따라 내려간 다음, 그 아래에 매달린 단어들만 뽑으면 되기 때문입니다. 전체 단어를 뒤질 필요 없이 후보가 바로 그 서브트리로 좁혀집니다.</span></li>
+<li><span><q>트라이의 단점은 무엇인가요?</q>메모리입니다. 노드마다 다음 글자로 가는 자식 표를 들고 있어야 하는데, 26칸 배열로 두면 대부분의 노드가 한두 칸만 쓰고, 해시맵으로 두면 노드마다 테이블 오버헤드가 붙습니다. 한글처럼 글자 종류가 많으면 해시맵을 쓰고, 대용량이면 한 줄로 이어진 구간을 합친 압축 트라이를 씁니다.</span></li>
+<li><span><q>금칙어 필터는 트라이로 충분한가요?</q>문장의 시작 위치마다 트라이를 다시 따라가면 문장 길이와 금칙어 길이의 곱에 비례합니다. 금칙어가 많으면 트라이에 실패 링크를 더해 문장을 한 번만 훑는 아호-코라식 알고리즘을 씁니다.</span></li>
 </ul>
 </div>
 </div>
@@ -1109,49 +1126,24 @@ title: 면접 대비 문답
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>그래프와 응용 구조</h3><span class="cnt">3문항</span></div>
-<p class="grp-note">기본 구조들을 조합해 실제 문제를 푸는 자료구조들입니다.</p>
+<div class="grp-head"><h3>그래프와 공간 분할</h3><span class="cnt">3문항</span></div>
+<p class="grp-note">게임의 그래프는 대부분 희소하고, 근접 질의는 공간을 나눠 비교 대상을 줄이는 것이 핵심입니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q22" aria-label="22번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q23" aria-label="23번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">GRPH-01</span><span class="qtext">그래프를 인접 행렬과 인접 리스트 중 무엇으로 표현하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>간선이 빽빽한 밀집 그래프면 인접 행렬, 간선이 성긴 희소 그래프면 인접 리스트가 유리합니다.</strong></p>
-<table>
-<thead><tr><th></th><th>메모리</th><th>간선 조회</th><th>유리한 곳</th></tr></thead>
-<tbody>
-<tr><td>인접 행렬</td><td>정점 수의 제곱</td><td>상수 시간</td><td>밀집 그래프</td></tr>
-<tr><td>인접 리스트</td><td>정점 수 더하기 간선 수</td><td>그 노드의 연결 수만큼</td><td>희소 그래프</td></tr>
-</tbody>
-</table>
-<p>인접 행렬은 두 정점이 이어졌는지 바로 확인하는 대신 정점 수의 제곱만큼 메모리를 먹습니다. 인접 리스트는 실제 있는 간선만 담아 메모리를 아끼는 대신, 특정 두 정점의 연결을 확인하려면 그 노드의 이웃을 훑어야 합니다. 격자 맵은 한 칸이 상하좌우 넷 정도만 이어지는 희소 그래프라 인접 리스트를 씁니다.</p>
+<p><strong>게임의 그래프는 대부분 정점마다 이웃이 몇 개뿐인 희소 그래프라 기본은 인접 리스트이고, 정점이 적거나 거의 모든 쌍이 이어진 밀집 그래프일 때 인접 행렬을 씁니다.</strong></p>
+<p>인접 행렬은 정점 수의 제곱만큼 칸을 쓰고, 두 정점이 이어져 있는지는 칸 하나로 바로 알지만 한 정점의 이웃을 나열하려면 행 전체를 훑어야 합니다. 인접 리스트는 실제 간선 수만큼만 쓰고 이웃 나열도 실제 이웃 수만큼입니다. 길찾기와 너비 우선 탐색은 이웃 나열을 반복하므로, 희소 그래프에서 인접 리스트는 정점과 간선 수에 비례하고 행렬은 정점 수의 제곱에 비례합니다.</p>
+<p>정점 1만 개에 이웃이 넷씩이면 행렬은 1억 칸 중 0.04%만 쓰게 됩니다. 반대로 소수의 거점 사이 모든 쌍 거리를 미리 계산해 두는 경우처럼 정점이 적으면 행렬이 단순하고 캐시에도 유리합니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>정점이 아주 많고 대부분 안 이어져 있으면요?</q>인접 행렬은 대부분 비어 있는데도 정점 수의 제곱만큼 메모리를 다 잡아 낭비가 큽니다. 그래서 규모가 큰 희소 그래프에서는 사실상 인접 리스트가 필수입니다.</span></li>
-</ul>
-</div>
-</div>
-</details>
-</div>
-<div class="q">
-<label class="chk"><input type="checkbox" id="ds-q23" aria-label="23번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">GRPH-02</span><span class="qtext">유니온-파인드는 무엇을 판단하는 자료구조인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>두 원소가 같은 집합에 속하는지, 즉 서로 연결되어 있는지를 빠르게 판단하고 두 집합을 합치는 자료구조입니다. 핵심은 소속 판단이 아니라 연결성 판단입니다.</strong></p>
-<p>빠른 비결은 두 가지 최적화입니다. 하나는 경로 압축으로, 루트를 찾아 올라간 김에 그 경로의 노드들을 전부 루트에 바로 매달아 트리를 납작하게 만듭니다. 다른 하나는 낮은 트리를 높은 트리 밑에 붙이는 랭크 합치기입니다.</p>
-<p>이 둘을 함께 쓰면 분할 상환으로 거의 상수 시간에 가까워집니다. 완전한 상수는 아니지만 실질적으로는 상수처럼 동작합니다. 게임에서는 연결된 영역 판정이나 미로 생성에, 알고리즘에서는 최소 신장 트리의 사이클 검사에 씁니다.</p>
-</div>
-<div class="tails">
-<p class="lab">꼬리질문</p>
-<ul>
-<li><span><q>경로 압축이 정확히 무엇을 하나요?</q>어떤 원소의 루트를 찾느라 위로 올라가는데, 그 김에 지나온 노드들을 전부 루트에 곧바로 연결해 버립니다. 그러면 다음번에 같은 노드를 조회할 때 한 번에 루트에 닿아서 점점 빨라집니다.</span></li>
+<li><span><q>격자 맵은 어떻게 표현하나요?</q>보통 둘 다 만들지 않습니다. 칸 좌표에 1을 더하고 빼서 이웃을 그때그때 계산하면 되기 때문입니다. 탐색 알고리즘은 이웃만 물으므로 저장 여부와 상관없이 그대로 동작합니다.</span></li>
+<li><span><q>정적인 그래프를 더 빠르게 담는 방법이 있나요?</q>모든 이웃을 배열 하나에 정점 순서대로 이어 붙이고 정점마다 시작 위치만 적어 두는 방식입니다. 리스트 객체가 정점마다 생기지 않아 가비지 컬렉션 부담이 없고 이웃이 메모리에 붙어 있어 캐시 효율이 좋습니다. 대신 간선을 바꾸려면 다시 만들어야 해서 구워 둔 내비메시 같은 정적 그래프에 씁니다.</span></li>
 </ul>
 </div>
 </div>
@@ -1160,18 +1152,40 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q24" aria-label="24번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">GRPH-03</span><span class="qtext">LRU 캐시는 어떤 자료구조로 모든 연산을 상수 시간에 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">GRPH-02</span><span class="qtext">유니온-파인드는 무엇을 판단하는 자료구조인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>이중 연결 리스트와 해시맵을 조합합니다. 그러면 조회와 갱신, 삭제가 모두 상수 시간이 됩니다.</strong></p>
-<p>가장 오래 안 쓴 것을 버리려면 사용 순서를 유지해야 하는데, 큐만으로는 중간에 다시 쓴 항목을 앞으로 끌어올릴 수 없습니다. 그래서 사용 순서는 이중 연결 리스트로 관리해 방금 쓴 것을 맨 앞으로 상수 시간에 옮기고, 키에서 그 노드의 위치는 해시맵으로 상수 시간에 찾습니다.</p>
-<p>그래서 조회가 들어오면 해시맵으로 노드를 찾아 리스트 맨 앞으로 옮기고, 용량이 꽉 차면 리스트 꼬리에 있는 가장 오래된 노드를 버립니다. 두 구조가 각자의 약점을 서로 메워 줍니다.</p>
+<p><strong>원소들이 그룹으로 합쳐지기만 할 때, 두 원소가 같은 그룹인지 확인하는 것과 두 그룹을 합치는 것을 둘 다 거의 상수 시간에 하는 자료구조입니다.</strong></p>
+<p>저장하는 것은 각 원소의 부모를 적은 배열 하나이고, 부모를 따라가 도착한 루트가 그룹의 대표입니다. 합칠 때는 한쪽 루트의 칸에 다른 쪽 루트를 적기만 하면 되어서, 그룹 번호를 원소마다 적는 방식처럼 전원을 고칠 필요가 없습니다.</p>
+<p>그냥 합치면 트리가 한 줄로 길어질 수 있어서 두 가지를 같이 씁니다. 작은 그룹을 큰 그룹 밑에 붙여 높이를 로그로 묶고, 찾는 김에 지나온 원소들이 루트를 직접 가리키게 바꿔 둡니다. 둘을 함께 쓰면 연산당 비용이 역아커만 함수 수준으로, 실용적으로는 상수입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>왜 단일 연결 리스트로는 안 되나요?</q>노드를 중간에서 떼어내려면 그 앞 노드의 링크를 고쳐야 하는데, 단일 링크면 앞 노드를 찾느라 다시 훑어야 해서 상수 시간이 깨집니다. 이전 링크를 가진 이중 연결 리스트라야 앞뒤를 바로 이어붙일 수 있습니다.</span></li>
+<li><span><q>그룹을 다시 쪼갤 수 있나요?</q>없습니다. 부모 칸은 누구 밑에 붙었는지만 기억하고 어떤 연결 때문에 붙었는지는 잊기 때문입니다. 연결이 끊길 수 있으면 다시 만들거나 플러드 필로 다시 확인합니다.</span></li>
+<li><span><q>게임에서는 어디에 쓰나요?</q>벽을 무작위 순서로 보면서 양쪽 칸이 다른 그룹일 때만 허무는 미로 생성, 붙어 있는 같은 색 블록을 묶어 개수를 세는 퍼즐, 절차적으로 만든 방들이 모두 이어져 있는지 확인하는 맵 검증에 씁니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="ds-q25" aria-label="25번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">GRPH-03</span><span class="qtext">충돌 검사나 근접 탐색에 쓰는 공간 분할 방식은 어떻게 고르나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>모든 쌍 비교는 물체 수의 제곱에 비례하므로 후보를 먼저 줄여야 하고, 물체가 고르게 퍼져 있으면 균등 그리드, 밀도 차가 크면 쿼드트리나 옥트리, 움직이는 물체가 많은 물리 엔진은 BVH 계열을 씁니다.</strong></p>
+<p>균등 그리드는 좌표를 칸 크기로 나눠 칸에 등록하고 자기 칸과 이웃 칸만 비교합니다. 등록이 상수 시간이라 매 프레임 다시 채워도 싸지만, 한 칸에 몰리면 그 칸 안에서 다시 제곱 비교가 됩니다. 쿼드트리는 넘친 칸만 4등분해서 빽빽한 곳은 잘게, 빈 곳은 크게 나눕니다.</p>
+<p>BVH는 공간이 아니라 가까운 물체끼리 상자로 묶은 트리라, 물체가 움직이면 상자만 넓혀 갱신할 수 있습니다. 실제로 Box2D는 동적 AABB 트리를 쓰고, Unity 3D 물리의 기본 설정은 상자를 한 축으로 정렬해 겹치는 구간만 비교하는 Sweep and Prune입니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>k-d 트리는 언제 쓰나요?</q>점을 x와 y 축을 번갈아 중앙값으로 나눈 이진 트리라, 움직이지 않는 점 집합에서 가장 가까운 점을 찾을 때 씁니다. 찾을 때 칸 경계까지의 거리가 지금까지 찾은 최선보다 멀면 그 칸 전체를 건너뛰어 평균 로그 시간이 됩니다. 넣고 빼면 균형이 깨져 다시 만들어야 합니다.</span></li>
+<li><span><q>그리드의 칸 크기는 어떻게 정하나요?</q>질의 반경이나 물체 크기 이상으로 잡습니다. 그래야 자기 칸과 이웃 칸만 봐도 빠지는 물체가 없습니다. 너무 작으면 큰 물체가 여러 칸에 걸치고, 너무 크면 한 칸에 많이 들어가 비교가 늘어납니다.</span></li>
 </ul>
 </div>
 </div>
@@ -1179,46 +1193,22 @@ title: 면접 대비 문답
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>상황형 문제 해결</h3><span class="cnt">4문항</span></div>
-<p class="grp-note">증상을 던지고 자료구조로 풀게 하는 유형입니다. 먼저 무엇으로 원인을 좁힐지부터 말하세요.</p>
+<div class="grp-head"><h3>상황형 문제 해결</h3><span class="cnt">5문항</span></div>
+<p class="grp-note">증상을 받으면 먼저 측정으로 원인을 좁히고, 그다음 어떤 자료구조 선택이 그 증상을 만들었는지 설명합니다.</p>
 <div class="q">
-<label class="chk"><input type="checkbox" id="ds-q25" aria-label="25번 자신 있음"></label>
+<label class="chk"><input type="checkbox" id="ds-q26" aria-label="26번 자신 있음"></label>
 <details>
 <summary><span><span class="qtag">SIT-01</span><span class="qtext">게임을 오래 켜둘수록 점점 느려지고 메모리도 계속 늘어납니다. 자료구조 관점에서 무엇을 의심하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>먼저 어디서 메모리가 쌓이는지 프로파일러로 좁힌 다음, 계속 커지기만 하고 비워지지 않는 컬렉션을 의심합니다.</strong></p>
-<ul>
-<li><strong>끝없이 커지는 리스트.</strong> 이벤트 로그나 히스토리를 리스트에 추가만 하고 안 비우는 경우가 흔합니다. 상한을 두거나 원형 버퍼로 최근 몇 개만 유지하면 메모리가 일정하게 유지됩니다.</li>
-<li><strong>안 지워지는 딕셔너리 키.</strong> 이미 죽은 오브젝트의 키를 딕셔너리에서 안 지우면, 크기가 계속 커지고 재해싱이 반복되며 조회도 느려집니다.</li>
-<li><strong>캐시가 안 맞는 순회.</strong> 흩어진 연결 리스트나 파편화된 컬렉션을 매 프레임 훑으면 캐시 미스가 늘어 점점 느려집니다. 연속 배열로 바꾸면 개선됩니다.</li>
-</ul>
+<p><strong>먼저 메모리 프로파일러로 시간이 지날수록 개수가 늘어나는 컬렉션을 찾고, 그다음 상한 없이 쌓이는 구조와 지운 것을 안 지우는 구조를 의심합니다.</strong></p>
+<ul><li><strong>상한 없는 캐시와 기록.</strong> 에셋 캐시나 로그, 입력 기록이 계속 쌓이면 메모리가 늘고 순회도 느려집니다. 최근 것만 의미 있으면 원형 버퍼로, 캐시는 LRU로 상한을 둡니다.</li><li><strong>지연 삭제로 부푼 힙.</strong> 우선순위 큐에서 취소된 예약을 표시만 하고 버리지 않으면 힙이 계속 커져 넣고 뺄 때마다 느려집니다. 죽은 항목 비율이 커지면 다시 만듭니다.</li><li><strong>줄지 않는 리스트.</strong> 리스트는 원소를 지워도 내부 배열을 줄이지 않습니다. 한때 크게 불어난 컬렉션은 용량을 다시 정리해야 합니다.</li><li><strong>지운 오브젝트를 붙든 딕셔너리.</strong> 파괴된 오브젝트가 딕셔너리나 이벤트 목록에 남아 있으면 가비지 컬렉션이 수거하지 못합니다.</li></ul>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>호출 빈도가 100배가 되면 어떻게 되나요?</q>매 프레임 도는 뜨거운 경로라면, 원소 수에 비례하는 순회나 잦은 할당이 그대로 100배로 증폭됩니다. 그래서 이런 경로일수록 상수 시간 조회가 되는 구조와, 미리 할당해 재사용하는 버퍼가 중요해집니다.</span></li>
-</ul>
-</div>
-</div>
-</details>
-</div>
-<div class="q">
-<label class="chk"><input type="checkbox" id="ds-q26" aria-label="26번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">SIT-02</span><span class="qtext">적이 많아지니 충돌 검사가 프레임을 잡아먹습니다. 어떻게 개선하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>먼저 모든 쌍을 다 비교하고 있는지 확인합니다. n개를 서로 다 비교하면 n의 제곱으로 늘어나기 때문에, 공간 분할로 비교 후보를 줄이는 것이 핵심입니다.</strong></p>
-<p>월드를 격자나 쿼드트리로 나눠 각 오브젝트를 자기가 속한 칸에 등록하고, 같은 칸과 인접한 칸에 있는 것끼리만 비교합니다. 그러면 멀리 떨어져 부딪힐 일 없는 쌍은 아예 보지 않게 되어 검사량이 크게 줄어듭니다. 물리 엔진의 브로드 페이즈가 바로 이 방식입니다.</p>
-<p>대신 칸 크기를 잘못 잡으면 오브젝트가 한 칸에 몰려 효과가 사라지므로, 오브젝트 크기와 밀도에 맞춰 칸을 정하는 게 중요합니다.</p>
-</div>
-<div class="tails">
-<p class="lab">꼬리질문</p>
-<ul>
-<li><span><q>오브젝트 분포가 들쭉날쭉하면 어떻게 하나요?</q>균일한 격자는 텅 빈 칸과 붐비는 칸이 갈려서 비효율적입니다. 이럴 때는 점 분포에 맞춰 쪼개는 k-d 트리나 쿼드트리가 밀도가 불균일해도 균형을 잘 유지합니다. 다만 삽입과 삭제가 잦으면 균형이 깨져 재구축이 필요할 수 있습니다.</span></li>
+<li><span><q>프로파일러 없이 바로 확인할 방법이 있나요?</q>의심 가는 컬렉션의 개수를 주기적으로 로그로 남겨 보는 것이 가장 빠릅니다. 플레이 시간에 비례해 계속 늘어나는 것이 있으면 그게 원인 후보입니다.</span></li>
 </ul>
 </div>
 </div>
@@ -1227,18 +1217,18 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q27" aria-label="27번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">SIT-03</span><span class="qtext">인벤토리에 특정 아이템이 있는지 확인하는 코드가 느립니다. 지금은 List를 처음부터 훑고 있어요.</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">SIT-02</span><span class="qtext">적이 많아지니 충돌 검사가 프레임을 잡아먹습니다. 어떻게 개선하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>포함 여부 확인이 잦다면 List 대신 HashSet이나 Dictionary로 바꿔 평균 상수 시간으로 만듭니다.</strong></p>
-<p>List의 탐색은 원소 수에 비례해서 아이템이 늘수록 선형으로 느려집니다. 해시 기반 구조는 키를 해시해 바로 버킷으로 가기 때문에 평균 상수 시간에 확인합니다.</p>
-<p>대신 HashSet은 순서와 인덱스 접근을 포기합니다. 화면에 표시할 순서가 필요하다면, 순서용 리스트와 조회용 HashSet을 함께 두는 방법도 있습니다. 아이템에 고유 ID가 있다면 그 ID를 키로 Dictionary를 만드는 게 가장 깔끔한 마이그레이션입니다.</p>
+<p><strong>먼저 프로파일러로 충돌 검사 자체가 병목인지 확인하고, 모든 쌍을 비교하고 있다면 공간 분할로 후보부터 줄입니다.</strong></p>
+<p>적이 n명이면 모든 쌍은 n의 제곱에 비례해서, 1천 명이면 매 프레임 약 50만 쌍입니다. 월드를 균등 그리드로 나눠 적을 칸에 등록하고 자기 칸과 이웃 칸만 비교하면, 고르게 퍼진 경우 비교가 수천 번 수준으로 줍니다. 그리드는 등록이 상수 시간이라 매 프레임 다시 채워도 쌉니다.</p>
+<p>적이 한곳에 몰리는 게임이면 그리드의 한 칸에 몰려 다시 느려지므로 쿼드트리처럼 밀도에 맞춰 나누는 구조를 고려합니다. 걸러 낸 후보만 원이나 상자 같은 실제 모양으로 정확히 검사합니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>아이템이 열 몇 개뿐이면요?</q>그 정도 규모면 List의 선형 탐색이 캐시에 잘 맞아 오히려 더 빠를 수 있습니다. 해시로 바꿔서 얻는 이득은 아이템 수가 충분히 커질 때 나오므로, 작은 컬렉션까지 굳이 바꿀 필요는 없습니다.</span></li>
+<li><span><q>적이 100배로 늘면 어떻게 되나요?</q>모든 쌍 비교면 비용이 만 배가 되지만, 그리드에서 밀도가 같다면 거의 100배에 그칩니다. 그 정도 규모면 적의 데이터를 연속 배열에 담아 캐시 효율을 높이는 것도 같이 봅니다.</span></li>
 </ul>
 </div>
 </div>
@@ -1247,18 +1237,57 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="ds-q28" aria-label="28번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">SIT-04</span><span class="qtext">실시간 순위표에서 상위 몇 명을 계속 뽑아야 하는데, 지금은 점수가 갱신될 때마다 전체를 다시 정렬합니다.</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">SIT-03</span><span class="qtext">인벤토리에 특정 아이템이 있는지 확인하는 코드가 느립니다. 지금은 List를 처음부터 훑고 있습니다.</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>매번 전체를 다시 정렬하는 건 갱신마다 비용이 큽니다. 상위 몇 명만 필요하면 힙을, 순위가 계속 바뀌고 임의 구간 조회가 필요하면 정렬된 균형 구조를 씁니다.</strong></p>
-<p>상위 몇 명만 필요할 때는 그 개수만큼의 크기를 가진 힙을 유지하면 됩니다. 새 점수가 들어와도 경계값과만 비교하면 되니 갱신이 로그 시간이고, 전체를 정렬할 필요가 없습니다.</p>
-<p>점수가 자주 바뀌고 임의의 순위나 구간을 조회해야 한다면, Red-Black 트리나 스킵 리스트 같은 정렬된 구조가 삽입과 삭제, 조회를 모두 로그 시간에 처리합니다. 레디스의 정렬 집합이 스킵 리스트로 이 기능을 제공합니다.</p>
+<p><strong>먼저 그 확인이 얼마나 자주 호출되는지와 아이템 수를 재 보고, 자주 호출되면 아이템 ID를 키로 하는 HashSet이나 개수를 담은 Dictionary를 함께 둡니다.</strong></p>
+<p>리스트의 포함 확인은 처음부터 비교해서 아이템 수에 비례합니다. 해시 기반으로 바꾸면 평균 상수 시간이 됩니다. 수량까지 필요하면 ID에서 개수로 가는 딕셔너리가 맞습니다.</p>
+<p>다만 원소가 수십 개 이하면 리스트 순회가 해시 계산보다 빠를 수도 있어서, 측정 없이 다 바꾸는 것은 좋지 않습니다. 또 인벤토리 화면은 슬롯 순서가 필요하므로, 순서는 리스트로 유지하고 조회용 해시를 옆에 두어 둘을 함께 갱신하는 구조가 흔합니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>플레이어가 100배로 늘면 어떻게 되나요?</q>전체를 다시 정렬하는 방식은 갱신마다 비용이 그대로 커져서 감당이 안 됩니다. 반면 힙이나 정렬된 균형 구조는 갱신 비용이 로그 규모라, 대상이 크게 늘어도 비용이 완만하게만 증가해 견딜 수 있습니다.</span></li>
+<li><span><q>리스트와 해시셋을 함께 두면 무엇을 조심하나요?</q>넣고 뺄 때 두 곳을 항상 같이 갱신해야 합니다. 한쪽만 고치면 화면과 실제 판정이 어긋나므로, 갱신을 한 메서드로 묶어 바깥에서 직접 건드리지 못하게 합니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="ds-q29" aria-label="29번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">SIT-04</span><span class="qtext">실시간 순위표에서 상위 몇 명을 계속 보여 줘야 하는데, 지금은 점수가 바뀔 때마다 전체를 다시 정렬합니다.</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>먼저 몇 명 중 몇 명을 얼마나 자주 보여 주는지 확인하고, 상위 몇 명만 필요하면 크기를 고정한 힙으로, 아무 순위나 물어야 하면 정렬 상태를 유지하는 구조로 바꿉니다.</strong></p>
+<p>전체 정렬은 갱신마다 n 로그 n입니다. 상위 k명만 필요하면 크기 k인 최소 힙을 두고, 새 점수가 힙의 최솟값보다 클 때만 교체하면 갱신이 로그 k입니다.</p>
+<p>내 순위처럼 임의의 위치를 물어야 하면 균형 트리 같은 정렬된 구조가 필요하고, 서버에서는 정렬된 집합을 제공하는 Redis를 흔히 씁니다. 점수 범위가 정해져 있다면 점수별 인원 수를 배열에 세어 두고 위쪽 칸을 더해 순위를 구하는 방법도 있습니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>플레이어가 100배로 늘면 어떻게 되나요?</q>전체 정렬은 100배 넘게 느려지지만, 상위 k명용 힙은 k만 같으면 갱신 비용이 그대로입니다. 그래서 무엇을 보여 줘야 하는지에 맞춰 필요한 만큼만 유지하는 것이 핵심입니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="ds-q30" aria-label="30번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">SIT-05</span><span class="qtext">맵이 커지니 A* 길찾기가 눈에 띄게 느려졌습니다. 어디를 보나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>먼저 프로파일러로 길찾기 안에서 어느 연산이 시간을 쓰는지 보고, 오픈 리스트, 방문 기록, 그래프 표현의 세 곳에서 자료구조 선택을 확인합니다.</strong></p>
+<ul><li><strong>오픈 리스트.</strong> 매번 리스트를 정렬하거나 최솟값을 처음부터 찾고 있다면 우선순위 큐인 힙으로 바꿔 꺼내기를 로그 시간으로 만듭니다. 이미 든 칸의 비용이 줄었을 때는 다시 넣고 꺼낼 때 버리는 지연 삭제가 간단합니다.</li><li><strong>방문 기록.</strong> 닫힌 목록을 리스트로 두고 포함 여부를 확인하면 칸 수에 비례합니다. 격자라면 칸 수만큼의 불 배열, 아니면 해시셋으로 바꿉니다.</li><li><strong>그래프 표현.</strong> 이웃을 찾을 때마다 새 리스트를 할당하면 가비지가 쌓입니다. 격자는 좌표로 이웃을 계산하고, 결과 버퍼는 재사용합니다.</li></ul>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>그래도 느리면 무엇을 더 할 수 있나요?</q>탐색 공간 자체를 줄입니다. 큰 격자 대신 내비메시나 웨이포인트로 정점 수를 줄이거나, 지역 단위로 먼저 길을 찾고 그 안을 다시 찾는 계층적 길찾기를 씁니다. 같은 목적지로 가는 유닛이 많으면 흐름장 하나를 만들어 공유하기도 합니다.</span></li>
 </ul>
 </div>
 </div>

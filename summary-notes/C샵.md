@@ -1293,6 +1293,40 @@ enemy.OnHit = null;         // ❌ 대입으로 목록 갈아치우기 금지
 
 즉 event = 델리게이트를 안전하게 캡슐화한 것. 발동 권한은 이벤트를 소유한 클래스가 독점하고, 바깥은 반응을 등록·해지만 함. 프로퍼티가 필드를 감싸 함부로 못 바꾸게 하는 것과 같은 원리.
 
+### Action · Func — 미리 만든 델리게이트 타입
+
+`delegate`는 "이런 모양의 메서드를 담는 타입"을 선언하는 문법이고, `Action`·`Func`는 그 문법으로 .NET이 미리 선언해 둔 타입. 메서드 모양(매개변수·반환 타입)마다 타입을 직접 선언하는 번거로움을 없앰.
+
+```csharp
+delegate int Calc(int a, int b);     // 직접 선언 — 모양마다 하나씩 필요
+Calc c = Add;
+int r = c(2, 3);                     // 5
+
+// .NET 안에 이렇게 선언돼 있음
+public delegate void    Action<T>(T obj);
+public delegate TResult Func<T, TResult>(T arg);
+```
+
+| | 반환값 | 매개변수 | 주 용도 |
+| --- | --- | --- | --- |
+| `delegate` 직접 선언 | 자유 | 자유(`ref`·`out` 가능) | 타입 이름이 의미를 가져야 할 때, `ref`·`out`이 필요할 때 |
+| `Action` | 없음 | 0개에서 16개 | 알림, 완료 콜백 |
+| `Func` | 있음 | 0개에서 16개 | 값을 계산해 돌려받는 콜백 |
+
+`Func`는 타입 인자의 마지막이 반환 타입 — `Func<int, string, bool>`은 `int`와 `string`을 받아 `bool`을 반환.
+
+```csharp
+Action          onDone   = () => Console.WriteLine("끝");   // 받는 것도 돌려주는 것도 없음
+Action<int>     onDamage = dmg => hp -= dmg;                // int를 받음
+Func<int, bool> isDead   = v => v <= 0;                     // int를 받아 bool을 돌려줌
+Func<float>     getSpeed = () => baseSpeed * 1.5f;          // 받는 것 없이 float을 돌려줌
+```
+
+- Action — 일이 일어났음을 알리는 용도. 이벤트는 거의 전부 Action 모양
+- Func — 판단·계산을 물어보는 용도. `list.Where(e => e.hp > 0)`의 인자가 `Func<Enemy, bool>`. 여럿을 묶으면 마지막 반환값만 남아(다음 항목) 이벤트로는 쓰지 않음
+
+모양이 같아도 이름이 다른 델리게이트 타입끼리는 대입이 안 됨. `Calc`와 `Func<int, int, int>`는 같은 모양의 메서드를 담지만 서로 다른 타입.
+
 ### 멀티캐스트 델리게이트 반환값
 
 `f +=` 로 여러 함수를 묶으면 다 실행되지만 반환값은 마지막 것만 남고 앞의 것들은 버려짐. `Func<int>`에 1, 2, 3을 묶어 호출하면 3.

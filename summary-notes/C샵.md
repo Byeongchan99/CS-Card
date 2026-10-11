@@ -1316,10 +1316,10 @@ public delegate TResult Func<T, TResult>(T arg);
 `Func`는 타입 인자의 마지막이 반환 타입 — `Func<int, string, bool>`은 `int`와 `string`을 받아 `bool`을 반환.
 
 ```csharp
-Action          onDone   = () => Console.WriteLine("끝");   // 받는 것도 돌려주는 것도 없음
+Action          onDone   = () => Console.WriteLine("끝");   // 인자 없음, 반환 없음
 Action<int>     onDamage = dmg => hp -= dmg;                // int를 받음
-Func<int, bool> isDead   = v => v <= 0;                     // int를 받아 bool을 돌려줌
-Func<float>     getSpeed = () => baseSpeed * 1.5f;          // 받는 것 없이 float을 돌려줌
+Func<int, bool> isDead   = v => v <= 0;                     // int를 받아 bool 반환
+Func<float>     getSpeed = () => baseSpeed * 1.5f;          // 인자 없이 float 반환
 ```
 
 - Action — 일이 일어났음을 알리는 용도. 이벤트는 거의 전부 Action 모양

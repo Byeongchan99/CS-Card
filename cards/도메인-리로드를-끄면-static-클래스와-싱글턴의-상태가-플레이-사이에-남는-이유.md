@@ -1,7 +1,7 @@
 ---
 title: 도메인 리로드를 끄면 static 클래스와 싱글턴의 상태가 플레이 사이에 남는 이유
 tags: [유니티, 싱글턴, 도메인리로드]
-related: []
+related: ["DontDestroyOnLoad-싱글턴이-있는-씬을-다시-로드하면-어느-인스턴스가-살아남는가", "ScriptableObject에-담은-상태가-플레이-종료와-재실행-후-어떻게-되는가-추론", "도메인-리로드-OFF에서-싱글턴-검사를-is-not-null로-바꾸면-생기는-일", "싱글턴-OnDestroy에서-Instance를-무조건-null로-만들면-생기는-사고", "싱글턴-매니저가-MonoBehaviour를-상속하면-쓸-수-있는-기능과-static-클래스가-못-쓰는-이유"]
 parent: 정적 생성자의 실행 시점과 새 게임 리셋에서 static 클래스와 싱글턴의 차이
 date: 2026-10-06
 result: 부분

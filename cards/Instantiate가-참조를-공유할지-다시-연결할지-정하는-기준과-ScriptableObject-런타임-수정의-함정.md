@@ -1,7 +1,7 @@
 ---
 title: Instantiate가 참조를 공유할지 다시 연결할지 정하는 기준과 ScriptableObject 런타임 수정의 함정
 tags: [유니티, 프리팹, ScriptableObject]
-related: []
+related: ["ScriptableObject에-담은-상태가-플레이-종료와-재실행-후-어떻게-되는가-추론", "유니티-Instantiate는-프리팹의-참조-필드-중-무엇을-공유하고-무엇을-복제하는가"]
 parent: 유니티 Instantiate는 프리팹의 참조 필드 중 무엇을 공유하고 무엇을 복제하는가
 date: 2026-09-29
 result: 맞음

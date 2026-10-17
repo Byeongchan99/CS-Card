@@ -1,7 +1,7 @@
 ---
 title: 싱글턴이 static 클래스로는 얻을 수 없는 것과 그 차이가 생기는 이유
 tags: [디자인 패턴, 싱글턴, CSharp]
-related: []
+related: ["정적-생성자의-실행-시점과-새-게임-리셋에서-static-클래스와-싱글턴의-차이", "Csharp-event로-옵저버를-구현하면-세-문제가-어떻게-되는가", "Instance를-직접-참조하는-코드가-유닛-테스트하기-어려운-이유와-생성자-주입", "MemberwiseClone으로-Clone을-구현하면-참조형-필드에서-무슨-일이-일어나는가", "Update에서-입력-플래그를-기록하고-FixedUpdate에서-소비할-때의-두-가지-구현-실수"]
 parent:
 date: 2026-10-06
 result: 부분

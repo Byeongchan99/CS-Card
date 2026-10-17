@@ -1,7 +1,7 @@
 ---
 title: Update에서 입력 플래그를 기록하고 FixedUpdate에서 소비할 때의 두 가지 구현 실수
 tags: [디자인 패턴, 게임루프, 입력, CSharp]
-related: []
+related: ["FixedUpdate에서-Input-GetKeyDown을-쓰면-점프가-씹히거나-중복되는-이유", "Csharp-event로-옵저버를-구현하면-세-문제가-어떻게-되는가", "MemberwiseClone으로-Clone을-구현하면-참조형-필드에서-무슨-일이-일어나는가", "가변-시간-간격-게임-루프가-물리-시뮬레이션과-멀티플레이에서-일으키는-문제", "같은-1초를-dt만-바꿔-오일러-적분하면-결과가-달라지는-이유"]
 parent: FixedUpdate에서 Input.GetKeyDown을 쓰면 점프가 씹히거나 중복되는 이유
 date: 2026-10-16
 result: 맞음

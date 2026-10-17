@@ -1,7 +1,7 @@
 ---
 title: 유니티 Instantiate는 프리팹의 참조 필드 중 무엇을 공유하고 무엇을 복제하는가
 tags: [유니티, 프로토타입, 프리팹]
-related: [Instantiate와 Destroy는 각각 왜 비싼 연산인가]
+related: ["Instantiate와 Destroy는 각각 왜 비싼 연산인가", "Instantiate가-참조를-공유할지-다시-연결할지-정하는-기준과-ScriptableObject-런타임-수정의-함정"]
 parent: 프로토타입의 Clone에서 필드별로 얕은 복사와 깊은 복사를 가르는 기준
 date: 2026-09-29
 result: 부분

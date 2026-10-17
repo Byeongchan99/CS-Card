@@ -1,7 +1,7 @@
 ---
 title: ScriptableObject에 담은 상태가 플레이 종료와 재실행 후 어떻게 되는가 (추론)
 tags: [유니티, ScriptableObject, 도메인리로드]
-related: []
+related: ["Instantiate가-참조를-공유할지-다시-연결할지-정하는-기준과-ScriptableObject-런타임-수정의-함정", "도메인-리로드를-끄면-static-클래스와-싱글턴의-상태가-플레이-사이에-남는-이유"]
 parent: 도메인 리로드를 끄면 static 클래스와 싱글턴의 상태가 플레이 사이에 남는 이유
 date: 2026-10-06
 result: 부분

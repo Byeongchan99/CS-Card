@@ -2336,19 +2336,19 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q10" aria-label="10번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">CO-05</span><span class="qtext">UnityEvent와 C# event는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">CO-05</span><span class="qtext">UnityEvent와 Action 델리게이트는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>가장 큰 차이는 연결 정보가 어디에 저장되느냐입니다. C# event는 코드에서 메서드를 직접 연결하고, UnityEvent는 인스펙터에서 고른 대상과 메서드 이름을 씬이나 프리팹 파일에 저장합니다.</strong></p>
-<p>C# event는 <code>+=</code>로 메서드 자체를 델리게이트 목록에 넣고 직접 호출합니다. 그래서 빠르고, 메서드 이름을 바꾸면 컴파일 에러로 바로 드러나지만, 연결을 바꾸려면 코드를 고쳐야 합니다. UnityEvent는 대상 참조와 메서드 이름 문자열을 직렬화해 두고 실행 중에 그 이름으로 메서드를 찾아 부릅니다. 기획자가 코드 없이 인스펙터에서 배선할 수 있는 대신, 메서드 이름을 바꾸면 컴파일은 통과하고 연결만 조용히 끊기며 호출도 더 느립니다.</p>
-<p>그래서 시스템끼리의 통신이나 자주 나는 이벤트는 C# event로, 문 열림이나 버튼 클릭처럼 레벨 디자인에서 건드릴 지점은 UnityEvent로 노출합니다. UI 버튼의 <code>onClick</code>이 UnityEvent인 이유도 이것입니다.</p>
+<p><strong>둘 다 호출할 메서드 목록을 담는 그릇인데, Action은 C#의 델리게이트 타입이고 UnityEvent는 유니티가 만든 클래스입니다. 가장 큰 차이는 연결 정보가 어디에 저장되느냐입니다.</strong></p>
+<p>Action은 코드에서 <code>+=</code>로 메서드 자체를 목록에 넣고 직접 호출합니다. 그래서 빠르고, 메서드 이름을 바꾸면 컴파일 에러로 바로 드러나지만, 연결을 바꾸려면 코드를 고쳐야 합니다. UnityEvent는 인스펙터에서 고른 대상 참조와 메서드 이름 문자열을 씬이나 프리팹 파일에 직렬화해 두고, 실행 중에 그 이름으로 메서드를 찾아 부릅니다. 기획자가 코드 없이 배선할 수 있는 대신, 메서드 이름을 바꾸면 컴파일은 통과하고 연결만 조용히 끊기며 호출도 더 느립니다.</p>
+<p>그래서 시스템끼리의 통신이나 자주 나는 이벤트는 <code>event</code>를 붙인 Action으로, 문 열림이나 버튼 클릭처럼 레벨 디자인에서 건드릴 지점은 UnityEvent로 노출합니다. UI 버튼의 <code>onClick</code>이 UnityEvent인 이유도 이것입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>event 키워드 없는 Action 필드와는 무엇이 다른가요?</q>Action은 메서드를 담는 델리게이트 타입이고, 거기에 event를 붙이면 바깥에서는 구독과 해제만 할 수 있습니다. event가 없으면 바깥 코드가 목록을 통째로 덮어쓰거나 직접 발생시킬 수 있어서, 남의 구독을 지우는 실수가 생깁니다.</span></li>
-<li><span><q>대상 오브젝트가 파괴되면 둘은 어떻게 다르게 동작하나요?</q>C# event는 해제하지 않으면 파괴된 대상을 그대로 호출합니다. UnityEvent는 호출 직전에 대상이 파괴된 유니티 오브젝트면 건너뜁니다. 다만 목록에는 남아 있으므로 <code>AddListener</code>로 붙인 리스너는 <code>RemoveListener</code>로 직접 떼어야 합니다.</span></li>
+<li><span><q>event 키워드는 무엇을 하나요?</q>Action과 나란한 세 번째 방식이 아니라, 델리게이트 필드에 붙이는 한정자입니다. 붙이면 바깥에서는 구독과 해제만 할 수 있고, 목록을 통째로 대입하거나 null로 지우거나 직접 발생시키는 건 선언한 클래스 안에서만 됩니다. event가 없으면 바깥 코드가 남의 구독까지 지울 수 있어서, 공개하는 Action에는 거의 항상 붙입니다. 델리게이트 타입에만 붙일 수 있어 UnityEvent에는 못 붙이고, UnityEvent는 공개 필드면 밖에서 발생과 전체 제거까지 다 되므로 <code>[SerializeField] private</code>으로 두기도 합니다.</span></li>
+<li><span><q>대상 오브젝트가 파괴되면 둘은 어떻게 다르게 동작하나요?</q>Action은 해제하지 않으면 파괴된 대상을 그대로 호출합니다. UnityEvent는 호출 직전에 대상이 파괴된 유니티 오브젝트면 건너뜁니다. 다만 목록에는 남아 있으므로 <code>AddListener</code>로 붙인 리스너는 <code>RemoveListener</code>로 직접 떼어야 합니다.</span></li>
 <li><span><q>UnityAction은 Action과 무엇이 다른가요?</q>역할은 같지만 유니티가 따로 정의한 델리게이트 타입이라 서로 대입되지 않습니다. <code>AddListener</code>는 UnityAction을 받는데, 메서드 이름이나 람다를 넘기면 알아서 맞춰집니다.</span></li>
 </ul>
 </div>
@@ -3209,6 +3209,7 @@ title: 면접 대비 문답
 <ul>
 <li><span><q>코루틴이나 async로 나누면 안 되나요?</q>코루틴은 일을 여러 프레임에 나눠 담을 뿐 메인 스레드에서 돌아 총 계산량과 속도는 그대로이고, async는 주로 입출력을 기다리는 동안 다른 일을 하는 용도입니다. 계산 자체를 여러 코어에서 동시에 하는 건 Job System뿐입니다.</span></li>
 <li><span><q>Task.Run으로 스레드에 넘기면요?</q>다른 스레드에서는 transform 같은 유니티 API를 쓸 수 없고, 같은 데이터를 동시에 고치는 문제를 C# 스레드가 막아 주지 않으며, 엔진이 이미 쓰는 스레드와 코어를 두고 다툽니다. Job System은 이 세 가지를 엔진 차원에서 해결한 장치입니다.</span></li>
+<li><span><q>잡 안에서 transform이나 Physics.Raycast 같은 유니티 API를 쓸 수 있나요?</q>거의 못 씁니다. 대부분의 유니티 API는 엔진 오브젝트를 잠금 없이 다루도록 만들어져 메인 스레드 전용이고, 잡 구조체는 클래스 참조를 담을 수 없어 GameObject를 넘길 길도 없습니다. 그래서 메인 스레드가 필요한 값을 NativeArray에 복사해 넘기고, 결과를 받아 메인 스레드에서 반영합니다. 예외는 잡용으로 따로 만든 API로, <code>IJobParallelForTransform</code>으로 Transform을 워커에서 움직이거나 <code>RaycastCommand</code>로 레이캐스트를 묶어 워커에서 실행할 수 있습니다.</span></li>
 </ul>
 </div>
 </div>

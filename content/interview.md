@@ -2108,36 +2108,39 @@ title: 면접 대비 문답
 </section>
 </div>
 <div class="field" data-field="unity" hidden>
-<p class="note"><strong>답변 프레임.</strong> 정의 한 문장으로 결론 먼저 → 왜 그렇게 동작·설계됐는지 → 트레이드오프(꼬리질문의 90%가 여기를 찌릅니다) → 필요하면 실제 예시 한 줄. 단정("절대 안 됩니다")은 반례 하나로 무너지니 "일반적으로 ~지만 ~한 경우엔 다릅니다"로.</p>
+<p class="note"><strong>답변 프레임.</strong> 정의 한 문장으로 결론 먼저 → 왜 그렇게 동작·설계됐는지 → 트레이드오프(꼬리질문의 90%가 여기를 찌릅니다) → 필요하면 실제 예시 한 줄. 단정("절대 안 됩니다")은 반례 하나로 무너지니 "일반적으로 ~지만 ~한 경우엔 다릅니다"로. <strong>필수</strong> 배지는 개념·원리를 깊게 파고드는 문항이라는 표시입니다. 나머지도 필수 문항의 꼬리질문에서 나오니 건너뛰지 마세요.</p>
 <div class="bar">
-<span class="prog"><b class="prog-done">0</b> / <span class="prog-total">42</span> 자신 있음</span>
+<span class="prog"><b class="prog-done">0</b> / <span class="prog-total">50</span> 자신 있음</span>
 <span class="bar-sp"></span>
 <button class="tool tool-open" type="button">모두 펼치기</button>
 <button class="tool tool-hide" type="button" aria-pressed="false">체크 숨기기</button>
 <button class="tool tool-reset" type="button">초기화</button>
 </div>
 <section class="grp">
-<div class="grp-head"><h3>생명주기와 실행 순서</h3><span class="cnt">5문항</span></div>
-<p class="grp-note">콜백이 언제, 어떤 순서로 불리는지가 버그와 최적화의 출발점입니다.</p>
+<div class="grp-head"><h3>생명주기와 프레임 루프</h3><span class="cnt">5문항</span></div>
+<p class="grp-note">콜백이 언제, 어떤 순서로 불리는지와 프레임 단위로 흐르는 시간, 입력 처리를 다룹니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q1" aria-label="1번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">LIFE-01</span><span class="qtext">Awake, OnEnable, Start는 각각 언제 불리고 무엇이 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">LIFE-01</span><span class="pri">필수</span><span class="qtext">Awake, OnEnable, Start는 각각 언제 불리고 무엇이 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>셋 다 초기화 콜백인데, 불리는 시점과 횟수가 다릅니다.</strong></p>
+<p><strong>셋 다 초기화 콜백인데 불리는 시점과 횟수가 다르고, 무엇보다 모든 오브젝트의 Awake가 끝난 뒤에야 Start가 시작된다는 점이 핵심입니다.</strong></p>
 <ul>
-<li><strong>Awake.</strong> 오브젝트가 생성될 때 딱 한 번 불립니다. 다른 오브젝트를 건드리지 않고 자기 자신을 준비하는 자리입니다.</li>
-<li><strong>OnEnable.</strong> 활성화될 때마다 불립니다. 껐다 켜기를 반복하면 그때마다 다시 불립니다.</li>
-<li><strong>Start.</strong> 모든 Awake가 끝난 뒤, 첫 프레임 직전에 한 번 불립니다. 다른 오브젝트를 참조해 연결하는 초기화는 여기서 합니다.</li>
+<li><strong>Awake.</strong> 게임오브젝트가 처음 활성화될 때 수명에 한 번 불립니다. 다른 오브젝트에 기대지 않고 자기 자신을 준비하는 자리입니다.</li>
+<li><strong>OnEnable.</strong> 활성화될 때마다 불립니다. 자기 Awake 바로 뒤에 붙어서 불리고, 껐다 켜면 다시 불립니다.</li>
+<li><strong>Start.</strong> 첫 Update 직전에 수명에 한 번 불립니다. 다른 오브젝트와 연결하는 초기화를 여기서 합니다.</li>
 </ul>
-<p>순서를 이렇게 나눈 이유는, 모든 Awake가 먼저 끝난 다음 Start가 돌기 때문에 Start 시점에는 다른 오브젝트들이 이미 자기 초기화를 마쳤다고 믿고 참조할 수 있어서입니다. 그래서 "내 준비는 Awake, 남과 연결은 Start"로 기억하면 됩니다.</p>
+<p>이렇게 나눈 이유는 오브젝트끼리의 Awake 순서가 보장되지 않기 때문입니다. 대신 Start 앞에 장벽이 하나 있어서, Start에서는 다른 오브젝트가 Awake 초기화를 마쳤다고 믿고 참조할 수 있습니다. 그래서 내 준비는 Awake에서, 남과의 연결은 Start에서 합니다.</p>
+<p>주의할 점은 장벽이 Start 앞에만 있다는 겁니다. OnEnable은 자기 Awake 직후에 불리기 때문에, 같은 씬이 로드될 때 다른 오브젝트의 Awake보다 먼저 불릴 수 있습니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>오브젝트끼리 Awake 호출 순서는 보장되나요?</q>보장되지 않습니다. 어느 오브젝트의 Awake가 먼저 도는지는 정해져 있지 않아서, Awake 안에서 다른 오브젝트를 참조하면 아직 준비가 안 됐을 수 있습니다. 그래서 다른 오브젝트에 의존하는 건 Start로 미루는 게 안전합니다.</span></li>
+<li><span><q>오브젝트끼리 실행 순서를 꼭 맞춰야 하면 어떻게 하나요?</q>Script Execution Order 설정이나 <code>[DefaultExecutionOrder]</code> 속성으로 스크립트의 실행 순서를 지정합니다. 값이 작을수록 먼저 실행됩니다. 다만 순서 지정이 늘어나면 의존 관계가 숨어 버리므로, 가능하면 Awake와 Start의 역할 분담으로 해결하는 편이 낫습니다.</span></li>
+<li><span><q>OnEnable에서 싱글턴 매니저를 참조하면 어떻게 되나요?</q>같은 씬이 로드될 때는 매니저의 Awake가 아직 안 돌았을 수 있어서, <code>Instance = this</code>가 실행되기 전이면 null을 만납니다. 매니저의 실행 순서를 앞당기거나, 처음 읽는 순간 찾아 채우는 지연 초기화를 쓰거나, 첫 구독만 Start에서 하고 재활성화부터 OnEnable이 맡게 합니다. 인스펙터로 연결한 참조나 static 이벤트처럼 순서와 무관한 경우도 많습니다.</span></li>
+<li><span><q>오브젝트를 껐다 켜면 무엇이 다시 불리나요?</q>OnEnable만 다시 불리고 Awake와 Start는 다시 불리지 않습니다. 비활성 상태로 생성된 오브젝트는 Awake가 미뤄졌다가 처음 <code>SetActive(true)</code>될 때 Awake와 OnEnable이 이어서 불립니다.</span></li>
 </ul>
 </div>
 </div>
@@ -2146,19 +2149,24 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q2" aria-label="2번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">LIFE-02</span><span class="qtext">Update와 FixedUpdate를 나누는 이유는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">LIFE-02</span><span class="pri">필수</span><span class="qtext">Update와 FixedUpdate를 나누는 이유는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>Update는 매 프레임 불리고, FixedUpdate는 고정된 시간 간격으로 불립니다. 물리를 프레임률과 무관하게 일관되게 처리하려고 나눈 겁니다.</strong></p>
-<p>프레임률은 기기 성능이나 순간 부하에 따라 들쭉날쭉한데, 물리 계산이 이 들쭉날쭉한 간격을 따라가면 같은 힘을 줘도 기기마다 결과가 달라집니다. 그래서 <code>Rigidbody</code>에 힘을 주거나 물리로 이동시키는 건 항상 같은 간격으로 도는 FixedUpdate에서 처리해서, 어느 기기에서 돌리든 물리 결과가 같게 만듭니다.</p>
-<p>대신 게임 로직 대부분과 렌더는 Update에서 처리합니다. 프레임마다 반응해야 하는 것들이니까요.</p>
+<p><strong>Update는 매 프레임 불려서 간격이 기기 성능에 따라 들쭉날쭉하고, FixedUpdate는 기본 0.02초의 고정 간격으로 불립니다. 물리 계산을 고정 간격에서 하려고 나눈 겁니다.</strong></p>
+<p>물리를 들쭉날쭉한 간격으로 계산하면 같은 힘을 줘도 기기마다 결과가 달라지고, 한 번에 건너뛰는 거리가 달라져 충돌 판정도 흔들립니다. 그래서 Rigidbody에 힘이나 속도를 주는 일은 FixedUpdate에서 해서 프레임률과 무관하게 같은 결과를 냅니다. 가르는 기준은 물리 엔진을 거치느냐이고, 물리를 거치지 않는 Transform 이동은 Update에서 <code>deltaTime</code>을 곱해 처리해도 됩니다.</p>
+<p>대신 FixedUpdate는 고정 간격을 맞추느라 한 프레임에 0번, 1번, 여러 번 돌 수 있고, 이 점이 입력 처리에서 문제를 만듭니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>그럼 입력 감지는 어디에 두나요?</q>Update에 둡니다. <code>GetKeyDown</code>처럼 그 프레임에만 한 번 true인 입력은, FixedUpdate가 한 프레임에 0번 불릴 수도 여러 번 불릴 수도 있어서 놓치거나 중복될 수 있습니다. 그래서 입력은 Update에서 받아 두고, 그 값을 FixedUpdate에서 물리에 반영하는 식으로 나눕니다.</span></li>
+<li><span><q>FixedUpdate에서 GetKeyDown으로 점프를 받으면 어떻게 되나요?</q><code>GetKeyDown</code>은 누른 그 프레임에만 true인데, FixedUpdate가 0번 돈 프레임에서는 입력을 놓치고 여러 번 돈 프레임에서는 한 번 누른 걸 여러 번 감지합니다. 그래서 입력은 Update에서 받아 플래그에 저장하고, FixedUpdate에서 그 플래그를 읽어 물리에 반영합니다.</span></li>
+<li><span><q>FixedUpdate로 움직인 물체가 화면에서 뚝뚝 끊겨 보이면요?</q>물리는 0.02초마다 갱신되는데 화면은 그보다 자주 그려져서, 몇 프레임 동안 같은 자리에 머물다 건너뛰듯 움직이기 때문입니다. Rigidbody의 Interpolate 옵션을 켜면 물리 단계 사이의 위치를 렌더링에서 보간해 부드럽게 보입니다.</span></li>
 </ul>
+</div>
+<div class="trap">
+<p class="lab">함정</p>
+<p>"FixedUpdate는 프레임마다 한 번 불린다"고 말하면 감점입니다. 고정 간격을 맞추느라 한 프레임에 0번이나 여러 번 불릴 수 있다는 점이 입력 처리 문제의 원인입니다.</p>
 </div>
 </div>
 </details>
@@ -2170,9 +2178,16 @@ title: 면접 대비 문답
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>LateUpdate는 그 프레임의 모든 Update가 끝난 뒤에 불립니다. 다른 오브젝트가 움직임을 다 마친 걸 보고 나서 처리해야 하는 일을 위한 자리입니다.</strong></p>
-<p>대표적인 게 카메라 추적입니다. 카메라가 플레이어를 따라가는데, 플레이어의 이동이 아직 안 끝난 상태에서 카메라가 따라가면 한 프레임 어긋나서 화면이 미세하게 떨립니다. 그래서 플레이어가 Update에서 이동을 마친 걸 확인한 다음, LateUpdate에서 카메라를 옮기면 지터 없이 딱 붙어 따라갑니다.</p>
-<p>정리하면 "남이 다 움직인 뒤에 반응해야 하는 것"을 LateUpdate에 둔다고 보면 됩니다.</p>
+<p><strong>LateUpdate는 그 프레임의 모든 Update가 끝난 뒤에 실행되는 단계로, 다른 오브젝트가 다 움직인 결과를 보고 반응해야 하는 일을 위해 있습니다.</strong></p>
+<p>Update끼리는 호출 순서가 보장되지 않습니다. 카메라와 플레이어를 둘 다 Update에 두면, 카메라가 먼저 불린 프레임에는 아직 안 움직인 플레이어를 따라가 한 박자 뒤처지고, 이게 프레임마다 엇갈리면서 화면이 떨립니다. 카메라를 LateUpdate에 두면 항상 이동을 마친 플레이어를 따라갑니다.</p>
+<p>그래서 카메라 추적, 애니메이션이 뼈대를 움직인 뒤 손발 위치를 맞추는 IK 보정, 캐릭터를 따라다니는 체력바 같은 월드 UI를 LateUpdate에 둡니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>LateUpdate끼리는 순서가 보장되나요?</q>보장되지 않습니다. 보장되는 건 모든 Update가 모든 LateUpdate보다 먼저라는 것뿐입니다. LateUpdate끼리 순서가 필요하면 실행 순서를 지정하거나 한 매니저가 차례로 부르게 합니다.</span></li>
+<li><span><q>카메라를 FixedUpdate에서 움직이면 어떤가요?</q>물리 간격과 렌더 프레임이 어긋나서, 어떤 프레임엔 카메라가 안 움직이고 어떤 프레임엔 두 번 움직여 오히려 더 끊겨 보입니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2184,9 +2199,21 @@ title: 면접 대비 문답
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>timeScale이 0이면 deltaTime이 0이 되기 때문입니다. deltaTime에는 timeScale이 곱해지거든요.</strong></p>
-<p>일시정지를 걸려고 <code>timeScale</code>을 0으로 두면 게임 전체가 시간이 멈춘 것처럼 서는데, 문제는 이걸로 움직이는 것들이 전부 같이 멈춘다는 겁니다. 그래서 정지 메뉴가 떠서 슬라이드되는 애니메이션도 안 움직입니다.</p>
-<p>해결책은 UI 애니메이션만 <code>unscaledDeltaTime</code>으로 구동하는 겁니다. 이건 timeScale의 영향을 안 받는 실제 경과 시간이라, 게임은 멈춰 있어도 정지 메뉴 UI는 계속 부드럽게 움직입니다.</p>
+<p><strong>timeScale은 시간에 곱하는 배율이라 0이면 deltaTime이 0이 되어 모든 게 멈추는 겁니다. 정지 중에도 움직여야 하는 것만 배율을 곱하지 않은 실제 시간을 쓰게 바꿉니다.</strong></p>
+<p>엔진은 매 프레임 실제로 흐른 시간인 <code>unscaledDeltaTime</code>을 재고, 거기에 timeScale을 곱한 값을 <code>deltaTime</code>으로 줍니다. 움직임은 보통 속도에 deltaTime을 곱해 계산하니까 timeScale이 0이면 이동량도 0이 됩니다. 일시정지 메뉴의 애니메이션도 deltaTime으로 계산되고 있어서 같이 멈추는 겁니다.</p>
+<ul>
+<li><strong>직접 계산하는 움직임.</strong> <code>Time.deltaTime</code> 대신 <code>Time.unscaledDeltaTime</code>을 씁니다.</li>
+<li><strong>코루틴 대기.</strong> <code>WaitForSeconds</code> 대신 <code>WaitForSecondsRealtime</code>을 씁니다.</li>
+<li><strong>Animator.</strong> Update Mode를 Unscaled Time으로 바꿉니다.</li>
+</ul>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>timeScale이 0이면 Update도 멈추나요?</q>아닙니다. timeScale은 시간 값에 곱해질 뿐 프레임 루프를 세우지 않아서 Update와 LateUpdate는 계속 불립니다. deltaTime을 쓰지 않는 코드는 그대로 실행되므로 일시정지 중에 총이 나가는 버그가 생기고, 입력 처리는 정지 상태를 직접 확인해서 막아야 합니다.</span></li>
+<li><span><q>FixedUpdate는 어떻게 되나요?</q>불리지 않습니다. 엔진은 게임 시간이 고정 간격만큼 흐를 때마다 FixedUpdate를 부르는데, 게임 시간이 흐르지 않으니 그 간격이 채워지지 않습니다. 같은 이유로 슬로 모션에서는 물리 갱신이 드물어져 끊겨 보이므로 <code>fixedDeltaTime</code>도 배율에 맞춰 줄입니다.</span></li>
+<li><span><q>일시정지 메뉴에서 씬을 나갈 때 주의할 점은요?</q>timeScale은 전역 값이라 씬을 바꿔도 유지됩니다. 1로 되돌리지 않으면 다음 씬이 멈춘 채 시작합니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2198,9 +2225,15 @@ title: 면접 대비 문답
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>레거시는 Update에서 키를 직접 폴링하는 방식이고, 새 Input System은 액션과 실제 키의 바인딩을 에셋으로 분리하는 방식입니다.</strong></p>
-<p>레거시는 <code>Input.GetKey</code>로 특정 키를 바로 읽어서 간단하고 빠릅니다. 대신 키가 코드에 하드코딩되니까, 게임패드나 터치를 함께 지원하거나 플레이어가 키를 다시 배치하려면 손이 많이 갑니다.</p>
-<p>새 Input System은 "점프"나 "이동" 같은 액션을 먼저 정의하고, 거기에 어떤 키나 버튼을 연결할지를 따로 두는 구조입니다. 그래서 키보드, 게임패드, 터치를 한 번에 다룰 수 있고 런타임 리바인딩도 쉽습니다. 대가는 초기 설정이 복잡하다는 점이라, 입력 소스가 하나뿐인 작은 프로젝트면 레거시가 더 간편할 수 있습니다.</p>
+<p><strong>레거시 입력은 코드가 어떤 키를 눌렀는지 직접 묻는 방식이고, 새 Input System은 점프나 이동 같은 행동과 실제 키 사이에 한 겹을 끼워 데이터로 분리한 방식입니다.</strong></p>
+<p>레거시에서는 "점프는 스페이스"가 코드에 박혀 있어서, 게임패드나 터치를 지원하려면 기기마다 분기하고 키 변경 기능도 매핑을 직접 관리해야 합니다. 새 Input System은 코드가 점프라는 액션만 구독하고, 어떤 키나 버튼이 그 액션인지는 바인딩 에셋이 정합니다. 그래서 여러 기기를 한 코드로 받고, 바인딩만 바꿔 키 변경을 지원합니다.</p>
+<p>트레이드오프는 이 간접 계층의 설정과 유지 비용입니다. 입력 소스가 하나뿐인 작은 프로젝트라면 레거시가 더 간편합니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>두 방식은 입력을 받는 방법도 다른가요?</q>레거시는 Update에서 매 프레임 키 상태를 묻는 폴링 방식입니다. 새 Input System은 폴링도 되지만 액션이 발생했을 때 콜백으로 받는 방식도 지원해서, OnEnable에서 구독하고 OnDisable에서 해제하는 식으로 씁니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2212,17 +2245,20 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q6" aria-label="6번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">CO-01</span><span class="qtext">코루틴은 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">CO-01</span><span class="pri">필수</span><span class="qtext">코루틴은 어떻게 동작하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>코루틴은 실행을 중간에 멈췄다가 나중에 이어서 재개할 수 있는 함수입니다. 유니티 플레이어 루프에 얹혀서 프레임 단위로 재개됩니다.</strong></p>
-<p>보통 함수는 호출되면 끝까지 쭉 돌고 반환하는데, 코루틴은 <code>yield</code>를 만나면 거기서 한 번 멈추고 제어를 유니티에 돌려줍니다. 그러면 유니티가 정해진 조건이 될 때 그 지점부터 다시 이어서 실행합니다. 그래서 여러 프레임에 걸친 연출이나 대기를, 한 프레임을 통째로 막지 않고 자연스럽게 풀어 쓸 수 있습니다.</p>
+<p><strong>코루틴은 yield 지점에서 멈췄다가, 유니티가 조건이 되었다고 판단하면 그 자리부터 이어서 실행되는 함수입니다.</strong></p>
+<p>보통 함수는 호출되면 끝까지 돌고 반환하지만, 코루틴은 yield를 만나면 제어를 유니티에 돌려주고 멈춥니다. 엔진은 프레임 루프를 돌며 매 프레임 재개 조건을 확인하고, 조건이 맞은 프레임에 이어서 실행합니다. <code>yield return null</code>이면 다음 프레임, <code>WaitForSeconds</code>면 그 시간이 지난 뒤, <code>WaitForEndOfFrame</code>이면 그 프레임 렌더링이 끝난 직후에 재개됩니다. 덕분에 페이드나 대기처럼 여러 프레임에 걸친 일을 한 프레임을 붙잡지 않고 순서대로 쓸 수 있습니다.</p>
+<p>중요한 건 코루틴이 스레드가 아니라는 점입니다. 제어를 주고받는 협력적 양보일 뿐이고 모두 메인 스레드에서 돕니다. 그래서 코루틴 본문에 무거운 계산을 한 번에 몰면 그 프레임이 그대로 멈춥니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>yield 종류에는 뭐가 있나요?</q>세 가지를 자주 씁니다. <code>yield return null</code>은 다음 프레임에 재개하고, <code>WaitForSeconds</code>는 지정한 시간이 지난 뒤 재개합니다. 다만 이 시간은 timeScale이 곱해진 시간이라, timeScale이 0이면 안 풀리고 그럴 땐 <code>WaitForSecondsRealtime</code>을 씁니다. <code>WaitForEndOfFrame</code>은 그 프레임 렌더링이 끝난 직후에 재개해서 스크린샷 같은 데 씁니다.</span></li>
+<li><span><q>그러면 무거운 계산을 코루틴에 넣으면 빨라지나요?</q>빨라지지 않습니다. 작업을 여러 프레임에 나눠 담아 한 프레임이 길어지는 걸 막을 뿐, 총 계산량은 같습니다. 계산 자체를 여러 코어로 나누려면 Job System을 써야 합니다.</span></li>
+<li><span><q>스크립트의 enabled를 false로 하면 코루틴이 멈추나요?</q>멈추지 않습니다. enabled는 Update 같은 엔진 콜백만 끄고, 코루틴은 게임오브젝트가 비활성화되거나 파괴될 때, 또는 <code>StopCoroutine</code>을 부를 때 멈춥니다.</span></li>
+<li><span><q>timeScale이 0인데 WaitForSeconds로 기다리면요?</q>WaitForSeconds는 스케일된 게임 시간으로 재기 때문에 끝나지 않습니다. 정지 중에도 흘러야 하면 <code>WaitForSecondsRealtime</code>을 씁니다.</span></li>
 </ul>
 </div>
 </div>
@@ -2231,13 +2267,20 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q7" aria-label="7번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">CO-02</span><span class="qtext">반복하는 코루틴에서 WaitForSeconds를 캐싱하라는 이유는?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">CO-02</span><span class="qtext">반복하는 코루틴에서 WaitForSeconds를 캐싱하라는 이유는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>반복할 때마다 <code>new WaitForSeconds</code>로 새로 만들면, 그 객체가 매번 힙에 쌓여서 가비지 컬렉터에 부담을 주기 때문입니다.</strong></p>
-<p>예를 들어 반복문 안에서 매번 새 대기 객체를 만들면, 같은 1초 대기인데도 계속 새 객체가 생기고 버려집니다. 이렇게 쌓인 쓰레기를 나중에 가비지 컬렉터가 치우는데, 치우는 순간 프레임이 살짝 끊깁니다.</p>
-<p>그래서 대기 객체를 미리 한 번만 만들어 필드에 담아두고 반복 내내 그걸 재사용합니다. 값이 매번 바뀌는 게 아니라면 새로 만들 이유가 없으니까요.</p>
+<p><strong>WaitForSeconds는 클래스라서 new 할 때마다 힙에 객체가 생기기 때문입니다. 반복하는 코루틴에서 매번 만들면 게임 내내 쓰레기가 쌓여 GC를 자주 부릅니다.</strong></p>
+<p>스폰 타이머, 깜빡임, 쿨다운처럼 주기적으로 도는 코루틴에서 <code>yield return new WaitForSeconds(1f)</code>를 쓰면 루프를 돌 때마다 객체가 하나씩 생깁니다. 대기 시간이 고정이라면 필드에 한 번 만들어 두고 같은 인스턴스를 계속 yield해도 동작은 똑같고 할당만 사라집니다.</p>
+<p>공유해도 되는 이유는 이 객체가 생성할 때 대기 시간만 담고 이후 바뀌지 않기 때문입니다. 그래서 여러 코루틴이 같은 인스턴스를 동시에 써도 됩니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>WaitForSecondsRealtime도 같은 방식으로 캐싱해도 되나요?</q>조심해야 합니다. WaitForSecondsRealtime은 내부에 진행 상태를 갖고 있어서, 여러 코루틴이 동시에 같은 인스턴스를 쓰면 서로의 대기 시간을 망가뜨립니다.</span></li>
+<li><span><q>대기 시간이 매번 다르면요?</q>재사용할 수 없습니다. 그럴 땐 <code>yield return null</code>로 돌면서 경과 시간을 직접 세는 수동 타이머를 쓰거나, 할당이 적은 UniTask 같은 대안을 씁니다. <code>yield return null</code>은 객체를 만들지 않아 매번 써도 할당이 없습니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2245,13 +2288,21 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q8" aria-label="8번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">CO-03</span><span class="qtext">코루틴과 async/await는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">CO-03</span><span class="pri">필수</span><span class="qtext">코루틴과 async/await는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>코루틴은 유니티 엔진에 얹혀 프레임 단위로 도는 거고, async/await는 엔진 밖의 Task 기반이라 씬이나 오브젝트 수명과 무관하게 돕니다.</strong></p>
-<p>가장 중요한 차이는 수명 관리입니다. 코루틴은 붙어 있는 게임오브젝트가 비활성이 되거나 파괴되면 자동으로 멈춥니다. 반면 async/await는 엔진과 상관없이 살아 있어서, 이미 파괴된 오브젝트를 건드리려 하면 문제가 생깁니다. 그래서 수동으로 취소를 걸어줘야 합니다.</p>
-<p>그래서 프레임을 기다리거나 간단한 연출은 코루틴이 맞고, 파일이나 네트워크 같은 진짜 비동기 I/O는 async가 맞습니다. 실무에서는 GC가 안 생기는 UniTask로 둘의 장점을 합쳐 쓰기도 합니다.</p>
+<p><strong>둘 다 멈췄다가 재개하는 방식이지만, 누가 재개하느냐와 오브젝트 수명에 묶이느냐가 다릅니다.</strong></p>
+<p>코루틴은 유니티 엔진 기능입니다. 엔진이 프레임 루프에서 조건을 확인해 재개하고, <code>StartCoroutine</code>을 호출한 MonoBehaviour에 소속되어 있어서 게임오브젝트가 비활성화되거나 파괴되면 자동으로 멈춥니다. async/await는 C# 언어 기능입니다. 컴파일러가 메서드를 상태 머신으로 바꾸고 await한 작업이 끝나면 이어서 실행하는데, 엔진은 이 메서드의 존재를 모릅니다. 그래서 오브젝트가 파괴되어도 await 뒤의 코드가 그대로 실행됩니다.</p>
+<p>대신 async는 <code>Task&lt;T&gt;</code>로 결과값을 돌려주고 try-catch로 예외를 평소처럼 처리할 수 있습니다. 그래서 프레임 대기나 연출, 타이머는 코루틴이, 파일이나 네트워크 같은 비동기 입출력은 async가 잘 맞습니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>async로 기다리는 동안 오브젝트가 파괴되면 어떻게 막나요?</q>오브젝트 수명에 묶인 취소 토큰을 넘깁니다. 유니티 2022.2부터는 <code>destroyCancellationToken</code>이 있어서, 파괴되면 await 지점에서 취소 예외로 빠져나갑니다. 이전 버전은 <code>CancellationTokenSource</code>를 만들어 OnDestroy에서 취소합니다.</span></li>
+<li><span><q>async/await는 다른 스레드에서 도나요?</q>아닙니다. await는 끝나면 이어서 해 달라는 예약일 뿐 새 스레드를 만들지 않고, 유니티에서는 await 뒤가 기본적으로 메인 스레드에서 이어집니다. 다른 스레드에서 도는 건 <code>Task.Run</code>으로 넘긴 작업뿐이고, 그 안에서는 유니티 API를 쓸 수 없습니다.</span></li>
+<li><span><q>에디터에서 플레이를 멈췄는데 로그가 계속 찍히는 건 왜인가요?</q>플레이 모드를 꺼도 에디터 프로세스는 살아 있어서, 취소하지 않은 Task가 계속 진행되기 때문입니다. 빌드한 게임은 종료하면 프로세스가 끝나 같이 사라지지만, 에디터에서는 <code>Application.exitCancellationToken</code> 같은 취소 처리가 필요합니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2259,13 +2310,25 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q9" aria-label="9번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">CO-04</span><span class="qtext">이벤트 구독을 Start가 아니라 OnEnable/OnDisable에서 하는 이유는?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">CO-04</span><span class="qtext">이벤트 구독을 OnEnable과 OnDisable에서 하는 이유는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>Start는 오브젝트 수명에 한 번뿐이지만, 활성과 비활성은 여러 번 반복될 수 있어서 짝이 안 맞기 때문입니다.</strong></p>
-<p>특히 풀링으로 오브젝트를 껐다 켰다 재활용하는 경우가 문제입니다. Start에서만 구독하면, 비활성 상태에서도 이벤트에 반응하거나, 다시 켤 때마다 구독이 중복으로 쌓입니다.</p>
-<p>그래서 활성화될 때 불리는 OnEnable에서 구독하고, 비활성화될 때 불리는 OnDisable에서 해제하면 구독과 해제가 항상 짝을 이룹니다. 켜져 있을 때만 반응하고, 꺼지면 깔끔하게 떨어집니다.</p>
+<p><strong>이벤트 호출은 엔진을 거치지 않는 일반 C# 메서드 호출이라 오브젝트를 꺼도 멈추지 않기 때문입니다. OnEnable에서 구독하고 OnDisable에서 해제하면 구독 구간이 활성 구간과 정확히 겹칩니다.</strong></p>
+<p>구독하면 이벤트를 가진 쪽이 구독자를 참조로 붙들고, 해제하기 전까지 계속 호출합니다. 비활성화로 멈추는 건 Update 같은 엔진 콜백뿐입니다. Start는 수명에 한 번뿐이라 껐다 켜는 주기와 짝을 이룰 콜백이 없으므로, 풀링처럼 껐다 켜는 오브젝트는 OnEnable과 OnDisable 쌍이 필요합니다.</p>
+<p>반대로 켜고 끄지 않는 오브젝트라면 Start에서 구독하고 OnDestroy에서 해제해도 충분하고, 초기화 순서 걱정이 없어 더 단순합니다. 꺼져 있어도 이벤트를 들어야 하는 닫힌 UI 패널 같은 경우는 Awake와 OnDestroy 쌍을 씁니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>해제를 빠뜨리면 무슨 일이 생기나요?</q>꺼진 오브젝트가 이벤트에 반응해서, 풀에 반환된 총알이 소리를 내는 식의 일이 생깁니다. 파괴된 오브젝트도 이벤트 쪽이 C# 객체를 붙들고 있어서 핸들러가 계속 불리고, 안에서 transform을 건드리면 MissingReferenceException이 납니다. 참조가 남아 GC가 회수하지도 못합니다. 그리고 OnEnable에서 구독만 하고 해제가 없으면 다시 켤 때마다 한 번씩 더 등록되어 핸들러가 여러 번 불립니다.</span></li>
+<li><span><q>Start에서 구독하고 OnDisable에서 해제하면 어떤가요?</q>짝이 맞지 않습니다. 한 번 껐다 켜면 OnDisable에서 해제된 뒤 Start는 다시 불리지 않아서, 그 뒤로는 이벤트를 받지 못합니다.</span></li>
+<li><span><q>람다로 구독하면 왜 해제가 안 되나요?</q><code>+= () =&gt; Foo()</code>와 <code>-= () =&gt; Foo()</code>는 서로 다른 델리게이트 객체라서 빼려는 대상을 찾지 못합니다. 해제가 필요하면 메서드 이름으로 구독합니다.</span></li>
+</ul>
+</div>
+<div class="trap">
+<p class="lab">함정</p>
+<p>"Start에서 구독하면 다시 켤 때마다 구독이 중복된다"고 하면 틀립니다. Start는 다시 불리지 않으므로 중복은 생기지 않습니다. Start 구독의 문제는 꺼진 동안에도 반응한다는 것이고, 중복 구독은 OnEnable에서 구독하고 해제를 빠뜨렸을 때 생깁니다.</p>
 </div>
 </div>
 </details>
@@ -2277,32 +2340,42 @@ title: 면접 대비 문답
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>C# event는 코드에서 연결하는 이벤트이고, UnityEvent는 인스펙터에서 드래그로 연결하는 이벤트입니다.</strong></p>
-<p>C# event는 코드에서 <code>+=</code>로 구독하기 때문에 빠르고 타입이 안전합니다. 대신 인스펙터에는 안 보여서, 프로그래머가 아닌 사람은 배선할 수 없습니다. UnityEvent는 기획자가 코드 없이 인스펙터에서 버튼이나 트리거의 콜백을 드래그로 이을 수 있는 대신, 내부적으로 리플렉션으로 호출해서 더 느리고 GC도 생깁니다.</p>
-<p>그래서 코드끼리의 잦은 통신은 C# event나 Action으로 하고, 인스펙터에 노출해 비프로그래머가 잇게 할 콜백은 UnityEvent로 씁니다. 다만 UnityEvent는 대상이 파괴돼도 자동으로 해제되지 않으니 관리가 필요합니다.</p>
+<p><strong>가장 큰 차이는 연결 정보가 어디에 저장되느냐입니다. C# event는 코드에서 메서드를 직접 연결하고, UnityEvent는 인스펙터에서 고른 대상과 메서드 이름을 씬이나 프리팹 파일에 저장합니다.</strong></p>
+<p>C# event는 <code>+=</code>로 메서드 자체를 델리게이트 목록에 넣고 직접 호출합니다. 그래서 빠르고, 메서드 이름을 바꾸면 컴파일 에러로 바로 드러나지만, 연결을 바꾸려면 코드를 고쳐야 합니다. UnityEvent는 대상 참조와 메서드 이름 문자열을 직렬화해 두고 실행 중에 그 이름으로 메서드를 찾아 부릅니다. 기획자가 코드 없이 인스펙터에서 배선할 수 있는 대신, 메서드 이름을 바꾸면 컴파일은 통과하고 연결만 조용히 끊기며 호출도 더 느립니다.</p>
+<p>그래서 시스템끼리의 통신이나 자주 나는 이벤트는 C# event로, 문 열림이나 버튼 클릭처럼 레벨 디자인에서 건드릴 지점은 UnityEvent로 노출합니다. UI 버튼의 <code>onClick</code>이 UnityEvent인 이유도 이것입니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>event 키워드 없는 Action 필드와는 무엇이 다른가요?</q>Action은 메서드를 담는 델리게이트 타입이고, 거기에 event를 붙이면 바깥에서는 구독과 해제만 할 수 있습니다. event가 없으면 바깥 코드가 목록을 통째로 덮어쓰거나 직접 발생시킬 수 있어서, 남의 구독을 지우는 실수가 생깁니다.</span></li>
+<li><span><q>대상 오브젝트가 파괴되면 둘은 어떻게 다르게 동작하나요?</q>C# event는 해제하지 않으면 파괴된 대상을 그대로 호출합니다. UnityEvent는 호출 직전에 대상이 파괴된 유니티 오브젝트면 건너뜁니다. 다만 목록에는 남아 있으므로 <code>AddListener</code>로 붙인 리스너는 <code>RemoveListener</code>로 직접 떼어야 합니다.</span></li>
+<li><span><q>UnityAction은 Action과 무엇이 다른가요?</q>역할은 같지만 유니티가 따로 정의한 델리게이트 타입이라 서로 대입되지 않습니다. <code>AddListener</code>는 UnityAction을 받는데, 메서드 이름이나 람다를 넘기면 알아서 맞춰집니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>오브젝트 활성화와 파괴</h3><span class="cnt">4문항</span></div>
-<p class="grp-note">"오브젝트를 끈다"와 "지운다"가 정확히 무엇을 의미하는지 구분하는 문항들입니다.</p>
+<div class="grp-head"><h3>씬과 오브젝트</h3><span class="cnt">6문항</span></div>
+<p class="grp-note">오브젝트의 계층, 켜고 끄기, 파괴, 씬 전환이 정확히 무엇을 하는지 구분하는 문항들입니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q11" aria-label="11번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">OBJ-01</span><span class="qtext">SetActive와 컴포넌트의 enabled는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">OBJ-01</span><span class="qtext">Transform의 로컬 좌표와 월드 좌표는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>SetActive는 게임 오브젝트 전체를 끄는 거고, enabled는 그 컴포넌트 하나만 끄는 겁니다.</strong></p>
-<p><code>SetActive(false)</code>는 그 오브젝트와 자식까지 통째로 비활성화합니다. 그러면 Update도 안 돌고 <code>OnDisable</code>이 불립니다. 반면 <code>enabled = false</code>는 그 컴포넌트 하나의 동작만 끄고, 오브젝트의 나머지 컴포넌트나 렌더링은 그대로 살아 있습니다.</p>
-<p>그래서 풀에 오브젝트를 반환할 때처럼 통째로 재울 때는 SetActive를 쓰고, 예를 들어 공격 히트박스만 잠깐 껐다 켤 때는 그 콜라이더의 enabled만 끕니다.</p>
+<p><strong>Transform이 실제로 저장하는 건 부모 기준의 로컬 값이고, 월드 값은 조상들의 변환을 누적해 계산한 결과입니다.</strong></p>
+<p>각 Transform은 부모에서 얼마나 떨어져 있고, 얼마나 돌아가 있고, 몇 배 크기인지만 저장합니다. 이렇게 하는 이유는 부모 하나만 움직여도 자손 전체가 따라오게 하기 위해서입니다. 손에 무기를 자식으로 붙이면 무기의 로컬 값은 그대로인데 손이 움직일 때마다 월드 위치가 따라갑니다.</p>
+<p>월드 위치는 로컬 위치에 부모 스케일을 곱하고, 부모 회전으로 돌리고, 부모 위치를 더해 구하고, 이걸 루트까지 반복합니다. 그래서 부모가 돌면 로컬 값은 그대로인데 자식의 월드 위치가 바뀝니다. <code>position</code>에 대입하면 엔진이 로컬 값으로 역산해 저장합니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>activeSelf와 activeInHierarchy는 무엇이 다른가요?</q><code>activeSelf</code>는 자신에게 건 SetActive 플래그라 부모와 무관하고, <code>activeInHierarchy</code>는 조상까지 전부 켜져 있어야 true인 실제 활성 상태입니다. 그래서 자신은 켜 뒀어도 부모가 꺼져 있으면 activeSelf는 true인데 activeInHierarchy는 false가 됩니다.</span></li>
+<li><span><q>계층이 깊으면 성능에 영향이 있나요?</q>부모가 움직이면 그 아래 모든 Transform의 월드 값을 다시 구하므로, 깊은 계층의 루트를 매 프레임 움직이면 비용이 쌓입니다. 그리고 유니티는 루트 하나에 딸린 계층을 한 단위로 관리해서, 수백에서 수천 개의 동적 오브젝트를 한 루트 밑에 몰면 병렬 갱신이 안 되고 재배치 비용이 듭니다. 정적인 배경이나 수십 개 수준이면 신경 쓸 필요는 없습니다.</span></li>
+<li><span><q>SetParent의 두 번째 인자는 무엇을 바꾸나요?</q>기본값인 true면 로컬 값을 다시 계산해 화면상 위치를 지키고, false면 로컬 값을 그대로 둬서 새 부모 기준으로 옮겨 갑니다. UI 요소를 패널에 붙일 때는 보통 false를 씁니다.</span></li>
+<li><span><q>부모의 스케일을 축마다 다르게 주면 어떤 문제가 생기나요?</q>자식이 회전해 있으면 기울어진 모양으로 늘어나는데, 이건 스케일 값 세 개로 표현할 수 없어서 <code>lossyScale</code>이 근삿값이 됩니다. 그래서 스케일은 말단 오브젝트에만 주고 부모로 쓰는 오브젝트는 1로 둡니다.</span></li>
 </ul>
 </div>
 </div>
@@ -2311,13 +2384,20 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q12" aria-label="12번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">OBJ-02</span><span class="qtext">Destroy와 DestroyImmediate는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">OBJ-02</span><span class="qtext">SetActive와 컴포넌트의 enabled는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>Destroy는 이번 프레임이 끝날 때 지연해서 파괴하고, DestroyImmediate는 부르는 즉시 파괴합니다.</strong></p>
-<p><code>Destroy</code>가 지연 파괴인 이유는, 지금 프레임에서 그 오브젝트를 아직 참조하고 있을 수 있기 때문입니다. 프레임 끝까지 기다렸다가 안전하게 지웁니다. 반면 <code>DestroyImmediate</code>는 그 자리에서 바로 없애서, 원래는 에디터 툴을 만들 때 쓰라고 있는 겁니다.</p>
-<p>그래서 런타임에서, 특히 컬렉션을 순회하는 도중에 DestroyImmediate를 쓰면 참조나 순회가 그 자리에서 깨져서 에러가 납니다. 런타임 파괴는 Destroy를 쓰는 게 원칙입니다.</p>
+<p><strong>끄는 단위가 다릅니다. SetActive는 게임오브젝트를 자식까지 통째로 끄고, enabled는 컴포넌트 하나만 끕니다.</strong></p>
+<p>게임오브젝트는 그 자체로는 기능이 없는 그릇이고 기능은 컴포넌트가 냅니다. <code>SetActive(false)</code>는 렌더링, 물리, 모든 스크립트, 자식까지 멈춥니다. 스크립트의 <code>enabled = false</code>는 그 스크립트를 엔진의 호출 목록에서 빼서 Update류 콜백만 멈추고, 오브젝트는 계속 보이고 충돌도 됩니다. 렌더러나 콜라이더에도 각자 enabled가 있어서 보이지만 않게 하거나 충돌만 끌 수 있습니다.</p>
+<p>그래서 풀에 반환하거나 완전히 치울 땐 SetActive를, 컷신 동안 조작만 막을 땐 조작 스크립트의 enabled를, 공격 판정을 잠깐 켤 땐 히트박스 콜라이더의 enabled를 씁니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>스크립트를 꺼도 계속 동작하는 건 무엇인가요?</q>엔진이 불러 주는 Update, FixedUpdate, LateUpdate만 멈춥니다. 코루틴은 계속 돌고, 다른 코드가 직접 부르는 메서드나 이벤트 핸들러도 enabled를 확인하지 않아 그대로 실행되며, 충돌 콜백도 꺼진 스크립트에 전달됩니다. 꺼진 동안 아무것도 안 하게 하려면 OnDisable에서 구독을 해제하고, 메서드 안에서 <code>isActiveAndEnabled</code>로 걸러냅니다.</span></li>
+<li><span><q>큰 UI 창을 SetActive로 자주 여닫으면 어떤가요?</q>SetActive는 모든 자식 컴포넌트에 OnDisable과 OnEnable을 돌리고, UI라면 다시 켤 때 레이아웃과 메시를 처음부터 다시 만들어 그 순간 프레임이 튑니다. 자주 여닫는 창은 Canvas 컴포넌트의 enabled만 꺼서 그리기만 멈추고 내부 상태는 유지합니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2325,13 +2405,20 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q13" aria-label="13번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">OBJ-03</span><span class="qtext">DontDestroyOnLoad로 만든 매니저가 씬을 다시 들어가면 중복됩니다. 왜 그렇고 어떻게 막나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">OBJ-03</span><span class="qtext">activeSelf와 activeInHierarchy는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>DontDestroyOnLoad는 씬을 바꿔도 그 오브젝트를 살려두는 기능인데, 그 오브젝트가 씬에도 놓여 있으면 씬을 다시 들어올 때마다 새로 하나씩 또 생기기 때문입니다.</strong></p>
-<p>이건 씬 전환 후에도 유지해야 하는 매니저 같은 걸 만들 때 씁니다. 그런데 매니저를 원래 씬에 배치해 뒀다면, 그 씬을 재진입할 때 이전 것은 살아 있는데 새 인스턴스가 또 만들어져서 둘이 됩니다.</p>
-<p>그래서 이미 인스턴스가 존재하는지 검사해서, 새로 생긴 중복은 스스로 파괴하게 만듭니다. 흔히 싱글턴 패턴으로 "내가 처음이면 나를 유지하고, 아니면 나를 지운다"를 넣어 해결합니다.</p>
+<p><strong>activeSelf는 자기 스위치의 값이고, activeInHierarchy는 자기와 모든 조상의 스위치가 다 켜져 있어서 실제로 동작 중인지를 나타냅니다.</strong></p>
+<p>부모를 꺼도 자식의 activeSelf는 바뀌지 않고 activeInHierarchy만 false가 됩니다. 스위치를 따로 두는 이유는, 부모가 자식의 값을 덮어쓰면 다시 켤 때 어느 자식이 원래 켜져 있었는지 알 수 없기 때문입니다. 그래서 부모를 다시 켜면 원래 켜져 있던 자식만 살아나고 일부러 꺼 둔 자식은 그대로 꺼져 있습니다.</p>
+<p>실제로 동작 중인지 알고 싶을 땐 activeInHierarchy를, 내가 설정해 둔 값을 저장하거나 토글할 땐 activeSelf를 씁니다. OnEnable과 OnDisable도 activeInHierarchy가 바뀔 때 불립니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>SetActive(true)를 했는데 오브젝트가 안 나타나면요?</q>조상 중 하나가 꺼져 있는 경우입니다. SetActive(true)는 자기 스위치만 켜고, 조상이 꺼져 있으면 실제로는 비활성입니다. 이 상태에서 StartCoroutine을 부르면 에러가 납니다.</span></li>
+<li><span><q>isActiveAndEnabled는 무엇인가요?</q>게임오브젝트가 실제로 활성이고 그 스크립트의 enabled도 true일 때만 true인 값입니다. 이 스크립트가 지금 엔진에게 Update를 호출받는 상태인지를 한 번에 알려 줘서, 직접 호출되는 메서드 첫 줄에서 꺼진 상태를 걸러낼 때 씁니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2339,36 +2426,41 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q14" aria-label="14번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">OBJ-04</span><span class="qtext">프리팹과 프리팹 변형(Variant)은 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">OBJ-04</span><span class="qtext">Destroy와 DestroyImmediate는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>프리팹은 게임오브젝트 구성을 통째로 저장한 틀이고, 프리팹 변형은 그 프리팹을 상속해서 일부만 바꾼 파생본입니다.</strong></p>
-<p>프리팹은 원본을 고치면 그걸 쓰는 모든 인스턴스에 한 번에 반영돼서 일관되게 관리됩니다. 인스턴스에서 특정 값만 바꾸면 그 항목만 오버라이드로 남고 나머지는 원본을 계속 따릅니다. 변형은 여기서 한 걸음 더 나아가, 기존 프리팹을 부모로 두고 색이나 스탯 같은 차이만 유지하는 겁니다.</p>
-<p>그래서 공통 구조는 부모 프리팹에서 물려받고 종류별 차이만 변형으로 두면, 기본 적을 고칠 때 그 변형들에도 공통 부분이 자동으로 반영됩니다. 색이나 능력치만 다른 적 종류를 만들 때 잘 맞습니다.</p>
-</div>
-</div>
-</details>
-</div>
-</section>
-<section class="grp">
-<div class="grp-head"><h3>GC와 성능 최적화</h3><span class="cnt">6문항</span></div>
-<p class="grp-note">프레임 끊김의 두 축은 힙 할당과 C++·C# 경계 비용입니다. "왜 비싼가"를 말할 수 있어야 합니다.</p>
-<div class="q">
-<label class="chk"><input type="checkbox" id="unity-q15" aria-label="15번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">PERF-01</span><span class="qtext">유니티에서 GC 스파이크는 왜 생기고 무엇을 피해야 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>GC 스파이크는 가비지 컬렉터가 힙을 회수할 때 메인 스레드를 잠깐 멈춰서 프레임이 끊기는 현상입니다.</strong></p>
-<p>중요한 건 원인이 무거운 계산이 아니라 힙 할당이라는 점입니다. 매 프레임 쓰레기를 계속 만들면 힙이 금방 차고, 그걸 치우느라 GC가 자주 돌면서 그때마다 화면이 멈칫합니다.</p>
-<p>그래서 Update처럼 매 프레임 도는 곳에서 새 객체를 만들거나, 박싱, LINQ, 문자열 결합, 람다 클로저처럼 몰래 할당을 일으키는 것들을 피합니다. 대신 객체를 미리 만들어 캐싱하거나 풀링해서, 할당 자체를 줄이는 게 핵심입니다.</p>
+<p><strong>둘 다 오브젝트를 파괴하는데, Destroy는 파괴를 예약해 두고 그 프레임의 스크립트 실행이 끝난 뒤 렌더링 전에 처리하고, DestroyImmediate는 호출한 줄에서 바로 파괴합니다.</strong></p>
+<p>미루는 이유는 프레임 도중에 오브젝트가 사라지면 깨지는 것들이 있어서입니다. 엔진이 순회하던 목록에서 항목이 빠져 순서가 어긋나고, 같은 프레임에 그 오브젝트를 쓰려던 다른 스크립트가 없는 대상을 건드리게 됩니다. 프레임 끝으로 미루면 그 프레임의 모든 코드가 오브젝트가 아직 있는 상태를 보고 일을 마칩니다.</p>
+<p>그래서 게임 실행 중에는 Destroy를 씁니다. DestroyImmediate는 플레이 중이 아닌 에디터 코드용입니다. 에디터에는 프레임 끝이 없어서 Destroy가 동작하지 않기 때문입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>계산량을 줄이는 것과 뭐가 다른가요?</q>다릅니다. CPU 계산이 무거운 건 그 프레임이 통째로 느려지는 문제고, GC 스파이크는 평소엔 멀쩡하다가 가끔 툭 끊기는 문제입니다. 그래서 접근이 다른데, GC 쪽은 연산을 줄이는 게 아니라 할당을 줄이는 방향으로 잡아야 합니다.</span></li>
+<li><span><q>Destroy한 직후 같은 프레임에서 자식 수를 세면요?</q>아직 그대로 세어집니다. 목록 UI를 비우고 다시 채울 때 사라질 항목과 새 항목이 같이 세어지는 문제가 흔합니다. 바로 개수를 써야 하면 파괴 전에 부모에서 먼저 떼어 냅니다.</span></li>
+<li><span><q>파괴된 오브젝트를 is null로 검사하면 왜 안 되나요?</q>파괴되면 엔진 쪽 실제 오브젝트는 사라지지만 C# 변수가 가리키는 껍데기 객체는 남습니다. 유니티는 == 연산자를 바꿔 놓아 이 껍데기를 null과 같다고 판단하게 했는데, <code>is null</code>이나 <code>?.</code>는 바꿔 놓은 연산자를 거치지 않고 진짜 null인지만 봅니다. 그래서 유니티 오브젝트는 == null로 검사합니다.</span></li>
+<li><span><q>Destroy(this)를 쓰면 어떻게 되나요?</q>이 스크립트 컴포넌트만 떨어지고 오브젝트는 남습니다. 오브젝트를 없애려면 <code>Destroy(gameObject)</code>를 씁니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="unity-q15" aria-label="15번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">OBJ-05</span><span class="qtext">DontDestroyOnLoad로 만든 매니저가 씬을 다시 들어가면 중복됩니다. 왜 그렇고 어떻게 막나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>씬을 로드한다는 건 씬 파일에 적힌 오브젝트를 전부 새로 만든다는 뜻이고, 이미 유지 영역에 같은 매니저가 있는지는 엔진이 확인하지 않기 때문입니다.</strong></p>
+<p>DontDestroyOnLoad는 오브젝트를 씬 전환 때 파괴되지 않는 별도 영역으로 옮길 뿐입니다. 매니저를 배치해 둔 씬을 다시 로드하면 씬 파일의 매니저가 또 생성되어 하나씩 늘어나고, 배경 음악이 겹치거나 점수가 두 번 오르는 식으로 드러납니다.</p>
+<p>막는 방법은 Awake에서 이미 인스턴스가 있으면 새로 생긴 쪽이 자신을 파괴하고 바로 return하는 겁니다. 규모가 있는 프로젝트는 매니저만 담은 부트스트랩 씬을 시작할 때 한 번만 로드해서 중복 자체가 생기지 않게 하고, 위의 검사는 어느 씬에서 플레이를 시작해도 동작하게 하는 안전장치로 같이 둡니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>중복 검사에서 return을 빼먹으면요?</q>Destroy는 프레임 끝에야 실제로 파괴하므로, return이 없으면 곧 사라질 중복본이 아래 초기화를 그대로 실행해 이벤트를 구독하거나 Instance를 덮어씁니다.</span></li>
+<li><span><q>유지되는 매니저가 씬이 바뀐 뒤 엉뚱하게 동작하는 건 왜인가요?</q>매니저는 남는데 매니저가 들고 있던 씬 오브젝트는 파괴되어 참조가 끊기고, Awake와 Start는 다시 불리지 않아 새 씬에 대한 초기화가 빠집니다. <code>SceneManager.sceneLoaded</code>에 등록해 씬이 로드될 때마다 다시 찾고 초기화합니다.</span></li>
 </ul>
 </div>
 </div>
@@ -2377,38 +2469,46 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q16" aria-label="16번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">PERF-02</span><span class="qtext">오브젝트 풀링은 무엇을 해결하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">OBJ-06</span><span class="qtext">LoadSceneAsync는 LoadScene과 무엇이 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>오브젝트 풀링은 <code>Instantiate</code>와 <code>Destroy</code>를 반복하는 비용을, 오브젝트를 보관했다 재활용하는 방식으로 없애는 기법입니다.</strong></p>
-<p>총알이나 이펙트처럼 짧게 살다 사라지는 걸 매번 생성하고 파괴하면 그 자체가 비쌉니다. 특히 <code>Destroy</code>를 반복하면 버려진 오브젝트가 쓰레기로 쌓여서 GC 부담이 커지고, 그게 프레임 끊김으로 나타납니다.</p>
-<p>그래서 미리 넉넉히 만들어 풀에 담아 두고, 필요하면 비활성 상태에서 하나 꺼내 켜고, 다 쓰면 파괴하지 않고 다시 꺼서 풀에 돌려놓습니다. 할당과 해제 자체를 없애는 거라 생성 비용도 GC 부담도 같이 사라집니다.</p>
+<p><strong>LoadScene은 로드가 끝날 때까지 반환하지 않아 그동안 화면이 멈추고, LoadSceneAsync는 호출 즉시 반환하고 여러 프레임에 걸쳐 뒤에서 읽습니다.</strong></p>
+<p>비동기 로드는 두 단계로 진행됩니다. 먼저 씬 파일과 에셋을 메인 스레드 밖에서 읽는 동안에는 화면이 계속 갱신되고 progress가 0에서 0.9까지 오릅니다. 그다음 오브젝트를 씬에 넣고 Awake, OnEnable, Start를 부르는 활성화 단계는 메인 스레드에서 일어나며 0.9에서 1로 넘어갑니다.</p>
+<p>그래서 비동기로 로드해도 활성화 순간의 끊김은 남습니다. 새 씬의 오브젝트들이 Awake나 Start에서 무거운 일을 하면 그만큼 길어지므로, 초기화를 가볍게 하거나 여러 프레임에 나눕니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>Instantiate에 위치를 넘기는 것과 나중에 대입하는 건 차이가 있나요?</q>있습니다. <code>Instantiate(prefab, pos, rot)</code>처럼 처음부터 위치를 넘기면 Transform이 한 번에 정해집니다. 반면 생성한 뒤에 <code>transform.position</code>에 대입하면, 기본 위치로 만들었다가 다시 옮기는 셈이라 자식 좌표 재계산이나 물리 통보 같은 갱신이 두 번 일어날 수 있습니다. 한둘이면 무시할 수준이지만 대량 스폰에서는 차이가 쌓입니다.</span></li>
+<li><span><q>로딩 바가 0.9에서 멈추는 건 왜인가요?</q><code>allowSceneActivation</code>을 false로 두면 엔진이 활성화 단계에 들어가지 않아 progress가 0.9에서 멈추도록 정해져 있습니다. 그래서 진행률은 progress를 0.9로 나눠 표시하고, 1이 될 때까지 기다리는 루프를 쓰면 영원히 끝나지 않습니다.</span></li>
+<li><span><q>Additive 모드는 언제 쓰나요?</q>기존 씬을 둔 채 새 씬을 추가로 열 때 씁니다. 매니저 씬을 열어 둔 채 콘텐츠 씬만 열고 내리거나, UI를 별도 씬으로 얹거나, 큰 맵을 구역별 씬으로 나눠 플레이어 주변만 여는 스트리밍에 씁니다.</span></li>
+<li><span><q>여러 씬이 열려 있을 때 Instantiate한 오브젝트는 어느 씬에 생기나요?</q>호출한 스크립트가 어느 씬에 있든 활성 씬에 생깁니다. Instantiate는 정적 함수라 누가 불렀는지 모르기 때문입니다. 원하는 씬에 두려면 부모를 지정하거나, 만든 뒤 <code>MoveGameObjectToScene</code>으로 옮기거나, 활성 씬을 바꿔 둡니다.</span></li>
 </ul>
 </div>
 </div>
 </details>
 </div>
+</section>
+<section class="grp">
+<div class="grp-head"><h3>메모리와 CPU 최적화</h3><span class="cnt">6문항</span></div>
+<p class="grp-note">프레임 끊김의 두 축은 힙 할당과 매 프레임 반복되는 탐색과 호출 비용입니다. 왜 비싼지를 말할 수 있어야 합니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q17" aria-label="17번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">PERF-03</span><span class="qtext">GetComponent를 매 프레임 호출하면 안 되는 이유는?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">PERF-01</span><span class="pri">필수</span><span class="qtext">유니티에서 GC 스파이크는 왜 생기고 무엇을 피해야 하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>GetComponent는 그 오브젝트의 컴포넌트 목록을 뒤져서 찾는 비용이 있기 때문입니다.</strong></p>
-<p>한두 번이면 별것 아니지만, 이걸 Update에 넣어 매 프레임 호출하면 프레임마다 목록을 뒤지는 일이 반복됩니다. 참조는 바뀌지 않는데 매번 찾을 이유가 없죠.</p>
-<p>그래서 <code>Awake</code>나 <code>Start</code>에서 한 번 찾아 필드에 캐싱해 두고 재사용합니다. 한 번만 쓰거나 있을지 없을지 모르는 경우엔 <code>TryGetComponent</code>가 깔끔합니다.</p>
+<p><strong>GC 스파이크는 가비지 컬렉터가 메모리를 정리하는 동안 게임이 멈춰서 그 프레임 하나만 유난히 길어지는 현상이고, 원인은 매 프레임 쌓이는 힙 할당입니다.</strong></p>
+<p>new로 만든 클래스 객체, 배열, 문자열은 힙에 놓이고, 매 프레임 조금씩 할당하면 사용량이 차오르다 한계에 닿을 때 GC가 돕니다. GC는 객체들이 서로 가리키는 관계를 따라가며 아직 쓰는 것을 표시하는데, 그 사이에 게임 코드가 참조를 바꾸면 표시가 틀어지므로 메인 스레드를 멈춥니다. 60fps에서 한 프레임 예산은 약 16.6밀리초라, GC가 20밀리초를 쓰면 프레임 하나를 통째로 건너뜁니다.</p>
+<p>유니티 런타임의 GC는 세대를 나누지 않아 매번 힙 전체를 훑고, 객체를 옮겨 빈틈을 메우지도 않아서 게임이 커질수록 한 번의 GC가 길어집니다. 그래서 매 프레임 도는 코드에서 문자열 결합, LINQ, 박싱, 배열을 반환하는 API, <code>tag</code> 비교처럼 보이지 않는 할당을 피하고, 한 번 만든 것을 재사용합니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>TryGetComponent가 왜 더 나은가요?</q>bool과 out으로 결과를 돌려주는 패턴이라 없을 때의 처리가 자연스럽게 포함됩니다. 그리고 예전에 못 찾았을 때 발생하던 불필요한 가비지 할당도 피할 수 있어서, 조건부로 컴포넌트를 다룰 때 유리합니다.</span></li>
+<li><span><q>Incremental GC를 켜면 해결되나요?</q>표시 작업을 여러 프레임에 나눠 긴 멈춤 한 번을 짧은 멈춤 여러 번으로 바꿔 줄 뿐, 일의 총량은 같습니다. 할당이 정리 속도보다 빠르면 결국 한 번에 몰아서 처리하므로, 할당을 줄이는 게 근본 대책입니다.</span></li>
+<li><span><q>계산이 무거워서 느린 것과는 어떻게 구분하나요?</q>계산이 무거우면 모든 프레임이 고르게 느리고, GC 스파이크는 평소엔 부드럽다가 주기적으로 끊깁니다. 프로파일러에서 함수별 실행 시간 대신 GC Alloc 열을 보면 어느 함수가 매 프레임 얼마나 할당하는지 나오고, 평상시 플레이에서는 0이 목표입니다.</span></li>
+<li><span><q>other.tag == "Enemy"는 왜 할당이 생기나요?</q>tag는 읽을 때마다 엔진 쪽 문자열을 C# 문자열로 새로 만들어 돌려주기 때문입니다. <code>CompareTag</code>는 문자열을 만들지 않고 비교합니다.</span></li>
 </ul>
 </div>
 </div>
@@ -2417,18 +2517,20 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q18" aria-label="18번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">PERF-04</span><span class="qtext">GameObject.Find나 FindObjectOfType를 지양하는 이유는?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">PERF-02</span><span class="pri">필수</span><span class="qtext">오브젝트 풀링은 무엇을 해결하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>씬에 있는 오브젝트를 전부 훑어서 찾는 방식이라 비싸기 때문입니다.</strong></p>
-<p>오브젝트가 많을수록 검색 비용이 커지는데, 이걸 Update에서 매 프레임 하면 치명적입니다. 씬 전체를 프레임마다 뒤지는 셈이니까요.</p>
-<p>그래서 대안이 몇 가지 있습니다. <code>Awake</code>나 <code>Start</code>에서 한 번 찾아 캐싱하거나, <code>[SerializeField]</code>로 인스펙터에서 직접 연결해 두거나, 이벤트나 의존성 주입으로 참조를 넘겨받는 겁니다. 되도록 런타임 검색 자체를 없애는 방향입니다.</p>
+<p><strong>자주 생겼다 사라지는 오브젝트를 매번 만들고 파괴하는 비용과, 그때 생기는 쓰레기로 인한 GC 스파이크를 없앱니다.</strong></p>
+<p>Instantiate는 프리팹의 오브젝트와 모든 컴포넌트를 복제하고, 메모리를 할당하고, Awake와 OnEnable을 부르고, 렌더러와 콜라이더를 엔진에 등록합니다. Destroy는 그 반대 작업을 하고 쓰레기를 남깁니다. 풀링은 로딩 중에 필요한 만큼 만들어 꺼 두고, 필요할 때 꺼내 켜고, 다 쓰면 끄고 돌려놓아서 플레이 중에는 메모리를 새로 잡지도 풀지도 않습니다.</p>
+<p>대가는 세 가지입니다. 꺼낸 오브젝트에 지난번 상태가 남아 있어서 직접 되돌려야 하고, 반납된 오브젝트는 null이 아니라서 그걸 가리키던 쪽이 재사용된 오브젝트를 계속 쫓을 수 있고, 안 쓰는 동안에도 풀 크기만큼 메모리를 차지합니다. 그래서 총알이나 이펙트처럼 자주, 많이 생기는 것에만 씁니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>Camera.main도 비슷한가요?</q>네, 같은 함정입니다. <code>Camera.main</code>은 호출할 때마다 'MainCamera' 태그가 붙은 오브젝트를 태그로 찾아옵니다. 그래서 Update에서 매 프레임 접근하면 비싸고, <code>Awake</code>나 <code>Start</code>에서 한 번 캐싱해 두고 재사용하는 게 맞습니다.</span></li>
+<li><span><q>꺼낼 때 상태를 되돌리는 코드는 어디에 두나요?</q>OnEnable에 둡니다. Awake와 Start는 수명에 한 번뿐이라 두 번째로 꺼낼 때는 실행되지 않습니다. 이벤트 구독도 OnEnable에서 하고 OnDisable에서 해제해야 꺼 둔 오브젝트가 이벤트에 반응하지 않습니다.</span></li>
+<li><span><q>평소엔 10개를 쓰다가 가끔 100개가 필요하면 풀 크기는 어떻게 정하나요?</q>가벼운 오브젝트는 처음부터 100개를 만들어 두고, 몰리는 시점을 알 수 있으면 보스전 직전 연출 구간에 미리 채웁니다. 100개가 필요한 순간은 대개 화면이 가장 바쁜 순간이라 그때 생성하면 끊김이 가장 눈에 띄기 때문입니다. 모자랄 때 늘리는 방식은 예측이 안 될 때의 안전장치로 둡니다.</span></li>
+<li><span><q>유니티 내장 ObjectPool과 직접 구현 중 어느 쪽이 빠른가요?</q>차이는 의미가 없습니다. 둘 다 컬렉션에서 꺼내고 넣는 구조이고, 시간이 드는 건 그 뒤의 SetActive와 상태 초기화라 똑같이 듭니다. 내장 풀을 쓸 때는 <code>defaultCapacity</code>가 미리 만드는 개수가 아니라 내부 칸 수이고, <code>maxSize</code>를 넘게 반납된 오브젝트는 파괴된다는 점을 알아야 합니다.</span></li>
 </ul>
 </div>
 </div>
@@ -2437,18 +2539,19 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q19" aria-label="19번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">PERF-05</span><span class="qtext">MonoBehaviour가 많을 때 Update가 성능에 부담이 되는 이유는?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">PERF-03</span><span class="qtext">Instantiate할 때 위치를 인자로 넘기는 것과 만든 뒤에 대입하는 것은 무엇이 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>엔진이 각 MonoBehaviour의 Update를 하나씩 불러주는데, 그 호출이 C++로 된 엔진과 C# 코드 사이의 경계를 넘는 일이라 건마다 오버헤드가 있기 때문입니다.</strong></p>
-<p>Update를 가진 인스턴스가 많아질수록 이 경계를 넘는 호출 횟수가 그만큼 늘어납니다. 각각의 로직이 가벼워도, 경계를 넘는 것 자체의 비용이 쌓이는 거죠.</p>
-<p>그래서 매니저 하나가 리스트를 들고 자기가 대상들을 돌게 만들면, 경계 호출은 매니저의 Update 한 번으로 줄고 나머지는 전부 C# 내부 루프가 됩니다. 핵심은 "매 프레임 콜백을 가진 인스턴스 수"를 줄여서 경계 호출 횟수를 낮추는 겁니다.</p>
+<p><strong>Instantiate는 반환하기 전에 Awake와 OnEnable을 부르기 때문에, 만든 뒤에 위치를 대입하면 그 콜백들이 도는 동안 오브젝트는 프리팹에 저장된 위치, 보통 원점에 있습니다.</strong></p>
+<p>예를 들어 OnEnable에서 출발 위치를 기록하는 총알은 원점을 출발점으로 기억하고, 총구가 원점에서 멀면 첫 프레임에 이미 사거리를 넘었다고 판단해 사라집니다. Trail Renderer는 원점에서 총구까지 긴 줄을 긋고, Play On Awake인 파티클과 소리는 원점에서 시작하고, 콜라이더는 원점에 잠깐 존재해 근처 트리거를 건드릴 수 있습니다.</p>
+<p>비용도 한 번 더 듭니다. 위치를 다시 바꾸면 자식들의 월드 좌표, 물리 엔진의 콜라이더 위치, 렌더러의 경계 상자를 다시 계산합니다. 그래서 위치와 회전, 부모를 생성 인자로 넘깁니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>내용이 빈 Update도 비용이 있나요?</q>있습니다. 엔진이 그 Update가 비었는지 모르고 일단 경계를 넘어 불러보기 때문에, 아무 일도 안 하는 Update도 호출 비용은 그대로 듭니다. 그래서 안 쓰는 Update는 지우는 게 좋습니다.</span></li>
+<li><span><q>풀에서 꺼낼 때도 같은 문제가 있나요?</q>있습니다. SetActive(true)를 부르는 순간 OnEnable이 실행되므로, 위치를 먼저 정한 다음에 켜야 OnEnable이 올바른 위치를 봅니다. 순서가 바뀌면 지난번에 꺼졌던 위치를 봅니다.</span></li>
+<li><span><q>UI 항목을 만든 뒤 SetParent로 붙였더니 크기가 이상해집니다. 왜인가요?</q><code>SetParent(parent)</code>는 화면상 위치와 크기를 유지하려고 값을 다시 계산하는데, 캔버스에 배율이 걸려 있으면 스케일이 1이 아닌 값으로 바뀝니다. <code>Instantiate(prefab, parent)</code>로 만들면 프리팹의 값을 부모 기준 값으로 그대로 써서 프리팹 모양대로 들어갑니다.</span></li>
 </ul>
 </div>
 </div>
@@ -2457,40 +2560,40 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q20" aria-label="20번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">PERF-06</span><span class="qtext">Animator 파라미터를 StringToHash로 캐싱하는 이유는?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">PERF-04</span><span class="qtext">GetComponent를 매 프레임 호출하면 안 되는 이유는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong><code>SetTrigger("Jump")</code>처럼 문자열로 넘기면 유니티가 매번 그 문자열을 내부적으로 해시로 바꿔서 조회하기 때문입니다.</strong></p>
-<p>애니메이터는 파라미터를 실제로 정수 해시로 관리하는데, 문자열을 넘기면 호출할 때마다 그 문자열을 해시로 변환하는 일이 반복됩니다. 자주 부르는 파라미터라면 이 반복 해싱이 쌓입니다.</p>
-<p>그래서 <code>StringToHash</code>로 해시를 미리 한 번 구해 캐싱해 두고, 이후엔 정수 해시를 넘깁니다. 여기서 아끼는 건 GC가 아니라 반복되는 문자열 해싱 비용이라는 점을 짚어주면 좋습니다.</p>
-</div>
-</div>
-</details>
-</div>
-</section>
-<section class="grp">
-<div class="grp-head"><h3>렌더링과 그래픽스</h3><span class="cnt">5문항</span></div>
-<p class="grp-note">화면에 그리는 비용, 특히 드로우콜을 줄이는 이야기가 중심입니다.</p>
-<div class="q">
-<label class="chk"><input type="checkbox" id="unity-q21" aria-label="21번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">REND-01</span><span class="qtext">드로우콜을 줄이는 배칭에는 어떤 종류가 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>배칭은 여러 오브젝트를 한 번의 드로우콜로 묶어 그리는 기법인데, 크게 세 가지가 있습니다.</strong></p>
-<ul>
-<li><strong>Static Batching.</strong> 움직이지 않는 오브젝트들을 미리 하나로 결합합니다. 정적이어야만 쓸 수 있습니다.</li>
-<li><strong>Dynamic Batching.</strong> 작은 메시를 런타임에 묶습니다. 대신 정점 수 제한이 있어서 큰 메시에는 못 씁니다.</li>
-<li><strong>GPU Instancing.</strong> 같은 메시와 머티리얼을 쓰는 다수를 한 드로우콜로 처리합니다. 움직이든 정점이 많든 됩니다.</li>
-</ul>
-<p>그래서 정점이 많은 같은 메시가 다수라면 Dynamic Batching은 제한에 걸리니 GPU Instancing으로 갑니다. 나무나 적처럼 같은 걸 잔뜩 그릴 때 특히 효과가 큽니다.</p>
+<p><strong>GetComponent는 저장된 값을 읽는 게 아니라 호출할 때마다 컴포넌트 목록을 훑어 찾는 작업이라, 매 프레임 오브젝트마다 반복하면 같은 답을 얻으려고 같은 탐색을 되풀이하게 됩니다.</strong></p>
+<p>호출하면 C#에서 엔진 쪽으로 넘어가, 엔진이 컴포넌트 목록을 앞에서부터 타입 검사해 찾은 것을 돌려줍니다. 한 번의 비용은 작지만 적이 500마리면 프레임마다 500번입니다. 그래서 Awake에서 한 번 찾아 필드에 저장하거나, <code>[SerializeField]</code>로 인스펙터에서 연결해 실행 중 탐색을 아예 없앱니다. 꼭 있어야 하는 컴포넌트는 <code>[RequireComponent]</code>로 반드시 붙게 강제합니다.</p>
+<p>Start가 아니라 Awake에서 가져오는 이유는, 다른 스크립트가 자기 Start에서 이 오브젝트의 메서드를 부를 수 있어서 그때 필드가 이미 채워져 있어야 하기 때문입니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>2D나 UI에서는 어떻게 묶나요?</q>스프라이트 아틀라스를 씁니다. 여러 스프라이트를 한 텍스처로 합쳐 두면, 같은 아틀라스를 쓰는 것끼리 한 드로우콜로 묶입니다. 텍스처가 바뀔 때마다 배치가 끊기는데, 아틀라스로 텍스처를 하나로 합치면 텍스처 전환 횟수가 줄어서 UI나 2D 스프라이트가 한 콜로 묶이는 겁니다.</span></li>
+<li><span><q>TryGetComponent는 무엇이 더 좋나요?</q>찾기와 존재 확인을 한 번에 해서, 충돌한 상대처럼 매번 대상이 달라 캐싱할 수 없는 경우에 깔끔합니다. 그리고 GetComponent는 에디터에서 못 찾았을 때 에러 메시지용 가짜 객체를 만들어 할당이 생기는데, TryGetComponent는 그런 할당이 없어서 에디터 프로파일링이 깨끗해집니다. 빌드에서는 둘 다 할당이 없습니다.</span></li>
+<li><span><q>Camera.main도 캐싱해야 하나요?</q>예전에는 읽을 때마다 태그로 씬을 훑어서 비쌌고, 유니티 2020.2부터는 엔진이 태그가 붙은 카메라를 기억해 둬서 그렇게 비싸지는 않습니다. 그래도 읽을 때마다 엔진 호출이 한 번 일어나고, 태그가 빠지면 null이 되므로 한 곳에서 캐싱하고 null을 처리하는 편이 낫습니다. 씬이 바뀌어 카메라가 파괴되면 다시 가져와야 합니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="unity-q21" aria-label="21번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">PERF-05</span><span class="qtext">GameObject.Find나 FindObjectOfType을 지양하는 이유는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>실행 중에 씬을 앞에서부터 뒤져 찾는 함수라서 비용이 씬의 오브젝트 수에 비례하고, 이름 문자열에 의존해 깨지기 쉽기 때문입니다.</strong></p>
+<p><code>GameObject.Find</code>는 켜져 있는 오브젝트의 이름을 하나씩 비교하고, <code>FindObjectOfType</code>은 로드된 오브젝트를 훑으며 타입을 검사해 더 느립니다. 적 200마리가 매 프레임 플레이어를 이름으로 찾으면, 하나뿐이고 바뀌지도 않는 대상을 위해 같은 탐색을 200번 되풀이합니다.</p>
+<p>비용 말고도 문제가 있습니다. 오브젝트 이름을 바꾸면 컴파일러가 못 잡고 조용히 null이 되고, 꺼져 있는 오브젝트는 찾지 못하고, 무엇에 의존하는지가 코드 속 문자열에 숨습니다. 그래서 찾지 않고 처음부터 참조를 갖게 만듭니다. 씬에 놓인 것끼리는 인스펙터로 연결하고, 실행 중 생성되는 것은 만드는 쪽이 넘겨주고, 같은 종류 여러 개는 스스로 목록에 등록하게 합니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>어쩔 수 없이 찾아야 하면요?</q>Start에서 한 번만 찾아 저장합니다. 이름보다는 엔진이 태그별로 정리해 둔 목록에서 찾는 <code>FindWithTag</code>가 빠릅니다.</span></li>
+<li><span><q>최신 버전에서 FindObjectOfType이 바뀐 이유는요?</q>예전 함수는 결과를 일정한 순서로 맞추느라 추가 비용을 치렀는데, 대부분의 코드는 순서가 필요 없었습니다. 그래서 같은 결과를 주는 <code>FindFirstObjectByType</code>과 아무거나 하나를 더 빨리 주는 <code>FindAnyObjectByType</code>으로 나뉘었습니다. 빨라져도 씬을 훑는다는 점은 같아서 매 프레임 부르지 않는 원칙은 그대로입니다.</span></li>
 </ul>
 </div>
 </div>
@@ -2499,27 +2602,50 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q22" aria-label="22번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">REND-02</span><span class="qtext">renderer.material에 접근하면 왜 배칭이 깨지나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">PERF-06</span><span class="qtext">MonoBehaviour가 많을 때 Update가 성능에 부담이 되는 이유는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong><code>renderer.material</code>에 접근하는 순간 그 머티리얼이 복제돼서, 그 렌더러만 고유한 머티리얼을 갖게 되기 때문입니다.</strong></p>
-<p>배칭은 같은 머티리얼을 공유하는 것끼리 묶는 건데, 복제가 일어나면 그 오브젝트는 남들과 다른 머티리얼이 되어 묶임에서 빠집니다. 그래서 드로우콜이 늘고, 복제된 인스턴스가 정리되지 않으면 누수도 생깁니다.</p>
-<p>그래서 전체가 공유하는 값은 <code>sharedMaterial</code>로 다루고, 개별 오브젝트의 색만 바꾸고 싶으면 머티리얼을 복제하는 대신 <code>MaterialPropertyBlock</code>으로 그 값만 덮어씁니다. 그러면 배칭을 유지하면서 개별 값을 줄 수 있습니다.</p>
+<p><strong>엔진 본체는 C++이고 스크립트는 C#이라, 엔진이 Update를 부를 때마다 C++에서 C#으로 넘어가는 비용이 들고, 이 비용이 Update를 가진 오브젝트 수만큼 쌓이기 때문입니다.</strong></p>
+<p>넘어갈 때마다 엔진은 그 오브젝트가 살아 있고 켜져 있는지 확인하고, C# 예외가 엔진을 죽이지 않게 감싸고, 두 언어의 호출 방식을 맞춥니다. 한 번은 작지만 Update가 5천 개면 프레임마다 5천 번이고, Update 안이 한 줄뿐이어도 이 비용은 그대로입니다.</p>
+<p>그래서 같은 종류가 수천 개 단위로 돌 때는 매니저 하나만 Update를 갖고, 그 안에서 대상들의 일반 메서드를 차례로 부릅니다. 엔진이 넘어오는 건 한 번이고 나머지는 C# 안의 호출입니다. 덤으로 호출 순서를 정하고, 멀리 있는 적은 몇 프레임에 한 번만 갱신하는 식의 조절도 한곳에서 할 수 있습니다. 대가는 등록과 해제를 직접 관리해야 한다는 점이라, 수십 개 수준에서는 쓰지 않습니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>비어 있는 Update도 비용이 드나요?</q>듭니다. 엔진은 안이 비었는지 보지 않고, 스크립트에 Update라는 메서드가 있는지만 확인해 호출 목록에 넣습니다. 안 쓰는 Update는 지웁니다.</span></li>
+<li><span><q>매니저에서 목록을 뒤에서부터 도는 이유는요?</q>순회 도중 대상이 꺼지면 OnDisable에서 목록에서 자신을 뺍니다. 앞에서부터 돌면 뒤 항목이 한 칸씩 당겨져 하나를 건너뛰고, 뒤에서부터 돌면 이미 처리한 쪽만 당겨져 영향이 없습니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
 </div>
+</section>
+<section class="grp">
+<div class="grp-head"><h3>렌더링과 UI</h3><span class="cnt">6문항</span></div>
+<p class="grp-note">화면에 그리는 비용, 특히 CPU가 드로우콜을 준비하는 비용을 줄이는 이야기가 중심입니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q23" aria-label="23번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">REND-03</span><span class="qtext">Built-in, URP, HDRP 렌더 파이프라인은 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">REND-01</span><span class="pri">필수</span><span class="qtext">드로우콜을 줄이는 배칭에는 어떤 종류가 있나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>Built-in은 레거시 기본 파이프라인이고, URP와 HDRP는 렌더 흐름을 C#에서 제어하는 스크립터블 렌더 파이프라인 기반으로, 각각 중간 사양과 고사양을 겨눕니다.</strong></p>
-<p>Built-in은 오래 검증됐지만 커스터마이즈가 어렵고 확장에 한계가 있습니다. URP는 가볍고 지원 플랫폼이 넓어서 모바일이나 중간 사양에 맞고, HDRP는 고품질 라이팅과 포스트 이펙트를 주는 대신 무거워서 고사양 PC나 콘솔용이고 모바일에는 못 씁니다.</p>
-<p>주의할 점은 URP와 HDRP는 프로젝트 초기에 정해야 한다는 겁니다. 중간에 갈아타면 셰이더와 머티리얼을 전부 다시 맞춰야 해서 비쌉니다.</p>
+<p><strong>배칭은 여러 오브젝트를 묶어 드로우콜 수나 드로우콜 하나의 비용을 줄이는 기법이고, Static Batching, Dynamic Batching, GPU Instancing, 그리고 URP와 HDRP의 SRP Batcher가 있습니다.</strong></p>
+<p>드로우콜의 비용은 삼각형 수가 아니라 셰이더, 텍스처, 색 같은 설정을 매번 준비해 넘기는 CPU 작업에서 나옵니다. 그래서 작은 오브젝트 천 개를 따로 그리면 GPU는 여유가 있는데 CPU가 명령을 준비하느라 프레임을 못 맞춥니다. 드로우콜 하나는 설정 한 벌로 그리므로 묶이려면 기본적으로 같은 머티리얼이어야 합니다.</p>
+<ul>
+<li><strong>Static Batching.</strong> 움직이지 않는 오브젝트의 메시를 미리 하나로 합칩니다. 실행 중 부담은 적지만 메모리가 늘고 움직일 수 없습니다.</li>
+<li><strong>Dynamic Batching.</strong> 움직이는 작은 메시를 매 프레임 CPU에서 합칩니다. 합치는 비용 때문에 효과가 제한적입니다.</li>
+<li><strong>GPU Instancing.</strong> 같은 메시와 머티리얼을 위치 목록과 함께 보내 GPU가 여러 번 찍어 냅니다. 움직여도 되고 메모리도 한 벌입니다.</li>
+<li><strong>SRP Batcher.</strong> 머티리얼 값을 GPU에 올려 유지해서 드로우콜 하나의 준비 비용을 줄입니다. 조건이 같은 셰이더라 머티리얼이 달라도 됩니다.</li>
+</ul>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>Static Batching은 왜 메모리가 늘어나나요?</q>원래는 나무 100그루가 메시 한 벌을 같이 쓰고 각자 위치만 가집니다. 그런데 드로우콜 하나에는 위치 정보를 한 벌만 줄 수 있어서, 한 번에 그리려면 나무마다 위치를 정점 좌표에 미리 계산해 넣어야 합니다. 그렇게 옮긴 정점은 나무마다 달라 공유할 수 없으니 100벌이 저장되고, 같은 이유로 합친 뒤엔 움직일 수 없습니다.</span></li>
+<li><span><q>배칭이 깨지는 흔한 원인은 무엇인가요?</q>코드에서 <code>renderer.material</code>에 접근해 머티리얼 복사본이 생기는 경우, 반투명처럼 그리는 순서가 정해져 있어 사이에 다른 머티리얼이 끼는 경우, 텍스처가 달라 머티리얼이 나뉘는 경우가 대부분입니다. Frame Debugger에서 드로우콜마다 앞의 것과 묶이지 못한 이유를 확인할 수 있습니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2527,13 +2653,20 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q24" aria-label="24번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">REND-04</span><span class="qtext">오클루전 컬링은 프러스텀 컬링과 무엇이 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">REND-02</span><span class="qtext">스프라이트 아틀라스는 왜 드로우콜을 줄이나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>프러스텀 컬링은 카메라 시야 밖을 걸러내는 거고, 오클루전 컬링은 시야 안에 있지만 다른 물체에 완전히 가려서 안 보이는 것을 안 그리는 겁니다.</strong></p>
-<p>시야 밖은 당연히 안 그리면 되지만, 시야 안이라도 벽 뒤에 완전히 가린 물체는 그려봤자 화면에 안 나옵니다. 오클루전 컬링은 이런 가려진 것까지 걸러냅니다. 이를 위해 정적 지형을 미리 구워서 어디서 뭐가 보이는지를 셀과 포털 정보로 담아 두고, 런타임에 가시성을 판정합니다.</p>
-<p>그래서 실내나 복잡한 도심처럼 가림이 많은 씬에서는 드로우콜을 크게 줄입니다. 대신 굽는 비용과 데이터가 들고, 탁 트인 야외처럼 가리는 게 별로 없는 곳에서는 효과가 적습니다.</p>
+<p><strong>드로우콜이 묶이려면 같은 텍스처를 써야 하는데, 스프라이트는 보통 그림 하나가 텍스처 하나라서 묶이지 않습니다. 아틀라스는 여러 스프라이트를 한 장의 텍스처에 모아 이 조건을 맞춰 줍니다.</strong></p>
+<p>텍스처는 머티리얼 설정의 일부라서, 셰이더와 머티리얼 에셋을 하나로 맞춰도 그릴 때 쓰는 텍스처가 다르면 한 드로우콜에 담을 수 없습니다. 아틀라스에서는 각 스프라이트 메시의 텍스처 좌표가 큰 텍스처 안의 자기 영역을 가리켜서, 텍스처는 하나지만 메시마다 다른 그림이 나옵니다.</p>
+<p>대가는 메모리입니다. 아틀라스는 통째로 올라가서 그중 하나만 써도 전체가 로드되므로, 같은 화면에 함께 나오는 것끼리 묶습니다. 너무 잘게 나누면 한 화면에서 아틀라스가 섞여 다시 끊깁니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>인벤토리 칸의 자식 순서가 배칭에 영향을 주나요?</q>줍니다. UGUI는 계층 순서대로 그리지 않고 요소마다 깊이를 매기는데, 앞에 그려진 것과 겹치지 않으면 깊이 0이고, 겹치면서 텍스처가 다르면 한 단계 올라갑니다. 배경, 아이콘, 글자 순이면 같은 아틀라스인 배경과 아이콘이 같은 깊이에 묶여 칸 수와 상관없이 두 번에 그려지지만, 글자가 아이콘보다 앞에 오면 아이콘이 한 단계 올라가 세 번이 됩니다. 보이는 모습대로 두는 순서가 배칭에도 유리합니다.</span></li>
+<li><span><q>칸 수만큼 드로우콜이 늘어나는 건 어떤 경우인가요?</q>아이콘마다 텍스처가 달라 아틀라스에 없을 때, 칸끼리 서로 겹쳐서 겹칠 때마다 깊이가 올라갈 때, 칸마다 Mask 컴포넌트가 있어 묶음이 끊길 때입니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2541,31 +2674,42 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q25" aria-label="25번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">REND-05</span><span class="qtext">UGUI에서 UI가 자주 바뀌면 왜 느려지나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">REND-03</span><span class="pri">필수</span><span class="qtext">renderer.material과 sharedMaterial은 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>UGUI는 캔버스 단위로 UI 메시를 묶어서 그리는데, 그 캔버스 안의 요소 하나만 바뀌어도 캔버스 전체가 다시 빌드되기 때문입니다.</strong></p>
-<p>한 요소가 변하면 그 캔버스가 더티로 표시되고, 캔버스에 속한 UI 메시를 통째로 다시 만듭니다. 그래서 큰 캔버스 하나에 자주 바뀌는 것과 정적인 것을 섞어 두면, 작은 변화 하나마다 전체를 다시 빌드하느라 비싸집니다.</p>
-<p>그래서 체력바나 타이머처럼 자주 갱신되는 요소는 별도 캔버스로 분리해서, 그것만 다시 빌드되게 합니다. 여기에 더해, 클릭을 받을 필요 없는 그래픽은 Raycast Target을 꺼서 불필요한 레이캐스트 비용도 줄입니다.</p>
+<p><strong>sharedMaterial은 렌더러가 가리키는 원본 머티리얼을 그대로 돌려주고, material은 처음 접근하는 순간 그 렌더러만의 복사본을 만들어 바꿔 끼운 뒤 돌려줍니다.</strong></p>
+<p>렌더러는 머티리얼을 가리키기만 해서 여러 렌더러가 하나를 함께 씁니다. sharedMaterial로 색을 바꾸면 원본이 바뀌어 같은 머티리얼을 쓰는 전부가 바뀌고, 에디터에서는 에셋 파일까지 바뀌어 플레이를 멈춰도 남습니다. material은 한 오브젝트만 바꾸려다 전체가 바뀌는 사고를 막는 안전한 기본값이지만, 머티리얼이 둘이 되어 같은 머티리얼을 조건으로 묶는 배칭에서 빠집니다.</p>
+<p>그래서 모두 같이 바뀌어야 하면 sharedMaterial을, 색 종류가 정해져 있으면 미리 만든 머티리얼로 갈아 끼우기를, 오브젝트마다 값이 제각각이면 MaterialPropertyBlock을 씁니다. 복사본을 만들었다면 오브젝트를 파괴할 때 직접 Destroy해 줘야 쌓이지 않습니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>material의 색을 읽기만 해도 배칭이 깨지나요?</q>깨집니다. 복사본으로 바꿔 끼우는 일이 값을 바꿀 때가 아니라 접근할 때 일어나기 때문입니다. 배칭은 같은 머티리얼인지를 값이 아니라 같은 객체인지로 판단하므로, 값이 원본과 똑같아도 다른 객체면 묶이지 않습니다. 매 프레임 속성을 전부 비교하면 아끼려던 CPU를 비교에 쓰게 되니 객체 비교 한 번으로 끝내는 겁니다.</span></li>
+<li><span><q>MaterialPropertyBlock은 어떻게 다른가요?</q>머티리얼은 원본 그대로 두고 그 렌더러에만 덮어쓸 값을 덧붙여서 복사본이 생기지 않습니다. 빌트인에서는 GPU Instancing과 함께 오브젝트마다 다른 색을 주면서 배칭을 유지하는 정석입니다. 다만 URP와 HDRP에서는 이걸 쓴 오브젝트가 SRP Batcher에서 빠집니다.</span></li>
+<li><span><q>URP에서도 material 접근이 배칭을 깨나요?</q>SRP Batcher는 조건이 같은 셰이더라서 복사본 머티리얼이어도 계속 싸게 그립니다. 그래서 URP에서는 영향이 적고, 오히려 MaterialPropertyBlock보다 복사본이 더 잘 맞는 경우도 있습니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
 </div>
-</section>
-<section class="grp">
-<div class="grp-head"><h3>물리와 충돌</h3><span class="cnt">6문항</span></div>
-<p class="grp-note">물리 엔진에게 "제대로 알려주는" 방법과 충돌 감지의 갈래를 다룹니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q26" aria-label="26번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">PHYS-01</span><span class="qtext">위치를 transform 대입 대신 Rigidbody.MovePosition으로 옮기는 이유는?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">REND-04</span><span class="qtext">오클루전 컬링은 프러스텀 컬링과 무엇이 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>transform에 위치를 직접 대입하면 물리를 무시하고 순간 이동하는 거라, 콜라이더를 뚫는 터널링이 생길 수 있기 때문입니다.</strong></p>
-<p>물리 엔진은 오브젝트들의 위치를 공간을 나눈 자체 자료구조에 캐싱해 두고 충돌을 계산합니다. <code>MovePosition</code>은 이동을 엔진에 등록해서 그 캐시가 갱신되고 충돌도 존중되며 보간까지 적용됩니다. 반면 transform 직접 대입은 엔진의 캐시와 실제 위치가 어긋나서, 엔진이 강제로 다시 계산하게 만들고 경로 중간을 건너뛰어 충돌을 놓칩니다.</p>
-<p>그래서 물리 영향을 받는 <code>Rigidbody</code> 오브젝트를 옮길 때는 MovePosition을 씁니다. 벽을 사이에 두고 빠르게 움직이는 물체가 벽을 뚫고 지나가는 게 대표적인 터널링 사례입니다.</p>
+<p><strong>프러스텀 컬링은 카메라 시야 범위 밖의 오브젝트를 빼고, 오클루전 컬링은 시야 안이지만 다른 물체에 완전히 가려 안 보이는 오브젝트를 뺍니다.</strong></p>
+<p>프러스텀 컬링은 항상 자동입니다. 오클루전 컬링은 가림 여부를 매 프레임 정확히 계산하면 그 자체로 비싸서, 유니티 기본 방식은 미리 굽습니다. 씬 공간을 작은 칸으로 나누고 각 칸에서 보일 수 있는 물체를 계산해 저장해 두고, 실행 중에는 카메라가 있는 칸의 결과를 조회만 합니다. 그래서 가리는 쪽은 벽이나 건물처럼 움직이지 않는 큰 물체여야 하고, 가려지는 쪽은 움직여도 됩니다.</p>
+<p>트레이드오프는 굽는 시간과 데이터, 그리고 조회 비용입니다. 실내나 빽빽한 도심처럼 가림이 많은 씬에서는 효과가 크고, 탁 트인 들판에서는 빠지는 게 없어 비용만 남습니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>GPU의 깊이 버퍼가 가려진 픽셀을 어차피 버리는데 왜 필요한가요?</q>깊이 테스트는 픽셀을 칠하는 마지막 단계라, 그 전에 CPU가 드로우콜을 준비하고 GPU가 정점을 전부 변환하고 덮는 픽셀을 계산하는 비용이 이미 다 듭니다. 오클루전 컬링은 드로우콜을 보내기 전에 빼서 그 비용 자체를 없앱니다.</span></li>
+<li><span><q>열리고 닫히는 문은 어떻게 처리하나요?</q>움직이는 물체는 가리는 쪽이 될 수 없으므로 Occlusion Portal을 씁니다. 굽힌 데이터에 이 통로가 열릴 수도 닫힐 수도 있다는 정보를 넣어 두고, 실행 중에는 열림 여부만 바꿉니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2573,13 +2717,20 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q27" aria-label="27번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">PHYS-02</span><span class="qtext">Rigidbody와 CharacterController는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">REND-05</span><span class="qtext">Built-in, URP, HDRP 렌더 파이프라인은 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>Rigidbody는 물리 엔진에 맡겨 중력과 힘, 충돌을 자동으로 처리하고, CharacterController는 물리를 쓰지 않고 충돌 감지만 하며 이동은 직접 구현합니다.</strong></p>
-<p>Rigidbody는 힘을 주면 엔진이 알아서 밀고 부딪히고 튕깁니다. 그래서 물체가 물리적으로 상호작용해야 할 때 자연스럽습니다. CharacterController는 중력이나 가속 같은 걸 직접 코드로 넣어야 하는 대신, 캐릭터가 미끄러지거나 예측 못 하게 튕기는 일 없이 정밀하게 움직입니다.</p>
-<p>그래서 굴러가는 공이나 던진 상자 같은 물리 상호작용은 Rigidbody, 플레이어처럼 조작이 정확해야 하는 캐릭터 이동은 CharacterController가 잘 맞습니다.</p>
+<p><strong>Built-in은 렌더링 순서가 엔진 내부에 고정된 예전 파이프라인이고, URP와 HDRP는 그 순서를 C#으로 작성하는 SRP 위에 만든 파이프라인입니다. URP는 가볍고 지원 플랫폼이 넓고, HDRP는 고사양 PC와 콘솔에서 사실적인 그래픽을 목표로 합니다.</strong></p>
+<p>순서가 C#으로 열려 있어서 URP에서는 Renderer Feature로 윤곽선 같은 패스를 끼워 넣을 수 있고, SRP Batcher도 기본으로 씁니다. HDRP는 물리 단위 조명, 볼류메트릭, 레이 트레이싱을 지원하는 대신 기본 비용이 높아 모바일에서는 쓸 수 없습니다.</p>
+<p>파이프라인은 프로젝트 초기에 정합니다. 셰이더와 머티리얼이 파이프라인마다 달라서, 도중에 바꾸면 기존 머티리얼이 분홍색으로 나오고 직접 만든 셰이더는 새로 작성해야 하며 셰이더 속성 이름도 달라집니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>Forward와 Deferred 렌더링은 어떻게 다른가요?</q>Forward는 물체를 그릴 때 닿는 조명을 그 자리에서 같이 계산해서 비용이 물체 수와 조명 수의 곱에 비례하고, 그래서 물체당 조명 수에 한도를 둡니다. Deferred는 먼저 모든 물체의 색, 법선, 깊이를 G-버퍼라는 여러 장의 텍스처에 기록하고, 그다음 조명마다 닿는 화면 픽셀만 계산해서 조명이 많아도 강합니다. 대신 G-버퍼가 메모리 대역폭을 많이 써 모바일에 불리하고, 반투명은 따로 Forward로 그립니다.</span></li>
+<li><span><q>URP의 Forward+는 무엇인가요?</q>화면을 작은 칸으로 나눠 칸마다 영향을 주는 조명 목록을 미리 만들고, 물체를 그릴 때 자기가 걸친 칸의 조명만 계산하는 방식입니다. Forward 구조를 유지하면서 물체당 조명 수 한도를 없앤 절충안입니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2587,27 +2738,47 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q28" aria-label="28번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">PHYS-03</span><span class="qtext">OnCollision과 OnTrigger는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">REND-06</span><span class="pri">필수</span><span class="qtext">UGUI에서 UI가 자주 바뀌면 왜 느려지나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>콜라이더가 <code>isTrigger</code>인지 여부로 갈립니다. 트리거는 물리적으로 부딪히지 않고 통과하며 겹침만 감지하고, 콜리전은 실제로 부딪히는 물리 충돌입니다.</strong></p>
-<p>트리거는 범위 감지에 씁니다. 예를 들어 특정 구역에 플레이어가 들어왔는지 알고 싶을 때, 막지 않고 통과시키면서 들어온 사실만 알려줍니다. 콜리전은 벽에 막히거나 물체끼리 튕기는 진짜 물리 충돌입니다.</p>
-<p>주의할 점은 둘 다 호출되려면 적어도 한쪽에 <code>Rigidbody</code>가 있어야 한다는 겁니다. 다만 이건 둘의 차이가 아니라 둘 다에 걸리는 공통 전제라서, 물어보면 구분해서 답하는 게 좋습니다.</p>
+<p><strong>UGUI는 캔버스가 아래 요소들의 메시를 모아 큰 메시로 합쳐 두고 재사용하는데, 요소 하나만 바뀌어도 그 요소를 다시 만들고 캔버스 전체를 다시 묶어야 하기 때문입니다.</strong></p>
+<p>요소의 색, 이미지, 글자 내용, 크기, 위치가 바뀌거나 켜지고 꺼지면 다음 프레임에 두 작업이 일어납니다. 먼저 바뀐 요소의 메시를 다시 만들고, 레이아웃 그룹 안이면 형제들의 배치도 다시 계산합니다. 글자는 글자마다 사각형을 배치해서 특히 비쌉니다. 그다음 캔버스 안의 모든 요소를 다시 정렬하고 합치는데, 이 비용은 바뀐 게 하나여도 캔버스 안 요소 수에 비례합니다.</p>
+<p>그래서 자주 바뀌는 요소를 하위 캔버스로 떼어 냅니다. 하위 캔버스는 독립된 묶음 단위라 그 안만 다시 묶고 바깥은 저장해 둔 결과를 씁니다. 대가는 캔버스끼리는 서로 안 묶여 드로우콜이 늘어난다는 점이라, 바뀌는 빈도로 나누고 너무 잘게 쪼개지 않습니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>바뀌는 횟수 자체는 어떻게 줄이나요?</q>보여 주는 값이 실제로 달라질 때만 갱신하고 표시 단위를 줄입니다. 타이머를 소수점 둘째 자리까지 보여 주면 매 프레임 다시 만들지만 초 단위면 1초에 한 번입니다. UI에 붙은 Animator는 가만히 있어도 매 프레임 값을 써 넣을 수 있어서 따로 떼거나 코드 트윈으로 바꾸고, 겹겹이 쌓인 레이아웃 그룹은 걷어 냅니다.</span></li>
+<li><span><q>창을 여닫을 때는 무엇을 쓰나요?</q>SetActive로 끄면 다시 켤 때 모든 요소를 처음부터 다시 만들고 묶습니다. 창에 캔버스를 따로 두고 그 enabled만 끄면 메시를 유지한 채 그리기만 멈춥니다.</span></li>
+<li><span><q>Raycast Target은 왜 꺼 두나요?</q>클릭이나 터치가 들어오면 캔버스는 입력을 받을 요소를 찾는데, 이미지와 글자는 기본으로 검사 대상입니다. 장식용 요소는 꺼서 검사 대상을 줄이고, 장식 이미지가 버튼을 덮어 클릭을 가로채는 버그도 막습니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
 </div>
+</section>
+<section class="grp">
+<div class="grp-head"><h3>애니메이션</h3><span class="cnt">3문항</span></div>
+<p class="grp-note">Animator가 애니메이션 규칙을 어떻게 데이터로 옮기는지와 파라미터 접근 비용을 다룹니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q29" aria-label="29번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">PHYS-04</span><span class="qtext">레이어 충돌 매트릭스는 무엇이고 왜 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">ANIM-01</span><span class="qtext">Animator 상태 머신은 무엇을 해결하나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>오브젝트를 물리 레이어로 나누고, 어떤 레이어끼리 서로 충돌하거나 감지할지를 표에서 켜고 끄는 설정입니다.</strong></p>
-<p>이렇게 하는 이유는 두 가지입니다. 하나는 성능인데, 서로 부딪힐 일이 없는 레이어 쌍의 충돌 계산을 아예 건너뛰어서 물리의 초기 검사 비용을 줄입니다. 다른 하나는 게임 규칙인데, 원치 않는 충돌을 없앨 수 있습니다.</p>
-<p>예를 들어 아군 총알이 아군에게 맞지 않게 하려면, 아군 총알 레이어와 아군 레이어의 충돌을 매트릭스에서 꺼 두면 됩니다. 레이캐스트의 LayerMask와 같은 레이어 개념을, 물리 충돌 전반에 적용한 거라고 보면 됩니다.</p>
+<p><strong>애니메이션을 언제 무엇으로 바꿀지의 규칙을 코드의 if문에서 꺼내 에셋 하나에 모으는 구조입니다.</strong></p>
+<p>코드에서 <code>Play("Run")</code>처럼 직접 고르면 "점프 중엔 달리기로 못 바뀐다" 같은 규칙이 여기저기 흩어집니다. Animator Controller는 애니메이션 하나를 재생하는 상태, 상태 사이를 잇는 전이, 전이 조건에 쓰는 파라미터로 이루어지고, 코드는 속도나 착지 여부 같은 사실만 파라미터로 알립니다. 무엇을 재생할지는 상태 머신이 정하므로, 애니메이터나 기획자가 코드를 고치지 않고 전이 규칙과 전환 시간을 조정할 수 있습니다.</p>
+<p>다만 애니메이션이 두세 개뿐인 문 같은 오브젝트는 상태 머신 없이 직접 재생하는 편이 단순합니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>공격 입력을 했는데 동작이 한 박자 늦게 나오는 이유는요?</q>대부분 전이의 Has Exit Time이 켜져 있어서입니다. 켜져 있으면 현재 애니메이션이 정해진 지점까지 재생된 뒤에야 넘어갑니다. 기본으로 켜져 있으므로 입력에 즉시 반응해야 하는 전이는 끕니다.</span></li>
+<li><span><q>공중에서 누른 점프가 착지하자마자 발동하는 건 왜인가요?</q>Trigger는 어떤 전이가 그걸 써서 넘어갈 때까지 켜진 채 남습니다. 공중에서 Jump로 가는 전이가 없으면 남아 있다가 착지 순간 발동하므로, 필요 없으면 <code>ResetTrigger</code>로 직접 끕니다.</span></li>
+<li><span><q>Any State 전이를 Bool로 걸면 어떤 문제가 생기나요?</q>조건이 계속 참이라 매 프레임 같은 상태로 다시 들어가 첫 프레임만 반복될 수 있습니다. Trigger로 걸거나 자기 자신으로의 전이를 끕니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2615,13 +2786,20 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q30" aria-label="30번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">PHYS-05</span><span class="qtext">Raycast는 어떻게 동작하며 LayerMask는 왜 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">ANIM-02</span><span class="qtext">블렌드 트리는 언제 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>Raycast는 시작점에서 한 방향으로 광선을 쏴서 처음 부딪히는 콜라이더를 찾아 주는 기능입니다.</strong></p>
-<p>맞으면 어떤 오브젝트를 어느 지점에서 맞혔는지, 그 표면의 법선과 거리까지 돌려줍니다. 마우스로 뭘 클릭했는지 알고 싶으면 화면 좌표를 <code>ScreenPointToRay</code>로 월드 광선으로 바꿔 쏩니다.</p>
-<p>LayerMask는 특정 레이어만 검사 대상으로 삼는 필터입니다. 관심 없는 레이어를 빼면 검사할 대상이 줄어 빨라지고, 원치 않는 것에 걸리지 않아 정확해집니다. 가장 가까운 하나만 필요하면 <code>Raycast</code>, 경로상 전부는 <code>RaycastAll</code>, 할당을 아끼려면 <code>RaycastNonAlloc</code>을 씁니다.</p>
+<p><strong>블렌드 트리는 상태 하나 안에서 여러 애니메이션을 파라미터 값에 따라 비율로 섞는 것으로, 이동 속도나 방향처럼 연속적으로 변하는 값을 표현할 때 씁니다.</strong></p>
+<p>걷기와 뛰기를 각각 상태로 두고 속도 조건으로 전이시키면, 속도는 연속으로 변하는데 전이는 이산적이라 경계값 근처에서 전이가 반복되며 동작이 튀고 중간 속도를 표현하지 못합니다. 블렌드 트리는 속도에 따라 걷기 반, 뛰기 반처럼 비율을 계속 바꿔 섞어 줍니다. 파라미터 두 개를 쓰면 앞뒤와 좌우 속도로 전진, 후진, 옆걸음을 한 상태에서 섞습니다.</p>
+<p>그래서 점프, 피격, 사망 같은 이산적인 변화는 상태 전이로, 이동처럼 연속적인 변화는 블렌드 트리로 나눕니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>블렌드 트리로 섞었더니 다리가 꼬여 보이는 이유는요?</q>블렌드 트리는 길이가 다른 애니메이션의 진행 비율을 맞춰 섞기 때문에, 발 딛는 순서가 다르면 다리가 꼬입니다. 걷기는 왼발부터, 뛰기는 오른발부터처럼 어긋나 있으면 맞춰야 합니다.</span></li>
+<li><span><q>달리면서 조준하는 것처럼 몸의 부분마다 다른 애니메이션이 필요하면요?</q>상체용 레이어를 따로 두고 아바타 마스크로 상체에만 적용합니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2629,31 +2807,46 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q31" aria-label="31번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">PHYS-06</span><span class="qtext">NavMesh 길찾기는 어떻게 이뤄지나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">ANIM-03</span><span class="qtext">Animator 파라미터를 StringToHash로 캐싱하는 이유는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>걸을 수 있는 표면을 미리 구운 내비게이션 메시 위에서 A* 알고리즘으로 경로를 찾는 방식입니다.</strong></p>
-<p>지형 전체를 격자로 훑는 대신, 걸을 수 있는 영역만 폴리곤 그물로 만들어 두고 그 위에서만 경로를 탐색하니 효율적입니다. NavMeshAgent가 목적지까지의 경로를 따라 이동하면서 서로 피해 갑니다.</p>
-<p>정적인 지형은 미리 굽고, 실행 중에 생기는 동적 장애물은 NavMeshObstacle로 실시간에 구멍을 냅니다. 계단이나 점프처럼 메시가 끊긴 구간은 Off-Mesh Link로 이어 줍니다.</p>
+<p><strong>Animator는 파라미터를 이름이 아니라 이름에서 계산한 정수 해시로 저장해서, 문자열로 넘기면 호출할 때마다 그 해시를 다시 계산하기 때문입니다.</strong></p>
+<p><code>SetFloat("Speed", v)</code>는 내부에서 매번 글자를 하나씩 읽어 정수로 바꾼 뒤 그 정수로 파라미터를 찾습니다. 같은 이름이면 해시는 항상 같으므로 <code>StringToHash</code>로 한 번 계산해 static 필드에 두고 정수를 넘기면 이 계산이 사라집니다.</p>
+<p>해시 계산 한 번은 아주 싸서 캐릭터 몇 명 수준에서는 차이를 못 느낍니다. 그래도 관례인 이유는 대가 없이 없앨 수 있고, 이름이 선언부 한곳에 모여 오타와 이름 변경을 한곳에서 관리할 수 있기 때문입니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>문자열을 넘기면 GC 할당도 생기나요?</q>코드에 직접 적은 문자열 리터럴은 프로그램 시작 때 한 번 만들어져 재사용되므로 할당이 없고, 아끼는 건 해시 계산입니다. 다만 <code>"Attack" + comboIndex</code>처럼 그때그때 조합하면 매번 새 문자열이 할당되므로, 조합될 이름들의 해시를 미리 배열에 담아 둡니다.</span></li>
+<li><span><q>같은 원리가 적용되는 다른 곳이 있나요?</q>셰이더 속성 이름에 쓰는 <code>Shader.PropertyToID</code>가 같은 원리입니다. 머티리얼이나 MaterialPropertyBlock에 색을 넣을 때 정수 ID를 넘기고, Animator 상태 이름 비교도 해시로 합니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>에셋·데이터·빌드</h3><span class="cnt">6문항</span></div>
-<p class="grp-note">데이터를 어디에 두고, 무엇이 저장되며, 빌드는 어떻게 도는지에 대한 문항들입니다.</p>
+<div class="grp-head"><h3>물리와 내비게이션</h3><span class="cnt">7문항</span></div>
+<p class="grp-note">물리 엔진에 이동을 제대로 알리는 법, 충돌 감지의 조건, 길찾기를 다룹니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q32" aria-label="32번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">DATA-01</span><span class="qtext">ScriptableObject는 무엇이고 언제 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">PHYS-01</span><span class="qtext">Rigidbody와 CharacterController는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>ScriptableObject는 데이터를 MonoBehaviour에서 떼어 내 에셋으로 관리하는 방식입니다.</strong></p>
-<p>핵심은 공유 참조입니다. 예를 들어 적 1000마리가 같은 스킬 데이터를 쓴다고 할 때, 데이터를 MonoBehaviour에 두면 인스턴스마다 그 데이터가 복제돼서 메모리에 1000벌이 생깁니다. ScriptableObject로 두면 에셋 하나를 모두가 참조하니까 메모리에 한 벌만 존재합니다.</p>
-<p>그래서 단일 진실 공급원이 되고, 씬 사이에서 공유하거나 데이터를 통째로 교체하기도 쉽습니다. 스탯 표나 설정처럼 여럿이 공유하는 데이터를 담기에 적합합니다.</p>
+<p><strong>둘 다 충돌을 지키며 캐릭터를 움직이는 방법인데, 위치를 최종적으로 누가 정하느냐가 다릅니다. Rigidbody는 물리 엔진이, CharacterController는 코드가 정합니다.</strong></p>
+<p>Rigidbody는 물리 엔진의 관리 대상이라 코드는 힘이나 속도를 줄 뿐이고, 실제 위치는 엔진이 매 물리 단계 중력, 마찰, 충돌 반응을 계산해 정합니다. 상자를 밀고 폭발에 날아가는 상호작용이 코드 없이 되지만, 관성 때문에 바로 서지 않고 경사에서 미끄러져 조작감을 맞추기 어렵습니다.</p>
+<p>CharacterController는 물리 엔진의 관리 대상이 아니라, 캡슐 모양 충돌 영역과 Move 함수를 가진 컴포넌트입니다. 코드가 이동량을 넘기면 그 경로로 캡슐을 밀어 보고 벽에 닿으면 미끄러지며 멈춥니다. 입력한 대로 정확히 움직이고 경사와 계단도 정해 둔 한도 안에서 오르지만, 중력과 관성을 직접 구현해야 하고, 다른 물체에 밀리지 않으며, 상자를 밀려면 콜백에서 직접 힘을 줘야 합니다.</p>
+<p>그래서 물리 퍼즐이나 차량은 Rigidbody로, 플랫포머나 액션 게임의 플레이어는 CharacterController로 만드는 경우가 많습니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>둘을 같은 오브젝트에 같이 붙이면요?</q>위치를 정하는 쪽이 둘이 되어 서로의 결과를 덮어씁니다. 하나만 씁니다.</span></li>
+<li><span><q>CharacterController의 isGrounded가 깜빡이는 이유는요?</q>마지막 Move에서 바닥에 닿았는지를 알려 주는 값이라, 서 있을 때 아래 이동을 0으로 두면 바닥을 건드리지 않아 false가 됩니다. 서 있을 때도 아래로 조금씩 누릅니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2661,13 +2854,29 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q33" aria-label="33번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">DATA-02</span><span class="qtext">Transform의 로컬 좌표와 월드 좌표는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">PHYS-02</span><span class="pri">필수</span><span class="qtext">Rigidbody가 붙은 오브젝트를 transform.position으로 옮기면 어떤 문제가 생기나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>로컬 좌표는 부모를 기준으로 한 상대 위치이고, 월드 좌표는 씬 전체의 절대 위치입니다.</strong></p>
-<p>씬은 Transform의 부모-자식 트리로 이뤄져 있습니다. 자식의 위치나 회전, 크기는 부모를 기준으로 하기 때문에, 부모가 움직이면 자식도 딸려 갑니다. 월드 좌표는 조상들의 변환을 전부 누적해서 계산한 값이라, <code>position</code>은 월드 기준이고 <code>localPosition</code>은 부모 기준입니다.</p>
-<p>주의할 점은 부모에 스케일이 걸려 있으면 자식의 월드 크기나 거리가 함께 왜곡된다는 겁니다. 그래서 부모에 배율을 줄 때는 자식이 어떻게 늘어나는지 신경 써야 합니다.</p>
+<p><strong>지금 자리와 목표 사이를 확인하지 않는 순간이동이라서, 사이의 벽을 통과하고 닿은 물체를 밀지 못하며, 물리 엔진이 아는 위치와도 잠깐 어긋납니다.</strong></p>
+<p>물리 엔진은 콜라이더 위치를 Transform과 별도로 들고 있다가, 다음 물리 단계 직전에 바뀐 Transform을 모아 반영합니다. 그때 아는 건 이전 위치와 새 위치뿐이라 경로를 모르고, 속도도 없어서 겹친 물체를 밀어내는 대신 겹쳤다가 튕겨 냅니다. 그래서 움직이는 방식을 바디 종류에 맞춥니다.</p>
+<ul>
+<li><strong>동적 바디.</strong> 굴러가는 공이나 밀리는 상자는 속도나 힘을 줘서, 엔진이 충돌을 처리하며 움직이게 합니다.</li>
+<li><strong>키네마틱 바디.</strong> 움직이는 발판이나 엘리베이터는 <code>MovePosition</code>으로 옮깁니다. 엔진이 한 단계에 걸친 이동으로 처리해 속도를 계산하고, 그 속도로 닿은 동적 물체를 밀어냅니다.</li>
+<li><strong>리스폰이나 순간이동.</strong> <code>rb.position</code>에 대입해 물리 쪽 위치를 바로 바꿉니다.</li>
+</ul>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>MovePosition을 동적 바디에 쓰면 어떻게 되나요?</q>위치를 그냥 덮어써서 물리 입장에서는 순간이동입니다. 동적 바디는 엔진이 속도를 고쳐 충돌을 처리하는데, 위치가 이미 정해져 버려 고칠 대상이 없기 때문입니다. 벽 안으로 들어가면 다음 단계에 튕겨 나옵니다. 동적 바디를 목표로 보내려면 목표까지의 거리를 단계 시간으로 나눈 속도를 줍니다.</span></li>
+<li><span><q>키네마틱 바디는 MovePosition으로 움직일 때 벽에 막히나요?</q>막히지 않습니다. 키네마틱은 충돌 반응을 받지 않는 게 정의라서 벽과 다른 키네마틱을 통과하고, 동적 바디만 밀어냅니다. 막혀야 하면 이동 전에 <code>SweepTest</code>로 경로를 직접 검사합니다.</span></li>
+<li><span><q>속도로 움직였는데도 빠른 총알이 얇은 벽을 뚫는 건 왜인가요?</q>물리 엔진은 기본적으로 각 단계의 위치만 검사해서, 한 단계에 벽 두께보다 멀리 가면 앞뒤 위치 모두 벽과 겹치지 않아 충돌이 없었다고 판단합니다. 이걸 터널링이라고 하고, 빠른 물체에만 Collision Detection을 Continuous 계열로 바꿔 경로 전체를 검사합니다.</span></li>
+</ul>
+</div>
+<div class="trap">
+<p class="lab">함정</p>
+<p>"MovePosition은 충돌을 지켜서 벽에 막힌다"고 말하면 감점입니다. 키네마틱 바디는 MovePosition으로 움직여도 벽을 통과하고, 동적 바디에서는 순간이동과 같습니다.</p>
 </div>
 </div>
 </details>
@@ -2675,13 +2884,20 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q34" aria-label="34번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">DATA-03</span><span class="qtext">필드를 public 대신 [SerializeField] private으로 두는 이유는?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">PHYS-03</span><span class="qtext">물리 엔진은 많은 콜라이더의 충돌 검사를 어떻게 줄이나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>인스펙터에서는 편집하게 열어 두면서, 코드 상으로는 외부 접근을 막아 캡슐화를 지키기 위해서입니다.</strong></p>
-<p><code>public</code>으로 두면 인스펙터 노출과 외부 코드 접근이 한 묶음으로 딸려 옵니다. 그러면 다른 클래스가 그 값을 마음대로 바꿔서 이 오브젝트가 지켜야 할 불변식이 깨질 수 있습니다.</p>
-<p><code>[SerializeField]</code>를 붙인 private 필드는 외부 코드에서는 못 건드리지만 인스펙터에는 노출돼서 편집과 디버깅이 됩니다. 즉 "에디터에서의 편집 권한"과 "코드에서의 접근 권한"을 분리하는 겁니다.</p>
+<p><strong>두 단계로 나눕니다. 먼저 경계 상자만 보고 겹칠 가능성이 있는 쌍을 추리는 broad phase를 거치고, 남은 후보만 실제 모양으로 정밀하게 검사하는 narrow phase를 거칩니다.</strong></p>
+<p>콜라이더가 천 개면 가능한 쌍이 약 50만 개라 매 단계 전부 정밀 검사할 수 없습니다. broad phase는 각 콜라이더를 감싸는 축 정렬 상자가 각 축에서 겹치는지만 비교해 멀리 있는 쌍을 아주 싸게 걸러 냅니다. 이것도 모든 쌍을 비교하면 50만 번이라, 대표적인 Sweep and Prune은 상자들의 축 위 시작점과 끝점을 정렬된 목록으로 들고 있다가 범위가 겹치는 것끼리만 짝짓습니다. 물체가 한 단계에 조금씩만 움직이므로 목록을 처음부터 정렬하지 않고 조금 바뀐 부분만 고쳐서 쌉니다.</p>
+<p>이 구조를 유지하려고 물리 엔진은 콜라이더 위치를 Transform과 별도의 사본으로 들고 있습니다. 그래서 transform으로 직접 옮기면 다음 물리 단계 직전까지 두 위치가 다르고, 반영할 때 경계 상자와 목록을 다시 고치는 비용이 옮긴 개수만큼 듭니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>transform으로 문을 옮긴 직후 레이캐스트를 쏘면 어떻게 되나요?</q>물리 엔진은 아직 옛 위치를 알고 있어서 닫혀 있던 자리의 문에 맞을 수 있습니다. 기본 설정에서는 자동으로 맞춰 주지 않으므로, 바로 써야 하면 <code>Physics.SyncTransforms</code>로 반영합니다.</span></li>
+<li><span><q>Rigidbody 없는 콜라이더를 코드로 계속 움직이면요?</q>엔진은 Rigidbody 없는 콜라이더를 움직이지 않는 정적 물체로 보고 관리합니다. 계속 옮기면 그 전제가 깨져 갱신 비용이 들고, 속도가 없어 닿은 물체를 밀지도 못합니다. 움직이는 문이나 회전 장애물에는 키네마틱 Rigidbody를 붙이고 MovePosition으로 움직입니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2689,13 +2905,21 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q35" aria-label="35번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">DATA-04</span><span class="qtext">유니티에서는 무엇이 직렬화되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">PHYS-04</span><span class="pri">필수</span><span class="qtext">OnCollision과 OnTrigger는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>인스펙터 노출, 저장, 프리팹은 전부 유니티 직렬화를 거치는데, 대상은 public이거나 <code>[SerializeField]</code>가 붙은 필드로 한정됩니다.</strong></p>
-<p>프로퍼티나 static, readonly, Dictionary 같은 건 기본적으로 직렬화되지 않습니다. 다형성이 필요한 필드도 기본은 안 돼서 <code>[SerializeReference]</code>가 따로 필요합니다.</p>
-<p>이게 중요한 이유는, 직렬화되는지 여부가 값이 유지되는지, 인스펙터에 보이는지, 그리고 스크립트를 다시 컴파일할 때 값이 살아남는지를 좌우하기 때문입니다. 인스펙터에 값이 안 뜨거나 리로드 후 값이 사라지면 대개 직렬화 규칙 문제입니다.</p>
+<p><strong>콜라이더의 isTrigger 하나로 갈립니다. 끈 콜라이더는 단단한 물체라 서로 밀어내는 반응을 계산하고 접촉 정보를 주고, 켠 콜라이더는 영역이라 반응 없이 통과하고 들어오고 나간 것만 알려 줍니다.</strong></p>
+<p><code>OnCollisionEnter</code>에는 접촉 지점, 법선, 상대 속도가 담긴 Collision이 넘어와서 착지나 몸으로 부딪히는 공격, 충격 세기에 따른 효과에 씁니다. <code>OnTriggerEnter</code>에는 상대 콜라이더만 넘어오는데, 반응을 계산하지 않으니 줄 접촉 정보가 없기 때문입니다. 체크포인트, 아이템 획득 범위, 데미지 장판, 감지 반경에 씁니다.</p>
+<p>공통 조건으로 두 콜라이더 중 적어도 한쪽에 Rigidbody가 있어야 이벤트가 납니다. Rigidbody 없는 콜라이더끼리는 둘 다 정적 물체로 취급돼 엔진이 그 쌍을 검사하지 않습니다. 콜리전은 밀어내는 반응을 계산해야 해서 속도를 고칠 수 있는 동적 Rigidbody가 있어야 하고, 트리거는 키네마틱이어도 됩니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>트리거 영역에 들어갔는데 이벤트가 안 오면 무엇부터 보나요?</q>대부분 두 콜라이더 모두 Rigidbody가 없는 경우입니다. 감지되는 플레이어나 총알 쪽에 Rigidbody를 붙이거나, 움직이지 않는 영역이면 영역 쪽에 키네마틱 Rigidbody를 붙입니다. 레이어 충돌 매트릭스에서 그 조합이 꺼져 있는지도 확인합니다.</span></li>
+<li><span><q>영역 안에 있다가 순간이동으로 빠져나가면 Exit가 오나요?</q>옵니다. 트리거 이벤트는 매 물리 단계 지금 겹쳐 있는 쌍을 직전 단계와 비교해 만들어서, 다음 단계에 Exit가 납니다. 반대로 영역을 가로질러 반대편으로 순간이동하거나, 한 단계에 얇은 트리거를 지나칠 만큼 빠르면 둘 다 오지 않습니다. 영역 안에서 파괴되거나 꺼지면 비교할 대상이 사라져 Exit가 안 올 수 있습니다.</span></li>
+<li><span><q>OnTriggerStay를 많이 쓰면 문제가 되나요?</q>겹쳐 있는 동안 쌍마다 매 물리 단계 호출돼서, 영역 안에 적이 백 마리면 매 단계 백 번 불립니다. 보통 Enter에서 목록에 넣고 Exit에서 빼서 목록으로 처리합니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2703,13 +2927,20 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q36" aria-label="36번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">DATA-05</span><span class="qtext">Resources.Load와 Addressables는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">PHYS-05</span><span class="qtext">레이어 충돌 매트릭스는 무엇이고 왜 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>Resources는 폴더 내용을 빌드에 통째로 넣어 로컬에서 불러오는 방식이고, Addressables는 주소로 필요할 때 불러오는 방식입니다.</strong></p>
-<p>Resources는 그 폴더가 빌드에 전부 포함되기 때문에 빌드 크기가 커지고, 문자열 경로로 찾아서 오타 같은 실수에 약합니다. Addressables는 에셋에 주소를 매겨 필요한 순간에 온디맨드로 로드하고, 원격 다운로드나 콘텐츠 갱신, 비동기 로드, 참조 카운트 관리까지 됩니다.</p>
-<p>여기서 짚을 점은, Resources가 원격에서 받아오는 게 아니라 빌드에 포함된 로컬 로드라는 겁니다. 규모가 커지면 관리와 갱신이 유리한 Addressables 쪽으로 가는 게 일반적입니다.</p>
+<p><strong>레이어 두 개의 모든 조합에 대해 서로 충돌하고 감지할지를 켜고 끄는 표로, 상관없는 조합을 충돌 검사 초기 단계에서 아예 걸러 내려고 씁니다.</strong></p>
+<p>꺼진 조합의 오브젝트들은 서로 없는 것처럼 통과하고 충돌 이벤트도 나지 않습니다. 아군 총알과 플레이어 조합을 끄면 쏜 총알이 자기 몸에 걸리지 않고, 적끼리 끄면 몰려오는 적이 서로 밀치지 않습니다. 매트릭스는 broad phase에서 후보 쌍을 만들 때 걸러서, 꺼진 조합은 정밀 검사, 반응 계산, 이벤트 처리가 전부 일어나지 않습니다.</p>
+<p>OnCollisionEnter에서 태그를 보고 무시하는 걸로는 안 됩니다. 콜백 시점엔 엔진이 이미 반응을 계산해 적용한 뒤라 총알은 튕겨 나갔고, 적 수백 마리가 겹칠 때 생기는 접촉 쌍의 계산 비용도 이미 치렀기 때문입니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>특정 두 콜라이더만 서로 무시하게 하려면요?</q><code>Physics.IgnoreCollision</code>으로 콜라이더 두 개만 지정합니다. 적이 쏜 총알이 다른 적에겐 맞지만 쏜 본인에게만 안 맞게 하는 식의 개별 예외에 씁니다. 레이어로 끄면 모든 적에게 안 맞게 됩니다.</span></li>
+<li><span><q>레이어와 태그는 어떻게 나눠 쓰나요?</q>레이어는 32개로 고정된 숫자라 비트마스크 하나로 여러 레이어를 표현하고 비트 연산 한 번으로 거를 수 있어서, 충돌 매트릭스, 레이캐스트, 카메라 컬링처럼 엔진이 대량으로 거르는 곳에 씁니다. 태그는 문자열이라 개수 제한이 없고, 코드에서 플레이어인지 확인하는 정도에 씁니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2717,51 +2948,74 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q37" aria-label="37번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">DATA-06</span><span class="qtext">IL2CPP와 Mono는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">PHYS-06</span><span class="qtext">레이캐스트에 LayerMask를 넘기는 이유는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>Mono는 코드를 런타임에 그때그때 컴파일하는 방식이고, IL2CPP는 미리 C++로 변환해 네이티브로 컴파일해 두는 방식입니다.</strong></p>
-<p>Mono는 IL을 실행 중에 컴파일해서 빌드가 빠르고 개발 중에 유리하지만, 일부 플랫폼은 지원하지 않습니다. IL2CPP는 IL을 C++로 바꾼 뒤 네이티브로 미리 컴파일해서 실행이 빠르고 역공학이 어렵습니다. iOS 같은 플랫폼에서는 필수인 대신 빌드가 느립니다.</p>
-<p>주의할 점은 IL2CPP는 미리 컴파일하는 방식이라 런타임에 코드를 생성하는 일부 리플렉션이나 dynamic에 제약이 있다는 겁니다. 그래서 코드 스트리핑 설정에 주의해야 합니다. 출시 빌드는 성능과 보안, 플랫폼 요건 때문에 IL2CPP를 쓰는 경우가 많습니다.</p>
+<p><strong>원하는 레이어에만 맞게 해서 결과를 정확하게 하고, 검사 대상을 줄여 비용도 줄이기 위해서입니다.</strong></p>
+<p>레이캐스트는 한 점에서 한 방향으로 두께 없는 광선을 쏴 처음 걸리는 콜라이더를 찾습니다. 마스크가 없으면 땅을 찾으려던 광선이 바닥의 아이템이나 투명한 트리거에 먼저 맞아 엉뚱한 결과를 냅니다. 레이어가 32개라 검사할 레이어를 32비트 정수 하나로 표현할 수 있고, 엔진은 콜라이더마다 자기 레이어 비트가 켜져 있는지 비트 연산 한 번으로 확인해 마스크 밖 레이어를 정밀 검사 전에 뺍니다.</p>
+<p>그리고 레이캐스트는 물리 엔진이 공간별로 정리해 둔 경계 상자 정보를 쓰기 때문에 빠르지만, 같은 이유로 콜라이더가 없는 메시는 맞지 않고 transform으로 옮긴 직후에는 옛 위치를 기준으로 맞습니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>NameToLayer의 결과를 그대로 마스크로 넘기면 어떻게 되나요?</q>레이어 번호와 마스크는 다릅니다. 8번 레이어를 원하는데 8을 그대로 넘기면 8은 이진수로 1000이라 3번 레이어만 검사합니다. <code>1 &lt;&lt; layer</code>로 비트를 켜거나 <code>LayerMask.GetMask</code>를 씁니다.</span></li>
+<li><span><q>시야 확인 레이캐스트가 아무것도 없는 곳에서 막히는 건 왜인가요?</q>기본 설정에서 레이캐스트는 트리거 콜라이더에도 맞기 때문에, 감지 범위나 자동문 같은 투명한 트리거에서 멈춘 겁니다. <code>QueryTriggerInteraction.Ignore</code>를 넘기면 트리거를 무시합니다.</span></li>
+<li><span><q>발밑 확인처럼 폭이 필요하면요?</q>두께 없는 선은 틈새로 빠지거나 모서리를 놓치기 쉬워서, <code>SphereCast</code>처럼 굵기가 있는 모양을 쓸어 보는 쪽이 안정적입니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="unity-q38" aria-label="38번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">PHYS-07</span><span class="qtext">NavMesh 길찾기는 어떻게 이뤄지나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>걸을 수 있는 면을 볼록 다각형으로 덮은 내비게이션 메시를 미리 굽고, 다각형을 노드로 삼아 A*로 경로를 찾은 뒤, 꺾이는 모서리만 남겨 직선 경로로 폅니다.</strong></p>
+<p>바닥을 격자로 나누면 넓은 맵에서 노드가 수십만 개가 되고 경로가 계단 모양으로 꺾입니다. 내비게이션 메시는 넓은 빈 공간도 큰 다각형 하나라 노드가 훨씬 적고, 볼록 다각형 안의 두 점을 잇는 선은 밖으로 나가지 않아 같은 다각형 안에서는 곧게 갈 수 있습니다. 굽을 때 에이전트 반지름만큼 벽에서 미리 깎아 두기 때문에, 경로는 에이전트를 크기 없는 점으로 계산해도 몸이 벽에 걸리지 않습니다.</p>
+<p>A*는 지금까지 온 거리와 남은 직선거리 추정의 합이 가장 작은 다각형부터 넓혀 가서 목적지 방향을 먼저 보며 적게 탐색하고, 직선거리는 실제보다 길게 추정되지 않으므로 최단 경로를 보장합니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>SetDestination 직후 remainingDistance로 도착을 판단하면 어떤 문제가 있나요?</q>경로 계산이 바로 끝나지 않을 수 있어서, <code>pathPending</code>이 true인 동안 remainingDistance가 0으로 나와 도착으로 잘못 판단합니다. pathPending이 false인지 같이 확인합니다.</span></li>
+<li><span><q>굽힌 뒤에 생기는 움직이는 장애물은 어떻게 처리하나요?</q>NavMeshObstacle을 붙입니다. 움직이는 동안은 에이전트가 피해 가게 하고, 멈추면 메시에 구멍을 내서 경로가 돌아가게 합니다. 구멍 내기는 비용이 있어서 멈춰 있을 때만 내도록 설정하는 게 보통입니다.</span></li>
+<li><span><q>에이전트를 순간이동시키려면요?</q><code>Warp</code>를 씁니다. transform으로 옮기면 에이전트가 알던 메시 위 위치와 어긋나 이상하게 끌려갑니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
 </div>
 </section>
 <section class="grp">
-<div class="grp-head"><h3>상황형 문제 해결</h3><span class="cnt">5문항</span></div>
-<p class="grp-note">정답보다 접근 순서를 봅니다. 한 증상에 여러 영역이 얽혀 있으니, 측정으로 원인을 좁힌 뒤 개념으로 설명하세요.</p>
-<div class="q">
-<label class="chk"><input type="checkbox" id="unity-q38" aria-label="38번 자신 있음"></label>
-<details>
-<summary><span><span class="qtag">SIT-01</span><span class="qtext">게임이 진행될수록 주기적으로 프레임이 뚝뚝 끊깁니다. 무엇을 의심하겠습니까?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
-<div class="ans">
-<div class="core">
-<p class="lab">핵심 답변</p>
-<p><strong>평소엔 멀쩡하다가 주기적으로 툭 끊긴다는 게 핵심 단서인데, 이건 계산이 무거운 게 아니라 뭔가 쌓였다가 한꺼번에 처리되는 신호입니다. 저는 GC 스파이크를 먼저 의심합니다.</strong></p>
-<p>매 프레임 쓰레기를 만드는 코드가 있으면 힙이 차고, 가비지 컬렉터가 그걸 치우는 순간 메인 스레드가 잠깐 멈춰서 규칙적으로 끊깁니다. 그래서 추측보다 먼저 프로파일러로 어디서 GC Alloc이 나는지 봅니다. Update 안의 new, 박싱, LINQ, 문자열 결합이 흔한 범인입니다.</p>
-<p>만약 시간이 갈수록 점점 더 심해진다면 메모리 누수도 같이 봅니다. 이벤트 구독을 해제 안 했거나 컬렉션에 계속 쌓기만 하면 메모리가 늘고, 결국 페이지 폴트까지 겹쳐 끊김이 심해집니다.</p>
-</div>
-</div>
-</details>
-</div>
+<div class="grp-head"><h3>데이터·에셋·빌드</h3><span class="cnt">6문항</span></div>
+<p class="grp-note">데이터를 어디에 두고, 무엇이 저장되며, 어떻게 불러오고 빌드하는지를 다룹니다.</p>
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q39" aria-label="39번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">SIT-02</span><span class="qtext">총알을 대량으로 발사하는데 쏠 때마다 살짝 끊깁니다. 원인과 해결은?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">DATA-01</span><span class="pri">필수</span><span class="qtext">유니티에서는 어떤 필드가 직렬화되나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>발사할 때마다 총알을 <code>Instantiate</code>로 만들고 <code>Destroy</code>로 없애는 게 원인일 가능성이 큽니다.</strong></p>
-<p>생성과 파괴 자체가 비용이고, 특히 파괴가 반복되면 버려진 총알이 쓰레기로 쌓여서 GC 부담이 커지고 그게 끊김으로 나타납니다. 그래서 먼저 프로파일러로 발사 순간에 할당이 튀는지 확인합니다.</p>
-<p>해결은 오브젝트 풀링입니다. 총알을 미리 만들어 풀에 담아 두고, 쏠 때 비활성 총알을 하나 꺼내 켜고, 사라질 때 파괴 대신 다시 풀에 돌려놓습니다. 할당과 해제를 아예 없애니까 발사할 때의 끊김이 사라집니다.</p>
+<p><strong>static, const, readonly가 아닌 필드 중에서 public이거나 <code>[SerializeField]</code>가 붙어 있고, 타입이 저장 가능한 것이 직렬화됩니다.</strong></p>
+<p>프로퍼티는 get과 set 메서드일 뿐이라 저장할 칸이 없어서 빠지고, static은 클래스에 하나뿐이라 인스턴스마다 저장할 대상이 아닙니다. 저장 가능한 타입은 기본형과 enum, Vector3 같은 유니티 타입, 다른 유니티 오브젝트 참조, <code>[Serializable]</code>을 붙인 클래스와 구조체, 그리고 이것들의 배열과 List입니다. Dictionary나 중첩 리스트는 안 됩니다.</p>
+<p>이게 중요한 이유는 유니티가 직렬화 하나로 씬과 프리팹 저장, 인스펙터 표시, Instantiate 복제, 에디터 핫 리로드를 모두 처리하기 때문입니다. 직렬화되지 않는 필드는 인스펙터에 안 보이고, 씬을 다시 열면 초기값으로 돌아가고, Instantiate한 복사본에도 옮겨지지 않습니다.</p>
 </div>
 <div class="tails">
 <p class="lab">꼬리질문</p>
 <ul>
-<li><span><q>총알이 빠른데 얇은 벽을 통과해 버립니다.</q>터널링입니다. 빠른 물체가 한 프레임에 벽을 건너뛰어 충돌을 놓치는 건데, 물리로 옮길 때 transform 직접 대입 대신 <code>Rigidbody.MovePosition</code>을 쓰거나, 콜라이더의 충돌 감지 모드를 연속 감지로 바꾸면 완화됩니다.</span></li>
+<li><span><q>원본의 private 필드 값은 Instantiate한 복사본에 옮겨지나요?</q>직렬화되지 않는 private 필드는 옮겨지지 않고 초기값으로 시작합니다. Instantiate는 원본의 직렬화된 필드만 복사하기 때문입니다.</span></li>
+<li><span><q>[Serializable] 클래스 필드에 넣은 파생 타입이 씬을 다시 열면 기반 타입으로 돌아옵니다. 왜인가요?</q>일반 클래스는 객체의 필드 값을 그 필드 자리에 그대로 적는 인라인 방식으로 저장되는데, 이때 실제 타입 이름도, 어느 객체였는지도 적지 않습니다. 그래서 선언 타입으로 다시 만들어 파생 타입의 필드가 사라지고, 같은 객체를 공유하던 두 필드는 사본 둘이 되며, null이던 필드는 빈 객체가 됩니다. <code>[SerializeReference]</code>를 필드에 붙이면 객체마다 ID와 타입을 기록해서 셋 다 유지됩니다.</span></li>
+<li><span><q>그러면 항상 SerializeReference를 쓰면 되지 않나요?</q>기본은 인라인입니다. SerializeReference 필드는 null로 시작하고 기본 인스펙터에 타입을 고르는 UI가 없어 바로 편집할 수 없고, 타입 이름이 파일에 적혀서 클래스 이름을 바꾸면 데이터가 끊깁니다. 그래서 인터페이스 목록처럼 파생 타입을 섞어 담아야 할 때만 씁니다.</span></li>
+<li><span><q>Dictionary는 어떻게 저장하나요?</q><code>ISerializationCallbackReceiver</code>를 구현해 저장 직전에 키 리스트와 값 리스트로 풀고, 로드 직후에 다시 딕셔너리로 조립합니다. 이 콜백은 메인 스레드가 아닌 곳에서도 불릴 수 있어서 안에서 유니티 API를 쓰면 안 됩니다.</span></li>
 </ul>
+</div>
+<div class="trap">
+<p class="lab">함정</p>
+<p>"public이면 직렬화된다"고 단정하면 감점입니다. public은 접근 제한자일 뿐이고, public이어도 프로퍼티, static, 지원하지 않는 타입은 저장되지 않으며, private도 SerializeField가 붙으면 저장됩니다.</p>
 </div>
 </div>
 </details>
@@ -2769,13 +3023,21 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q40" aria-label="40번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">SIT-03</span><span class="qtext">같은 적을 수백 마리 스폰하니 드로우콜이 폭증하고 GPU가 느립니다. 어떻게 줄이나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">DATA-02</span><span class="qtext">필드를 public 대신 [SerializeField] private으로 두는 이유는 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>같은 메시를 수백 개 그리는데 드로우콜이 그만큼 나간다는 건, 하나로 묶이지 못하고 개별로 그려지고 있다는 뜻입니다.</strong></p>
-<p>먼저 프레임 디버거로 왜 배칭이 안 되는지 봅니다. 같은 메시와 머티리얼이라면 GPU Instancing으로 한 드로우콜에 묶을 수 있습니다. 이게 정점 많은 동일 메시 다수에 가장 잘 맞습니다.</p>
-<p>배칭이 깨지는 흔한 원인은 코드에서 <code>renderer.material</code>에 접근해 머티리얼이 복제되는 겁니다. 개별 색만 바꾸는 거라면 복제 대신 <code>MaterialPropertyBlock</code>으로 값만 덮어씌워 배칭을 유지합니다. 더 근본적으로 멀리 있는 적은 안 보이게 컬링하거나 단순한 모델로 바꿔 그리는 일감 자체를 줄입니다.</p>
+<p><strong>인스펙터에서 편집할 수 있게 저장 쪽은 열면서, 다른 클래스의 코드가 값을 마음대로 바꾸는 접근은 막기 위해서입니다.</strong></p>
+<p>필드에는 유니티가 저장하고 인스펙터에 보여 주는가, 다른 클래스가 읽고 쓸 수 있는가라는 두 질문이 따로 있습니다. public은 둘을 한꺼번에 열어서, 인스펙터에 띄우려고 체력을 public으로 두면 어느 코드든 체력을 직접 깎을 수 있고, 0 아래로 내려가거나 사망 처리를 건너뛰는 일이 생깁니다.</p>
+<p>SerializeField private으로 두고 값을 바꾸는 길을 TakeDamage 같은 메서드 하나로 만들면, 체력은 0 아래로 안 내려가고 0이 되면 사망 이벤트가 난다는 규칙이 항상 지켜지고, 버그가 나면 그 메서드 하나만 보면 됩니다. 기획자는 여전히 인스펙터에서 값을 조정합니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>프로퍼티로 공개하면서 인스펙터에도 띄우려면요?</q><code>[field: SerializeField]</code>로 자동 프로퍼티의 숨은 필드에 속성을 붙입니다. 다만 저장되는 이름이 컴파일러가 만든 숨은 필드 이름이라, 프로퍼티 이름을 바꾸면 저장된 값과 연결이 끊깁니다.</span></li>
+<li><span><q>코드의 초기값을 바꿨는데 씬의 오브젝트에 반영이 안 되는 건 왜인가요?</q>저장된 값이 코드의 초기값보다 우선하기 때문입니다. 이미 씬이나 프리팹에 저장된 인스턴스는 저장된 값을 불러오고, 새 초기값은 새로 붙인 컴포넌트나 Reset에만 들어갑니다.</span></li>
+<li><span><q>필드 이름을 바꾸면 저장된 값은 어떻게 되나요?</q>저장 값은 필드 이름으로 짝을 짓기 때문에 못 찾고 초기값으로 돌아갑니다. <code>[FormerlySerializedAs("옛이름")]</code>을 붙이면 이어받습니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2783,13 +3045,20 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q41" aria-label="41번 자신 있음"></label>
 <details>
-<summary><span><span class="qtag">SIT-04</span><span class="qtext">대량 유닛의 경로 계산이 메인 스레드를 막아 프레임이 튑니다. 어떻게 풀겠습니까?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<summary><span><span class="qtag">DATA-03</span><span class="pri">필수</span><span class="qtext">ScriptableObject는 무엇이고 언제 쓰나요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>무거운 계산이 전부 메인 스레드에서 한 프레임 안에 돌기 때문입니다. 그 계산을 메인 스레드 밖으로 빼거나 여러 프레임에 나눠야 합니다.</strong></p>
-<p>먼저 프로파일러로 정말 그 계산이 프레임을 잡아먹는지 확인합니다. 유니티에서는 Job System으로 이런 계산을 워커 스레드에 분산해 멀티코어를 활용할 수 있고, 여기에 Burst 컴파일러를 붙이면 그 잡을 SIMD 최적화된 네이티브 코드로 바꿔 수 배 가속됩니다. 데이터를 촘촘한 배열로 두는 방식과 맞물리면 캐시 지역성까지 살아 더 빨라집니다.</p>
-<p>스레드로 못 빼는 부분이라면, 코루틴으로 계산을 여러 프레임에 쪼개 나눠 담거나, 멀리 있는 유닛은 덜 자주 갱신해서 한 프레임의 일감 자체를 줄입니다.</p>
+<p><strong>ScriptableObject는 게임오브젝트에 붙지 않고 프로젝트에 에셋 파일로 저장되는 데이터 객체로, 여러 오브젝트가 공유하는 설정이나 수치 데이터를 둘 때 씁니다.</strong></p>
+<p>데이터를 MonoBehaviour 필드에 두면 Instantiate할 때마다 통째로 복사되어 고블린 천 마리면 데이터도 천 벌입니다. ScriptableObject에 두면 각자 참조 하나만 갖고 데이터는 한 벌입니다. 데이터가 작으면 메모리 차이는 크지 않고, 실제로 더 큰 이점은 관리에 있습니다. 값이 한 에셋에 모여 수치를 한 곳에서 고치고, 같은 코드에 데이터 에셋만 갈아 끼워 종류를 늘리고, 스프라이트나 사운드 같은 에셋을 인스펙터에서 바로 연결할 수 있습니다.</p>
+<p>가장 흔한 실수는 실행 중에 이 값을 고치는 겁니다. 모두가 같은 객체를 가리키므로, 맞은 고블린 하나의 체력을 줄이려고 에셋의 값을 바꾸면 모든 고블린이 영향을 받습니다. 개체마다 바뀌는 값은 MonoBehaviour에 복사해 두고 그쪽을 바꿉니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>실행 중에 ScriptableObject 값을 바꾸면 저장되나요?</q>에디터에서는 에셋 파일이라 플레이를 멈춰도 바뀐 값이 남아서, 테스트할 때마다 수치가 조금씩 바뀌는 버그가 생깁니다. 빌드에서는 파일에 저장되지 않아 게임을 다시 켜면 원래대로 돌아갑니다. 그래서 세이브 데이터로는 쓸 수 없습니다.</span></li>
+<li><span><q>몬스터 수백 종의 데이터라면 ScriptableObject와 JSON 중 무엇을 쓰나요?</q>행이 많은 표는 스프레드시트에서 관리해 JSON이나 CSV로 내보내는 경우가 많고, 종류가 수십 개 정도에 에셋 연결이 중요하면 ScriptableObject가 편합니다. 표를 읽어 ScriptableObject 에셋을 자동으로 만드는 방식도 씁니다.</span></li>
+</ul>
 </div>
 </div>
 </details>
@@ -2797,13 +3066,190 @@ title: 면접 대비 문답
 <div class="q">
 <label class="chk"><input type="checkbox" id="unity-q42" aria-label="42번 자신 있음"></label>
 <details>
+<summary><span><span class="qtag">DATA-04</span><span class="pri">필수</span><span class="qtext">프리팹과 프리팹 변형은 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>프리팹은 게임오브젝트 구성을 통째로 에셋에 저장한 틀이고, 프리팹 변형은 기존 프리팹을 기반으로 다른 점만 저장한 프리팹입니다.</strong></p>
+<p>씬 파일은 프리팹 인스턴스를 통째로 저장하지 않고, 어느 프리팹의 인스턴스인지와 프리팹과 다른 값의 목록, 즉 오버라이드만 저장합니다. 불러올 때 프리팹 값을 깔고 그 목록만 덮어쓰므로, 프리팹을 고치면 오버라이드하지 않은 값은 모든 인스턴스에 반영됩니다. 변형은 이 방식을 에셋 단위로 한 것이라, 칼 든 고블린에서 칼을 활로만 바꾼 궁수 변형은 원본의 체력이 바뀌면 그대로 물려받습니다.</p>
+<p>핵심은 복제와의 차이입니다. 프리팹을 복사해 따로 만들면 별개의 에셋이 되어 이후 공통 수정을 두 군데에서 해야 하지만, 변형은 공통 부분을 계속 물려받습니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>프리팹을 고쳤는데 일부 인스턴스에만 반영이 안 되는 건 왜인가요?</q>그 인스턴스에 해당 값의 오버라이드가 남아 있어서입니다. 실험 삼아 값을 바꿨다가 원래 숫자로 다시 입력해도 오버라이드 목록에 남습니다. 인스펙터는 오버라이드를 굵은 글씨와 파란 선으로 표시하므로, Apply로 프리팹에 올리거나 Revert로 버려 정리합니다.</span></li>
+<li><span><q>실행 중에 Instantiate한 오브젝트도 프리팹과 연결되어 있나요?</q>아닙니다. 프리팹과 인스턴스의 연결은 에디터에서만 존재하고, 실행 중에 만든 오브젝트는 단순한 복제본이라 프리팹 에셋을 바꿔도 이미 만든 복제본은 바뀌지 않습니다.</span></li>
+<li><span><q>프리팹 변형과 ScriptableObject는 언제 각각 쓰나요?</q>변형은 자식 오브젝트, 컴포넌트, 모델처럼 구성 자체가 다른 종류에 쓰고, ScriptableObject는 구조는 같고 수치만 다른 종류에 씁니다. 실무에선 구조가 다른 종류마다 변형을 두고 각 변형에 수치 데이터 에셋을 연결해 섞어 씁니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="unity-q43" aria-label="43번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">DATA-05</span><span class="qtext">Resources.Load와 Addressables는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>Resources는 폴더 안의 모든 것이 빌드에 통째로 들어가고 문자열 경로로 로컬에서 꺼내는 방식이고, Addressables는 에셋을 번들로 묶어 주소로 비동기 로드하면서 의존성, 메모리 해제, 원격 업데이트까지 관리하는 시스템입니다.</strong></p>
+<p>가장 단순한 직접 참조는 씬을 열 때 참조된 에셋을 전부 메모리에 올리므로, 필요한 순간에만 꺼내 쓰는 방식이 필요합니다. Resources는 이걸 해결하지만, 쓰이는지 알 수 없어 안 쓰는 파일까지 빌드에 들어가고, 앱을 켤 때 파일 수에 비례해 목록을 만들어 시작이 느려지고, 경로 오타가 실행 중에야 드러나고, 내용을 바꾸려면 앱을 다시 빌드해야 합니다.</p>
+<p>Addressables는 빌드 때 주소가 어느 번들에 있고 그 번들이 어떤 번들을 필요로 하는지 적은 카탈로그를 만들고, 요청하면 의존 번들까지 불러오거나 내려받아 에셋을 돌려줍니다. 로드할 때 참조 수를 올리고 Release로 내려서 0이 된 번들을 내리고, 원격 그룹이면 바뀐 번들과 카탈로그만 서버에 올려 앱 업데이트 없이 콘텐츠를 바꿉니다. 대가는 그룹 설계와, Load와 Release의 짝을 맞추는 관리입니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>AssetReference를 쓰면 직접 참조와 무엇이 다른가요?</q>인스펙터에 끌어다 연결하는 건 같지만, 씬 파일에는 에셋의 GUID만 적히고 씬을 열 때 같이 로드되지 않습니다. GUID라서 파일을 옮기거나 이름을 바꿔도 끊기지 않습니다.</span></li>
+<li><span><q>에셋을 Release했는데 메모리가 안 줄어드는 건 왜인가요?</q>해제 단위가 번들이라서, 같은 번들의 에셋 하나라도 아직 쓰고 있으면 번들 전체가 남고 다 쓴 에셋도 같이 남습니다. 그래서 그룹은 같이 쓰고 같이 버리는 것끼리 묶습니다.</span></li>
+<li><span><q>원격 업데이트로 새 기능도 넣을 수 있나요?</q>번들에는 에셋만 들어가고 스크립트는 들어가지 않습니다. 새 스킨이나 밸런스용 에셋은 바꿀 수 있지만, 새 코드가 필요하면 앱을 업데이트해야 합니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="unity-q44" aria-label="44번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">DATA-06</span><span class="pri">필수</span><span class="qtext">IL2CPP와 Mono는 어떻게 다른가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>C#은 IL이라는 중간 언어로 컴파일되는데, Mono는 실행 중에 IL을 기계어로 번역하는 JIT 방식이고, IL2CPP는 빌드할 때 IL을 C++로 바꿔 네이티브 코드로 미리 컴파일하는 AOT 방식입니다.</strong></p>
+<p>Mono는 IL이 든 DLL을 그대로 빌드에 넣고 메서드가 처음 호출될 때 번역합니다. 빌드가 빠르고 실행 중 코드 생성도 되지만, 첫 호출 번역 비용이 있고 DLL이 그대로 들어가 디컴파일하면 코드가 거의 다 보입니다. 에디터 플레이 모드는 항상 Mono입니다.</p>
+<p>IL2CPP는 C++ 컴파일러의 최적화를 거치고 실행 중 번역이 없어 대체로 빠르고 역공학도 어렵습니다. iOS는 앱이 실행 중에 새 기계어를 만들어 실행하는 걸 금지해서 IL2CPP가 필수이고, 콘솔과 WebGL도 그렇습니다. 대가는 느린 빌드와, 실행 중에 코드를 만드는 <code>Reflection.Emit</code> 같은 기능을 쓸 수 없다는 점입니다. 그래서 개발 중에는 Mono로 빠르게 반복하고 출시 빌드는 IL2CPP로 하는 경우가 많습니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>에디터에서는 되는데 IL2CPP 빌드에서만 타입을 못 찾고 null이 나옵니다. 왜인가요?</q>코드 스트리핑 때문일 가능성이 큽니다. IL2CPP 빌드는 크기를 줄이려 쓰이지 않는 타입과 메서드를 지우는데, 코드를 따라가며 쓰임을 판단하므로 문자열로만 타입을 찾는 리플렉션은 따라가지 못합니다. 그런 타입에는 <code>[Preserve]</code>를 붙이거나 link.xml에 적어 보존합니다.</span></li>
+<li><span><q>Android에서도 IL2CPP를 써야 하나요?</q>유니티의 Mono는 Android에서 32비트만 지원하는데 Google Play가 64비트 빌드를 요구하므로, 스토어에 올리려면 사실상 IL2CPP를 씁니다.</span></li>
+<li><span><q>IL2CPP면 코드 유출을 막을 수 있나요?</q>어렵게 만들 뿐 막지는 못합니다. 닷넷 DLL이 남지 않고 기계어만 남지만, 리플렉션을 위한 메타데이터 파일이 함께 들어가서 타입과 메서드 이름 같은 구조를 복원하는 도구가 있습니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section class="grp">
+<div class="grp-head"><h3>상황형 문제 해결</h3><span class="cnt">6문항</span></div>
+<p class="grp-note">정답보다 접근 순서를 봅니다. 한 증상에 여러 영역이 얽혀 있으니, 측정으로 원인을 좁힌 뒤 개념으로 설명하세요.</p>
+<div class="q">
+<label class="chk"><input type="checkbox" id="unity-q45" aria-label="45번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">SIT-01</span><span class="qtext">게임이 진행될수록 주기적으로 프레임이 뚝뚝 끊깁니다. 무엇을 의심하겠습니까?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>평소엔 부드럽다가 주기적으로 툭 끊긴다는 게 단서입니다. 계산이 무거우면 모든 프레임이 고르게 느려야 하니, 쌓였다가 한꺼번에 처리되는 GC 스파이크를 먼저 의심합니다.</strong></p>
+<p>추측보다 먼저 프로파일러에서 끊기는 프레임을 잡아 GC 수집이 있는지 보고, 평상시 프레임의 GC Alloc 열에서 어느 함수가 매 프레임 할당하는지 찾습니다. Update 안의 new, 문자열 결합, LINQ, 박싱, tag 비교, 배열을 반환하는 물리 API가 흔한 범인입니다.</p>
+<p>찾으면 컬렉션은 필드에 두고 Clear로 재사용하고, 문자열은 값이 바뀔 때만 만들고, NonAlloc 버전 API를 쓰고, 자주 생기는 오브젝트는 풀링합니다. 그리고 게임이 오래 돌수록 끊김이 심해진다면 누수도 같이 봅니다. 유니티의 GC는 매번 힙 전체를 훑어서 살아 있는 객체가 많을수록 오래 걸리므로, 해제하지 않은 이벤트 구독이나 계속 쌓이기만 하는 컬렉션이 끊김을 키웁니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>할당을 완전히 0으로 못 만들면요?</q>Incremental GC로 멈춤을 여러 프레임에 나누고, 로딩 화면이나 씬 전환 직후처럼 끊겨도 티가 안 나는 순간에 <code>GC.Collect</code>를 미리 불러 둡니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="unity-q46" aria-label="46번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">SIT-02</span><span class="qtext">총알을 대량으로 발사하는데 쏠 때마다 살짝 끊깁니다. 원인과 해결은 무엇인가요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>쏠 때마다 총알을 Instantiate하고 맞으면 Destroy하는 구조라면, 생성 비용과 파괴 때 생기는 쓰레기가 원인일 가능성이 큽니다.</strong></p>
+<p>먼저 프로파일러에서 발사 순간 프레임에 Instantiate 시간과 GC Alloc이 튀는지 확인합니다. Instantiate는 컴포넌트를 복제하고 Awake와 OnEnable을 부르고 렌더러와 콜라이더를 등록하는 무거운 작업이고, Destroy는 쓰레기를 남겨 나중에 GC 스파이크로 돌아옵니다.</p>
+<p>해결은 오브젝트 풀링입니다. 로딩 때 총알을 미리 만들어 꺼 두고, 쏠 때 위치를 먼저 정한 뒤 켜고, 사라질 때 끄고 돌려놓습니다. 이때 꺼낸 총알의 수명 타이머와 궤적 같은 상태를 OnEnable에서 되돌려야 하고, 총알이 수천 개 단위라면 각자의 Update 대신 매니저 하나가 이동을 처리해 엔진 호출 횟수도 줄입니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>풀링을 했는데 총알이 엉뚱한 곳에서 궤적을 그리며 나타나면요?</q>위치를 정하기 전에 SetActive(true)를 했거나 지난번 궤적이 남아 있는 경우입니다. 위치를 먼저 정하고 켜고, OnEnable에서 Trail을 비웁니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="unity-q47" aria-label="47번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">SIT-03</span><span class="qtext">같은 적을 수백 마리 스폰하니 드로우콜이 폭증합니다. 어떻게 줄이겠습니까?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>같은 적이면 같은 메시와 머티리얼이라 원래 묶일 수 있어야 하므로, 묶이지 않는 이유부터 찾습니다. Frame Debugger로 각 드로우콜이 왜 앞의 것과 묶이지 못했는지 확인합니다.</strong></p>
+<p>가장 흔한 원인은 피격 색이나 팀 색을 바꾸려고 <code>renderer.material</code>에 접근해서 적마다 머티리얼 복사본이 생긴 경우입니다. 머티리얼 이름 뒤에 Instance가 붙어 있으면 이겁니다. 읽기만 해도 복사되므로 디버그 코드나 트윈 라이브러리도 의심합니다.</p>
+<p>해결은 파이프라인에 따라 다릅니다. 빌트인이면 머티리얼에서 GPU Instancing을 켜고, 적마다 다른 색은 MaterialPropertyBlock과 인스턴스별 속성으로 줍니다. URP라면 SRP Batcher가 같은 셰이더끼리 드로우콜 준비 비용을 줄여 주므로 셰이더가 통일되어 있는지 봅니다. 그다음 화면 밖이나 가려진 적은 컬링으로 빼고, 멀리 있는 적은 LOD로 정점 수를 줄입니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>적의 Animator도 수백 개인데 괜찮나요?</q>Animator는 기본적으로 화면 밖에서도 매 프레임 계산합니다. Culling Mode로 화면 밖 계산을 줄이거나 멈춥니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="unity-q48" aria-label="48번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">SIT-04</span><span class="qtext">유닛 수천 개의 이동과 회피 계산이 메인 스레드를 막아 프레임이 떨어집니다. 어떻게 풀겠습니까?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>먼저 프로파일러로 시간이 계산 자체에 드는지, Update 호출 수에 드는지 나눠 봅니다. 계산량이 문제라면 Job System으로 여러 코어에 나누고 Burst로 코어 하나의 속도를 올립니다.</strong></p>
+<p>유닛마다 Update가 있다면 엔진이 C#으로 넘어오는 비용부터 매니저 하나로 모아 줄입니다. 그래도 계산이 무거우면, 스크립트는 전부 메인 스레드 하나에서 돌기 때문에 코어가 여러 개여도 나머지는 놀고 있습니다. Job System은 위치와 속도를 NativeArray에 담아 잡으로 예약하면 엔진의 워커 스레드들이 범위를 나눠 처리하고, 같은 배열에 동시에 쓰는 실수를 에디터가 바로 에러로 잡아 줍니다. Burst는 이 잡 코드를 SIMD를 쓰는 최적화된 기계어로 바꿉니다.</p>
+<p>대가는 데이터를 배열로 옮기고 결과를 다시 반영하는 코드, 잡 안에서 클래스나 유니티 API를 못 쓰는 제약, 그리고 대상이 적을 땐 나누는 비용이 더 크다는 점입니다. 수천 개 이상이고 각자의 계산이 독립적일 때 맞습니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>코루틴이나 async로 나누면 안 되나요?</q>코루틴은 일을 여러 프레임에 나눠 담을 뿐 메인 스레드에서 돌아 총 계산량과 속도는 그대로이고, async는 주로 입출력을 기다리는 동안 다른 일을 하는 용도입니다. 계산 자체를 여러 코어에서 동시에 하는 건 Job System뿐입니다.</span></li>
+<li><span><q>Task.Run으로 스레드에 넘기면요?</q>다른 스레드에서는 transform 같은 유니티 API를 쓸 수 없고, 같은 데이터를 동시에 고치는 문제를 C# 스레드가 막아 주지 않으며, 엔진이 이미 쓰는 스레드와 코어를 두고 다툽니다. Job System은 이 세 가지를 엔진 차원에서 해결한 장치입니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="unity-q49" aria-label="49번 자신 있음"></label>
+<details>
 <summary><span><span class="qtag">SIT-05</span><span class="qtext">체력바가 매 프레임 갱신되는데 UI 전체가 무거워집니다. 왜일까요?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
 <div class="ans">
 <div class="core">
 <p class="lab">핵심 답변</p>
-<p><strong>체력바 하나가 바뀔 때마다 그게 속한 캔버스 전체가 다시 빌드되고 있을 가능성이 큽니다.</strong></p>
-<p>UGUI는 캔버스 단위로 UI 메시를 묶어 그리는데, 그 안의 요소 하나만 바뀌어도 캔버스가 더티가 돼서 통째로 다시 빌드됩니다. 그래서 매 프레임 바뀌는 체력바가 크고 정적인 UI와 같은 캔버스에 있으면, 프레임마다 그 큰 캔버스 전체를 다시 만드는 셈이라 무거워집니다.</p>
-<p>그래서 자주 바뀌는 체력바나 타이머는 별도 캔버스로 분리해서 그것만 다시 빌드되게 합니다. 여기에 더해, 클릭을 받을 필요 없는 그래픽은 Raycast Target을 꺼서 레이캐스트 비용도 줄입니다.</p>
+<p><strong>체력바가 정적인 UI와 같은 캔버스에 있으면, 체력바 하나가 바뀔 때마다 캔버스 전체가 다시 묶이기 때문일 가능성이 큽니다.</strong></p>
+<p>프로파일러에서 <code>Canvas.BuildBatch</code>와 <code>Canvas.SendWillRenderCanvases</code>가 매 프레임 크게 나오는지 확인합니다. UGUI는 요소 하나만 바뀌어도 그 요소의 메시를 다시 만들고 캔버스 안 모든 요소를 다시 정렬하고 합칩니다. 정적인 HUD 수백 개와 같은 캔버스에 있으면 체력바 때문에 그 수백 개를 매 프레임 다시 묶습니다.</p>
+<p>그래서 체력바처럼 자주 바뀌는 요소를 하위 캔버스로 떼어 그 안만 다시 묶게 하고, 값이 실제로 바뀔 때만 갱신하며, 체력 숫자 텍스트도 보여 주는 값이 달라질 때만 다시 만듭니다. 캐릭터 머리 위 체력바라면 위치 갱신을 LateUpdate에서 하고, 장식 요소의 Raycast Target도 꺼 둡니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>캔버스를 요소마다 다 나누면 더 좋지 않나요?</q>캔버스끼리는 서로 묶이지 않아서, 같은 아틀라스를 써도 캔버스마다 따로 드로우콜이 됩니다. 다시 묶는 비용 대신 드로우콜이 늘어나므로, 바뀌는 빈도가 다른 묶음만 떼어 냅니다.</span></li>
+</ul>
+</div>
+</div>
+</details>
+</div>
+<div class="q">
+<label class="chk"><input type="checkbox" id="unity-q50" aria-label="50번 자신 있음"></label>
+<details>
+<summary><span><span class="qtag">SIT-06</span><span class="qtext">에디터에서는 잘 되던 기능이 iOS 빌드에서만 예외를 냅니다. 무엇부터 보겠습니까?</span></span><svg class="chev" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+<div class="ans">
+<div class="core">
+<p class="lab">핵심 답변</p>
+<p><strong>에디터는 항상 Mono로 돌고 iOS 빌드는 IL2CPP라는 차이부터 봅니다. 기기 로그에서 예외 종류를 확인하고, IL2CPP의 코드 스트리핑과 AOT 제약을 의심합니다.</strong></p>
+<p>타입이나 메서드를 못 찾는 null이나 MissingMethodException이라면 스트리핑입니다. IL2CPP 빌드는 쓰이지 않는 코드를 지우는데, 문자열로만 타입을 찾는 리플렉션이나 직렬화 라이브러리가 쓰는 타입은 쓰이는 것으로 보이지 않아 지워집니다. <code>[Preserve]</code>나 link.xml로 보존합니다.</p>
+<p>NotSupportedException이라면 실행 중 코드 생성입니다. iOS는 실행 중에 새 기계어를 만들 수 없어서 <code>Reflection.Emit</code>을 쓰는 코드는 동작하지 않고, 일부 JSON이나 DI 라이브러리가 내부에서 이걸 써서 AOT 호환 버전이나 설정이 필요합니다. 리플렉션으로 실행 중에 처음 만들어지는 제네릭 조합도 오래된 버전에서는 문제가 됩니다.</p>
+</div>
+<div class="tails">
+<p class="lab">꼬리질문</p>
+<ul>
+<li><span><q>이런 문제를 미리 잡으려면요?</q>개발 중에도 주기적으로 IL2CPP 빌드를 실기기에서 돌려 봅니다. 에디터에서만 테스트하면 Mono에서만 확인한 셈이라, 출시 직전에 몰아서 터집니다.</span></li>
+</ul>
 </div>
 </div>
 </details>

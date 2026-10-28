@@ -476,6 +476,44 @@ button,
 .mermaid .edgeLabel foreignObject {
   overflow: visible;
 }
+.mermaid .edgeLabel {
+  font-size: 14px;
+}
+
+// Mermaid 노드를 노트의 인라인 SVG 그림과 같은 모양으로 — 둥근 모서리, 1.5px 선.
+// 강조는 노드에 클래스를 달아 준다(`A["..."]:::accent`). 색은 SVG 그림과 같은
+// 파랑(핵심·결과) / 코랄(문제) 이고, 점선 muted는 "없음"처럼 비어 있는 것을 뜻한다.
+// mermaid가 넣는 <style>이 #id 선택자라 !important로 덮는다.
+.mermaid {
+  .node :is(rect, polygon, circle, path),
+  .cluster rect {
+    stroke-width: 1.5px !important;
+  }
+  .node rect,
+  .cluster rect {
+    rx: 8px;
+    ry: 8px;
+  }
+  .flowchart-link,
+  .transition {
+    stroke-width: 1.5px !important;
+  }
+  .node.accent :is(rect, polygon, circle, path) {
+    fill: rgba(79, 131, 224, 0.13) !important;
+    stroke: #4f83e0 !important;
+  }
+  .node.warn :is(rect, polygon, circle, path) {
+    fill: rgba(226, 87, 76, 0.12) !important;
+    stroke: #e2574c !important;
+  }
+  .node.muted :is(rect, polygon, circle, path) {
+    fill: transparent !important;
+    stroke-dasharray: 4 3;
+  }
+  .node.muted .nodeLabel {
+    opacity: 0.7;
+  }
+}
 .mermaid .edgeLabel p {
   border-radius: 4px;
   box-shadow:

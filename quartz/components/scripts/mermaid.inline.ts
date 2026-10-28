@@ -182,7 +182,27 @@ const cssVars = [
   "--dark",
   "--darkgray",
   "--codeFont",
+  "--bodyFont",
 ] as const
+
+// 종이색(--light)과 글자색(--darkgray)을 t 비율로 섞은 hex. mermaid는 색을 직접 계산하므로
+// color-mix() 같은 CSS 식이 아니라 실제 색 값을 넘겨야 한다.
+function mixColor(a: string, b: string, t: number): string {
+  const rgb = (c: string) => {
+    c = c.trim()
+    if (c.startsWith("#")) {
+      if (c.length === 4) c = "#" + [...c.slice(1)].map((x) => x + x).join("")
+      return [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16))
+    }
+    return (c.match(/\d+/g) ?? ["0", "0", "0"]).slice(0, 3).map(Number)
+  }
+  const x = rgb(a)
+  const y = rgb(b)
+  return (
+    "#" +
+    x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, "0")).join("")
+  )
+}
 
 let mermaidImport = undefined
 document.addEventListener("nav", async () => {
@@ -220,20 +240,37 @@ document.addEventListener("nav", async () => {
     )
 
     const darkMode = document.documentElement.getAttribute("saved-theme") === "dark"
+    // 노트의 인라인 SVG 그림과 같은 시각 언어로 맞춘다 — 본문 글꼴, 종이색에 글자색을 살짝 섞은
+    // 중립 채움·회색 테두리(갈색 --tertiary를 쓰지 않음). 강조색은 custom.scss의 노드 클래스로 준다.
+    // 다크도 "dark" 테마 대신 같은 base 테마에 다크 색을 넣어 두 모드가 같은 구조를 갖게 한다.
+    const paper = computedStyleMap["--light"]
+    const ink = computedStyleMap["--darkgray"]
     mermaid.initialize({
       startOnLoad: false,
       securityLevel: "loose",
-      theme: darkMode ? "dark" : "base",
+      theme: "base",
       themeVariables: {
-        fontFamily: computedStyleMap["--codeFont"],
-        primaryColor: computedStyleMap["--light"],
-        primaryTextColor: computedStyleMap["--darkgray"],
-        primaryBorderColor: computedStyleMap["--tertiary"],
-        lineColor: computedStyleMap["--darkgray"],
-        secondaryColor: computedStyleMap["--secondary"],
-        tertiaryColor: computedStyleMap["--tertiary"],
-        clusterBkg: computedStyleMap["--light"],
-        edgeLabelBackground: computedStyleMap["--light"],
+        darkMode,
+        background: paper,
+        fontFamily: computedStyleMap["--bodyFont"],
+        fontSize: "15px",
+        primaryColor: mixColor(paper, ink, 0.06),
+        primaryTextColor: ink,
+        primaryBorderColor: mixColor(paper, ink, 0.38),
+        secondaryColor: mixColor(paper, ink, 0.06),
+        tertiaryColor: paper,
+        lineColor: mixColor(paper, ink, 0.55),
+        textColor: ink,
+        clusterBkg: mixColor(paper, ink, 0.03),
+        clusterBorder: mixColor(paper, ink, 0.3),
+        edgeLabelBackground: paper,
+        labelBackgroundColor: paper,
+        stateBkg: mixColor(paper, ink, 0.06),
+        stateBorder: mixColor(paper, ink, 0.38),
+        transitionColor: mixColor(paper, ink, 0.55),
+        transitionLabelColor: ink,
+        specialStateColor: mixColor(paper, ink, 0.6),
+        innerEndBackground: mixColor(paper, ink, 0.6),
       },
     })
 

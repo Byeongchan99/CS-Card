@@ -1,7 +1,7 @@
 ---
 title: while true가 있는 코루틴이 화면을 멈추지 않는 이유와 지역 변수와 실행 위치가 보존되는 곳
 tags: [디자인 패턴, 코루틴, 컴파일러, CSharp]
-related: [Setup이 끝난 뒤에도 람다가 지역 변수를 계속 쓸 수 있는 이유, IEnumerable을 구현하지 않은 타입에서도 foreach가 컴파일되는 이유]
+related: ["Setup이 끝난 뒤에도 람다가 지역 변수를 계속 쓸 수 있는 이유", "IEnumerable을 구현하지 않은 타입에서도 foreach가 컴파일되는 이유", "코루틴의-MoveNext가-매번-첫-줄부터-실행되는데도-yield-다음-지점에서-재개하는-원리", "Csharp-event로-옵저버를-구현하면-세-문제가-어떻게-되는가", "MemberwiseClone으로-Clone을-구현하면-참조형-필드에서-무슨-일이-일어나는가"]
 parent: 업데이트 메서드로 옮길 때 위치와 방향을 지역 변수가 아니라 필드에 둬야 하는 이유
 date: 2026-10-20
 result: 맞음
